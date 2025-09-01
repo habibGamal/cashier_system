@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans:
+    Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --color-dark-50: #373737;
+  --color-dark-100: #353535;
+  --color-dark-200: #323232;
+  --color-dark-300: #2d2d2d;
+  --color-dark-400: #2c2c2c;
+  --color-dark-500: #272727;
+  --color-dark-600: #252525;
+  --color-dark-700: #222;
+  --color-dark-800: #1e1e1e;
+  --color-dark-900: #121212;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility isolate-0 {
+  @apply border border-gray-300  border-solid rounded-xl p-4;
+}
+
+@utility isolate {
+  @apply p-4 bg-white  border-2 border-gray-300  shadow-xl rounded-xl;
+  isolation: unset !important;
+}
+
+@utility isolate-2 {
+  @apply p-4 bg-white  border-2 border-gray-200   rounded-xl;
+}
+
+@utility isolate-3 {
+  @apply p-4 bg-white  border-2 border-gray-200   rounded-xl;
+}
+
+.ltr {
+    direction: ltr;
+}

@@ -1,0 +1,87 @@
+{
+  "user": {
+    "email": "admin@example.com",
+    "password": "password",
+    "name": "Admin User"
+  },
+  "cashier": {
+    "email": "cashier@example.com",
+    "password": "password",
+    "name": "Cashier User"
+  },
+  "orders": {
+    "dineIn": {
+      "type": "dine_in",
+      "table_number": "5",
+      "items": [
+        {
+          "product_name": "برجر كلاسيك",
+          "quantity": 2,
+          "notes": "بدون بصل"
+        }
+      ]
+    },
+    "delivery": {
+      "type": "delivery",
+      "customer": {
+        "name": "أحمد محمد",
+        "phone": "01234567890",
+        "address": "شارع التحرير، القاهرة"
+      },
+      "items": [
+        {
+          "product_name": "بيتزا مارجريتا",
+          "quantity": 1
+        }
+      ]
+    },
+    "takeaway": {
+      "type": "takeaway",
+      "items": [
+        {
+          "product_name": "شاورما فراخ",
+          "quantity": 3
+        }
+      ]
+    }
+  },
+  "webOrders": {
+    "delivery": {
+      "id": 1,
+      "order_number": "WEB001",
+      "type": "web_delivery",
+      "status": "pending",
+      "customer": {
+        "name": "محمد أحمد",
+        "phone": "01234567890",
+        "address": "شارع النيل، الجيزة"
+      },
+      "items": [
+        {
+          "product_name": "برجر لحم",
+          "quantity": 2,
+          "price": 150
+        }
+      ],
+      "total": 300
+    },
+    "takeaway": {
+      "id": 2,
+      "order_number": "WEB002",
+      "type": "web_takeaway",
+      "status": "pending",
+      "customer": {
+        "name": "فاطمة علي",
+        "phone": "01987654321"
+      },
+      "items": [
+        {
+          "product_name": "ساندويتش فلافل",
+          "quantity": 4,
+          "price": 25
+        }
+      ],
+      "total": 100
+    }
+  }
+}

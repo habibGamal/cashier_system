@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "message": "تم تحديد الطلب كخارج للتوصيل",
+  "order": {
+    "id": 1,
+    "order_number": "WEB001",
+    "type": "web_delivery",
+    "status": "out_for_delivery",
+    "out_for_delivery_at": "2025-08-13T13:45:00.000000Z"
+  }
+}
