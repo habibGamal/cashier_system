@@ -20,10 +20,8 @@ class OrderRepository implements OrderRepositoryInterface
             'type' => $orderDTO->type,
             'shift_id' => $orderDTO->shiftId,
             'user_id' => $orderDTO->userId,
-            'dine_table_number' => $orderDTO->tableNumber,
             'customer_id' => $orderDTO->customerId,
             'driver_id' => $orderDTO->driverId,
-            'kitchen_notes' => $orderDTO->kitchenNotes,
             'order_notes' => $orderDTO->orderNotes,
             'order_number' => $orderNumber,
             'status' => OrderStatus::PROCESSING,
@@ -51,7 +49,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function getShiftOrders(int $shiftId): Collection
     {
         return Order::where('shift_id', $shiftId)
-            ->with(['customer', 'driver', 'table', 'items.product'])
+            ->with(['customer', 'driver', 'items.product'])
             ->orderBy('created_at', 'asc')
             ->get();
     }
@@ -60,7 +58,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         return Order::where('shift_id', $shiftId)
             ->where('status', OrderStatus::PROCESSING)
-            ->with(['customer', 'driver', 'table', 'items.product'])
+            ->with(['customer', 'driver', 'items.product'])
             ->get();
     }
 

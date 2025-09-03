@@ -243,13 +243,10 @@ class ShiftsReportService
             ->get();
 
         $stats = [
-            'dineIn' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'delivery' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'takeaway' => ['count' => 0, 'value' => 0, 'profit' => 0],
-            'talabat' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'webDelivery' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'webTakeaway' => ['count' => 0, 'value' => 0, 'profit' => 0],
-            'companies' => ['count' => 0, 'value' => 0, 'profit' => 0],
         ];
 
         foreach ($completedOrders as $order) {
@@ -270,13 +267,10 @@ class ShiftsReportService
     private function getStatsKey(OrderType $orderType): ?string
     {
         return match ($orderType) {
-            OrderType::DINE_IN => 'dineIn',
             OrderType::DELIVERY => 'delivery',
             OrderType::TAKEAWAY => 'takeaway',
-            OrderType::TALABAT => 'talabat',
             OrderType::WEB_DELIVERY => 'webDelivery',
             OrderType::WEB_TAKEAWAY => 'webTakeaway',
-            OrderType::COMPANIES => 'companies',
             default => null,
         };
     }

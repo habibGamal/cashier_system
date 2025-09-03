@@ -23,19 +23,20 @@ class OrderCreated implements ShouldBroadcast
     {
         return [
             new PrivateChannel('shift.' . $this->order->shift_id),
-            new PrivateChannel('kitchen'),
         ];
     }
 
     public function broadcastWith(): array
     {
         return [
-            'order' => [
+            'data' => [
                 'id' => $this->order->id,
                 'order_number' => $this->order->order_number,
-                'type' => $this->order->type->label(),
-                'table_number' => $this->order->dine_table_number,
-                'created_at' => $this->order->created_at->format('H:i:s'),
+                'type' => $this->order->type->value,
+                'status' => $this->order->status->value,
+                'total' => $this->order->total,
+                'customer_id' => $this->order->customer_id,
+                'created_at' => $this->order->created_at->toISOString(),
             ],
         ];
     }

@@ -40,7 +40,6 @@ class InventoryDailyAggregationService
     {
         $today = Carbon::today();
         $dateString = $today->toDateString();
-
         return DB::transaction(function () use ($dateString, $today) {
             try {
                 // Check if day is already opened

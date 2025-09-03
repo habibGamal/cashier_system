@@ -15,7 +15,6 @@ use App\Models\Payment;
 use App\Models\OrderItem;
 use App\Models\Expense;
 use App\Models\ExpenceType;
-use App\Models\TableType;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
@@ -58,12 +57,6 @@ class OrderController extends Controller
 
         $orders = $this->orderService->getShiftOrders($currentShift->id);
 
-        // Get previous partial paid orders for companies
-        $previousPartialPaidOrders = Order::with(['customer', 'driver', 'items.product', 'payments'])
-            ->where('payment_status', PaymentStatus::PARTIAL_PAID)
-            ->where('type', OrderType::COMPANIES)
-            ->get();
-
         // Get current shift expenses
         $expenses = Expense::with('expenceType')
             ->where('shift_id', $currentShift->id)
@@ -75,7 +68,6 @@ class OrderController extends Controller
 
         return Inertia::render('Orders/Index', [
             'orders' => $orders,
-            'previousPartialPaidOrders' => $previousPartialPaidOrders,
             'currentShift' => $currentShift,
             'expenses' => $expenses,
             'expenseTypes' => $expenseTypes,
@@ -215,7 +207,7 @@ class OrderController extends Controller
             $completedOrder = $this->orderService->completeOrder($order->id, $paymentsData, $shouldPrint);
 
             // Log order completion
-            $this->loggingService->logOrderCompletion($order->id, $paymentsData, $completedOrder->total);
+            $this->loggingService->logOrderCompletion($order->id, $paymentsData, (float) $completedOrder->total);
 
             return redirect()->to(route('orders.index') .'#' . $order->type->value)
                 ->with('success', 'تم إنهاء الطلب بنجاح');
@@ -540,15 +532,13 @@ class OrderController extends Controller
     public function updateOrderType(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'type' => 'required|in:dine_in,takeaway,delivery,companies,talabat',
-            'table_number' => 'nullable|string|max:50',
+            'type' => 'required|in:takeaway,delivery,web_delivery,web_takeaway',
         ]);
 
         try {
             $this->orderService->changeOrderType(
                 $order->id,
-                $validated['type'],
-                $validated['table_number'] ?? null
+                $validated['type']
             );
 
             return back()->with('success', 'تم تغيير نوع الطلب بنجاح');
@@ -567,7 +557,7 @@ class OrderController extends Controller
         ]);
 
         try {
-            $this->orderService->updateNotes($order->id, null, $validated['order_notes']);
+            $this->orderService->updateNotes($order->id, $validated['order_notes']);
 
             return back()->with('success', 'تم حفظ ملاحظات الطلب بنجاح');
         } catch (Exception $e) {
@@ -656,33 +646,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Print kitchen order with multiple printers
-     */
-    public function printInKitchen(Request $request)
-    {
-        $validated = $request->validate([
-            'orderId' => 'required|integer|exists:orders,id',
-            'items' => 'nullable|array',
-            'items.*.product_id' => 'required|integer|exists:products,id',
-            'items.*.name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:0.001',
-            'items.*.notes' => 'nullable|string|max:500',
-        ]);
-
-        try {
-            // Use the new Browsershot implementation
-            $this->printService->printKitchenReceipt(
-                $validated['orderId'],
-                $validated['items'] ?? []
-            );
-
-            return back()->with('success', 'تم إرسال الطلب للمطبخ بنجاح');
-        } catch (Exception $e) {
-            return back()->withErrors(['error' => 'حدث خطأ أثناء طباعة طلب المطبخ: ' . $e->getMessage()]);
-        }
-    }
-
-    /**
      * Open the cashier drawer
      */
     public function openCashierDrawer()
@@ -704,7 +667,6 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required|in:' . implode(',', array_column(OrderType::cases(), 'value')),
-            'table_number' => 'nullable|string|max:50',
         ]);
 
         try {
@@ -716,11 +678,10 @@ class OrderController extends Controller
 
             // Map order type to enum
             $orderType = match ($validated['type']) {
-                'dine_in' => OrderType::DINE_IN,
                 'takeaway' => OrderType::TAKEAWAY,
                 'delivery' => OrderType::DELIVERY,
-                'companies' => OrderType::COMPANIES,
-                'talabat' => OrderType::TALABAT,
+                'web_delivery' => OrderType::WEB_DELIVERY,
+                'web_takeaway' => OrderType::WEB_TAKEAWAY,
                 default => throw new InvalidArgumentException('Invalid order type'),
             };
 
@@ -728,7 +689,6 @@ class OrderController extends Controller
                 type: $orderType,
                 shiftId: $currentShift->id,
                 userId: auth()->id(),
-                tableNumber: $validated['table_number'] ?? null,
             );
 
             $order = $this->orderService->createOrder($createOrderDTO);
@@ -736,40 +696,13 @@ class OrderController extends Controller
             // Log order creation
             $this->loggingService->logOrderCreation(
                 $order->id,
-                $validated['type'],
-                $validated['table_number'] ?? null
+                $validated['type']
             );
 
             return redirect()->route('orders.manage', $order);
         } catch (Exception $e) {
             logger()->error('Error creating order: ' . $e->getMessage());
             return back()->withErrors(['error' => 'حدث خطأ أثناء إنشاء الطلب: ' . $e->getMessage()]);
-        }
-    }
-
-    /**
-     * Get table types
-     */
-    public function getTableTypes()
-    {
-        try {
-            $tableTypes = TableType::orderBy('name')->get();
-
-            // If no table types exist, return default option
-            if ($tableTypes->isEmpty()) {
-                $tableTypes = collect([
-                    (object) [
-                        'id' => null,
-                        'name' => 'صالة',
-                        'created_at' => null,
-                        'updated_at' => null,
-                    ]
-                ]);
-            }
-
-            return response()->json($tableTypes);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'حدث خطأ أثناء جلب أنواع الطاولات'], 500);
         }
     }
 

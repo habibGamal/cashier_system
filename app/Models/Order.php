@@ -33,8 +33,6 @@ class Order extends Model
         'profit',
         'web_pos_diff',
         'payment_status',
-        'dine_table_number',
-        'kitchen_notes',
         'order_notes',
         'order_number',
     ];
@@ -58,11 +56,6 @@ class Order extends Model
 
     public function getServiceRateAttribute(): float
     {
-        if ($this->type === OrderType::DINE_IN) {
-            $settingsService = app(SettingsService::class);
-            return (float) setting(SettingKey::DINE_IN_SERVICE_CHARGE);
-        }
-
         return 0.0;
     }
 
@@ -94,11 +87,6 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
-    }
-
-    public function table(): HasOne
-    {
-        return $this->hasOne(DineTable::class);
     }
 
     // Computed attributes

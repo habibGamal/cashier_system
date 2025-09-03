@@ -53,7 +53,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/quick-driver', [OrderController::class, 'quickDriver'])->name('quickDriver')->middleware(['shift']);
     Route::post('/fetch-customer-info', [OrderController::class, 'fetchCustomerInfo'])->name('fetchCustomerInfo')->middleware(['shift']);
     Route::post('/fetch-driver-info', [OrderController::class, 'fetchDriverInfo'])->name('fetchDriverInfo')->middleware(['shift']);
-    Route::get('/table-types', [OrderController::class, 'getTableTypes'])->name('tableTypes')->middleware(['shift']);
 
     // Web Order Management Routes
     Route::prefix('web-orders')->name('web-orders.')->group(function () {
@@ -69,7 +68,6 @@ Route::middleware('auth')->group(function () {
     // Printer Management Routes
     Route::post('/orders/print/{order}', [OrderController::class, 'printReceipt'])->name('print');
     Route::post('/printers-of-products', [OrderController::class, 'getPrintersOfProducts'])->name('printers.products');
-    Route::post('/print-in-kitchen', [OrderController::class, 'printInKitchen'])->name('print.kitchen');
     Route::post('/open-cashier-drawer', [OrderController::class, 'openCashierDrawer'])->name('cashier.openDrawer');
 
     // Admin Printer Management Routes

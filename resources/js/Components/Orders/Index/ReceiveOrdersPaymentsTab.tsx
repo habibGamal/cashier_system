@@ -1,5 +1,5 @@
 import React from 'react';
-import { DineInTab } from './DineInTab';
+import { DisplayTab } from './DisplayTab';
 import type { Order } from '@/types';
 
 interface ReceiveOrdersPaymentsTabProps {
@@ -7,5 +7,5 @@ interface ReceiveOrdersPaymentsTabProps {
 }
 
 export const ReceiveOrdersPaymentsTab: React.FC<ReceiveOrdersPaymentsTabProps> = ({ orders }) => {
-    return <DineInTab orders={orders} />;
+    return <DisplayTab orders={orders} />;
 };

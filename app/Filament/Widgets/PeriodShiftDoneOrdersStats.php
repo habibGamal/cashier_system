@@ -35,13 +35,10 @@ class PeriodShiftDoneOrdersStats extends BaseWidget
 
         // Map the new service format to the old format expected by widgets
         $statsMapping = [
-            'dine_in' => ['key' => 'dineIn', 'label' => 'الاوردرات الصالة', 'icon' => 'heroicon-m-home', 'color' => 'success'],
             'delivery' => ['key' => 'delivery', 'label' => 'الاوردرات ديليفري', 'icon' => 'heroicon-m-truck', 'color' => 'info'],
             'takeaway' => ['key' => 'takeaway', 'label' => 'الاوردرات تيك اواي', 'icon' => 'heroicon-m-shopping-bag', 'color' => 'warning'],
-            'talabat' => ['key' => 'talabat', 'label' => 'الاوردرات طلبات', 'icon' => 'heroicon-m-device-phone-mobile', 'color' => 'purple'],
             'web_delivery' => ['key' => 'webDelivery', 'label' => 'الاوردرات اونلاين ديليفري', 'icon' => 'heroicon-m-globe-alt', 'color' => 'danger'],
             'web_takeaway' => ['key' => 'webTakeaway', 'label' => 'الاوردرات اونلاين تيك اواي', 'icon' => 'heroicon-m-computer-desktop', 'color' => 'info'],
-            // 'companies' => ['key' => 'companies', 'label' => 'اوردرات الشركات', 'icon' => 'heroicon-m-building-office', 'color' => 'gray'],
         ];
 
         foreach ($statsMapping as $enumValue => $config) {

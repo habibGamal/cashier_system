@@ -12,7 +12,6 @@ use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\Printer;
 use App\Models\Driver;
-use App\Models\DineTable;
 use App\Models\Region;
 use App\Models\ExpenceType;
 use App\Models\Setting;
@@ -188,7 +187,6 @@ class MigrateOldDataCommand extends Command
             'shifts',
             'users',
             'settings',
-            'dine_tables',
             'drivers',
             'product_components',
             'products',
@@ -574,7 +572,7 @@ class MigrateOldDataCommand extends Command
                     'user_id' => $user->id,
                     'shift_id' => $oldOrder->shift_id ?? 1, // Default to first shift
                     'status' => $oldOrder->status ?? 'pending',
-                    'type' => $oldOrder->type ?? 'dine_in',
+                    'type' => $oldOrder->type ?? 'takeaway',
                     'sub_total' => $oldOrder->sub_total ?? 0,
                     'tax' => $oldOrder->tax ?? 0,
                     'service' => $oldOrder->service ?? 0,
@@ -583,8 +581,6 @@ class MigrateOldDataCommand extends Command
                     'total' => $oldOrder->total ?? 0,
                     'profit' => $oldOrder->profit ?? 0,
                     'payment_status' => $oldOrder->payment_status ?? 'unpaid',
-                    'dine_table_number' => $oldOrder->dine_table_number,
-                    'kitchen_notes' => $oldOrder->kitchen_notes,
                     'order_notes' => $oldOrder->order_notes,
                     'order_number' => $orderNumber,
                     'created_at' => Carbon::parse($oldOrder->created_at),

@@ -316,7 +316,6 @@ class ShiftLogsReport extends Page implements HasForms
             'expense_id' => 'رقم المصروف',
             'expense_type' => 'نوع المصروف',
             'order_type' => 'نوع الطلب',
-            'table_number' => 'رقم الطاولة',
             'customer_name' => 'اسم العميل',
             'customer_phone' => 'هاتف العميل',
             'customer_address' => 'عنوان العميل',

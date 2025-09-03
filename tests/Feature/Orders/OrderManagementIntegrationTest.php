@@ -52,8 +52,7 @@ describe('Order Management Integration', function () {
             expect($order)->toBeInstanceOf(Order::class)
                 ->and($order->status)->toBe(OrderStatus::PROCESSING)
                 ->and($order->payment_status)->toBe(PaymentStatus::PENDING)
-                ->and($order->type)->toBe(OrderType::DINE_IN)
-                ->and($order->dine_table_number)->toBe('T001');
+                ->and($order->type)->toBe(OrderType::TAKEAWAY);
 
             Event::assertDispatched(OrderCreated::class);
 
@@ -177,7 +176,7 @@ describe('Order Management Integration', function () {
                 'Customer allergic to onions'
             );
 
-            expect($order->kitchen_notes)->toBe('No onions')
+            expect($order->order_notes)->toBe('No onions')
                 ->and($order->order_notes)->toBe('Customer allergic to onions');
         });
 

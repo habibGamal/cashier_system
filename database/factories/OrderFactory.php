@@ -22,7 +22,7 @@ class OrderFactory extends Factory
             'user_id' => User::factory(),
             'shift_id' => Shift::factory(),
             'status' => OrderStatus::PROCESSING->value,
-            'type' => OrderType::DINE_IN->value,
+            'type' => OrderType::TAKEAWAY->value,
             'sub_total' => $this->faker->randomFloat(2, 10, 200),
             'tax' => $this->faker->randomFloat(2, 0, 20),
             'service' => $this->faker->randomFloat(2, 0, 20),
@@ -31,8 +31,6 @@ class OrderFactory extends Factory
             'total' => $this->faker->randomFloat(2, 10, 300),
             'profit' => $this->faker->randomFloat(2, 1, 100),
             'payment_status' => PaymentStatus::PENDING->value,
-            'dine_table_number' => $this->faker->optional()->randomNumber(),
-            'kitchen_notes' => $this->faker->optional()->sentence(),
             'order_notes' => $this->faker->optional()->sentence(),
             'order_number' => $this->faker->unique()->randomNumber(),
         ];

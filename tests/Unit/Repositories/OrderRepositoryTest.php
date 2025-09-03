@@ -21,19 +21,17 @@ describe('OrderRepository', function () {
             $shift = \App\Models\Shift::factory()->create();
 
             $createOrderDTO = new CreateOrderDTO(
-                type: OrderType::DINE_IN,
+                type: OrderType::TAKEAWAY,
                 shiftId: $shift->id,
-                userId: $user->id,
-                tableNumber: 'T001'
+                userId: $user->id
             );
 
             $order = $this->repository->create($createOrderDTO);
 
             expect($order)->toBeInstanceOf(Order::class)
-                ->and($order->type)->toBe(OrderType::DINE_IN)
+                ->and($order->type)->toBe(OrderType::TAKEAWAY)
                 ->and($order->shift_id)->toBe($shift->id)
                 ->and($order->user_id)->toBe($user->id)
-                ->and($order->dine_table_number)->toBe('T001')
                 ->and($order->status)->toBe(OrderStatus::PROCESSING)
                 ->and($order->payment_status)->toBe(PaymentStatus::PENDING);
         });

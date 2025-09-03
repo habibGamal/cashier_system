@@ -95,18 +95,6 @@ class CurrentShiftMoneyInfoStats extends BaseWidget
                 ])
                 ->color('info'),
 
-            Stat::make('النقود المدفوعة فيزا طلبات', number_format($stats['talabatCardPayments'], 2) . ' جنيه')
-                ->description('المدفوعات بكارت طلبات')
-                ->descriptionIcon('heroicon-m-device-phone-mobile')
-                ->extraAttributes([
-                    'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{payment_method:'talabat_card'}} )
-                        document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    JS
-                ])
-                ->color('warning'),
-
             Stat::make('متوسط قيمة الاوردر', number_format($stats['avgReceiptValue'], 2) . ' جنيه')
                 ->description('متوسط قيمة الطلب الواحد')
                 ->descriptionIcon('heroicon-m-calculator')

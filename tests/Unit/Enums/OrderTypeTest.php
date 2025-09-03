@@ -4,40 +4,37 @@ use App\Enums\OrderType;
 
 describe('OrderType Enum', function () {
     it('has correct values', function () {
-        expect(OrderType::DINE_IN->value)->toBe('dine_in')
-            ->and(OrderType::TAKEAWAY->value)->toBe('takeaway')
+        expect(OrderType::TAKEAWAY->value)->toBe('takeaway')
             ->and(OrderType::DELIVERY->value)->toBe('delivery')
-            ->and(OrderType::COMPANIES->value)->toBe('companies')
-            ->and(OrderType::TALABAT->value)->toBe('talabat');
+            ->and(OrderType::WEB_DELIVERY->value)->toBe('web_delivery')
+            ->and(OrderType::WEB_TAKEAWAY->value)->toBe('web_takeaway');
     });
 
     it('returns correct labels', function () {
-        expect(OrderType::DINE_IN->label())->toBe('صالة')
-            ->and(OrderType::TAKEAWAY->label())->toBe('تيك أواي')
+        expect(OrderType::TAKEAWAY->label())->toBe('تيك أواي')
             ->and(OrderType::DELIVERY->label())->toBe('دليفري')
-            ->and(OrderType::COMPANIES->label())->toBe('شركات')
-            ->and(OrderType::TALABAT->label())->toBe('طلبات');
+            ->and(OrderType::WEB_DELIVERY->label())->toBe('اونلاين دليفري')
+            ->and(OrderType::WEB_TAKEAWAY->label())->toBe('اونلاين تيك أواي');
     });
 
     it('correctly identifies types that require table', function () {
-        expect(OrderType::DINE_IN->requiresTable())->toBeTrue()
-            ->and(OrderType::TAKEAWAY->requiresTable())->toBeFalse()
+        expect(OrderType::TAKEAWAY->requiresTable())->toBeFalse()
             ->and(OrderType::DELIVERY->requiresTable())->toBeFalse()
-            ->and(OrderType::COMPANIES->requiresTable())->toBeFalse()
-            ->and(OrderType::TALABAT->requiresTable())->toBeFalse();
+            ->and(OrderType::WEB_DELIVERY->requiresTable())->toBeFalse()
+            ->and(OrderType::WEB_TAKEAWAY->requiresTable())->toBeFalse();
     });
 
     it('correctly identifies types with delivery fee', function () {
         expect(OrderType::DELIVERY->hasDeliveryFee())->toBeTrue()
-            ->and(OrderType::DINE_IN->hasDeliveryFee())->toBeFalse()
+            ->and(OrderType::WEB_DELIVERY->hasDeliveryFee())->toBeTrue()
             ->and(OrderType::TAKEAWAY->hasDeliveryFee())->toBeFalse()
-            ->and(OrderType::COMPANIES->hasDeliveryFee())->toBeFalse()
-            ->and(OrderType::TALABAT->hasDeliveryFee())->toBeFalse();
+            ->and(OrderType::WEB_TAKEAWAY->hasDeliveryFee())->toBeFalse();
     });
 
     it('can be created from string value', function () {
-        expect(OrderType::from('dine_in'))->toBe(OrderType::DINE_IN)
-            ->and(OrderType::from('takeaway'))->toBe(OrderType::TAKEAWAY)
-            ->and(OrderType::from('delivery'))->toBe(OrderType::DELIVERY);
+        expect(OrderType::from('takeaway'))->toBe(OrderType::TAKEAWAY)
+            ->and(OrderType::from('delivery'))->toBe(OrderType::DELIVERY)
+            ->and(OrderType::from('web_delivery'))->toBe(OrderType::WEB_DELIVERY)
+            ->and(OrderType::from('web_takeaway'))->toBe(OrderType::WEB_TAKEAWAY);
     });
 });

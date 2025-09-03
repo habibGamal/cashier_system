@@ -213,8 +213,7 @@ class ChannelPerformanceReportService
                 DB::raw('COALESCE(SUM(order_items.total - (order_items.cost * order_items.quantity)), 0) as gross_profit'),
                 // Calculate estimated operational costs (could be enhanced with actual data)
                 DB::raw('CASE
-                    WHEN orders.type IN ("delivery", "web_delivery", "talabat") THEN COALESCE(SUM(order_items.total), 0) * 0.15
-                    WHEN orders.type IN ("dine_in") THEN COALESCE(SUM(order_items.total), 0) * 0.25
+                    WHEN orders.type IN ("delivery", "web_delivery") THEN COALESCE(SUM(order_items.total), 0) * 0.15
                     ELSE COALESCE(SUM(order_items.total), 0) * 0.10
                 END as estimated_operational_cost'),
                 DB::raw('COALESCE(AVG(order_items.total), 0) as avg_order_value'),

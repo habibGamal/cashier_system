@@ -12,11 +12,8 @@ export default function ReceiptTemplate({
 }) {
     const getOrderTypeString = (type: string) => {
         const typeMap = {
-            dine_in: "صالة",
             takeaway: "تيك أواي",
             delivery: "دليفري",
-            companies: "شركات",
-            talabat: "طلبات",
             web_delivery: "اونلاين دليفري",
             web_takeaway: "اونلاين تيك أواي",
         };
@@ -43,9 +40,6 @@ export default function ReceiptTemplate({
                 {new Date().toLocaleString("ar-EG", { hour12: true })}
             </p>
             <p>نوع الطلب : {getOrderTypeString(order.type)}</p>
-            {order.type === "dine_in" && (
-                <p>طاولة رقم {order.dine_table_number}</p>
-            )}
             {["delivery", "web_delivery", "web_takeaway"].includes(
                 order.type
             ) && (

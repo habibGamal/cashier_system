@@ -14,24 +14,13 @@ class OrderCreationService
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderItemRepositoryInterface $orderItemRepository,
-        private readonly TableManagementService $tableManagementService,
         private readonly OrderCalculationService $orderCalculationService,
     ) {}
 
     public function create(CreateOrderDTO $createOrderDTO): Order
     {
-        // Check table availability if required
-        if ($createOrderDTO->type->requiresTable()) {
-            $this->tableManagementService->validateTableAvailability($createOrderDTO->tableNumber);
-        }
-
         // Create order
         $order = $this->orderRepository->create($createOrderDTO);
-
-        // Reserve table if required
-        if ($createOrderDTO->type->requiresTable()) {
-            $this->tableManagementService->reserveTable($createOrderDTO->tableNumber, $order->id);
-        }
 
         // Fire event
         OrderCreated::dispatch($order);

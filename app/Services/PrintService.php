@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Enums\OrderType;
 use App\Models\Order;
 use App\Enums\SettingKey;
-use App\Jobs\PrintKitchenOrder;
 use App\Jobs\PrintOrderReceipt;
 use Illuminate\Support\Facades\Storage;
 use Mike42\Escpos\EscposImage;
@@ -52,11 +51,12 @@ class PrintService
     }
 
     /**
-     * Print order receipt
+     * Print kitchen receipt - Disabled (kitchen functionality removed)
      */
     public function printKitchenReceipt($orderId, $items): void
     {
-        $this->printKitchenViaBrowsershotQueued($orderId, $items);
+        // Kitchen printing functionality has been removed
+        Log::info("Kitchen printing is disabled for order {$orderId}");
     }
 
     /**
@@ -85,70 +85,7 @@ class PrintService
     }
 
     /**
-     * Print kitchen order via Browsershot (dispatched to queue)
-     */
-    private function printKitchenViaBrowsershotQueued($orderId, $items): void
-    {
-        try {
-            Log::info("Starting kitchen printing via queue for order {$orderId}");
-
-            // Load order with relationships
-            $order = Order::with(['user', 'customer', 'driver', 'table'])->findOrFail($orderId);
-
-            // Validate and prepare items data
-            $preparedItems = $this->prepareKitchenItems($items);
-
-            if (empty($preparedItems)) {
-                throw new Exception('لا توجد منتجات للطباعة');
-            }
-
-            // Get product IDs from items to find their printers
-            $productIds = collect($preparedItems)->pluck('product_id')->unique()->values()->toArray();
-
-            // Get products with their printers
-            $products = Product::with('printers:id')
-                ->whereIn('id', $productIds)
-                ->get(['id']);
-
-            // Map items to printers
-            $itemsByPrinterMap = [];
-
-            foreach ($preparedItems as $item) {
-                $product = $products->firstWhere('id', $item['product_id']);
-
-                if ($product && $product->printers->isNotEmpty()) {
-                    foreach ($product->printers as $printer) {
-                        if (!isset($itemsByPrinterMap[$printer->id])) {
-                            $itemsByPrinterMap[$printer->id] = [];
-                        }
-
-                        // Add item to this printer's list
-                        $itemsByPrinterMap[$printer->id][] = $item;
-                    }
-                }
-            }
-
-            // Dispatch print jobs to queue for each printer
-            foreach ($itemsByPrinterMap as $printerId => $printerItems) {
-                PrintKitchenOrder::dispatch($order, $printerItems, $printerId);
-            }
-
-            if (empty($itemsByPrinterMap)) {
-                Log::warning("No printers found for order {$orderId} items");
-                throw new Exception('لا توجد طابعات مخصصة للمنتجات المحددة');
-            }
-
-            Log::info("Kitchen printing jobs dispatched successfully for order {$orderId}");
-
-        } catch (Exception $e) {
-            Log::error("Error dispatching kitchen printing jobs for order {$orderId}: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-
-    /**
-     * Prepare and validate kitchen items data
+     * Prepare and validate kitchen items data (deprecated)
      */
     private function prepareKitchenItems(array $items): array
     {
@@ -300,7 +237,7 @@ class PrintService
             Log::info("Testing Browsershot Arabic text printing for order {$order->id}");
 
             // Load order with relationships
-            $order->load(['user', 'customer', 'driver', 'items.product', 'table']);
+            $order->load(['user', 'customer', 'driver', 'items.product']);
 
 
             // ---------- 1. Generate HTML content using generateReceiptHtml method ----------

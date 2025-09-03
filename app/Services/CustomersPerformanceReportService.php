@@ -45,11 +45,6 @@ class CustomersPerformanceReportService
                 DB::raw('MAX(orders.created_at) as last_order_date'),
                 DB::raw('MIN(orders.created_at) as first_order_date'),
 
-                // Dine In
-                DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "dine_in" THEN orders.id END), 0) as dine_in_orders'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "dine_in" THEN order_items.total ELSE 0 END), 0) as dine_in_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "dine_in" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as dine_in_profit'),
-
                 // Takeaway
                 DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "takeaway" THEN orders.id END), 0) as takeaway_orders'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "takeaway" THEN order_items.total ELSE 0 END), 0) as takeaway_sales'),
@@ -69,16 +64,6 @@ class CustomersPerformanceReportService
                 DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "web_takeaway" THEN orders.id END), 0) as web_takeaway_orders'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total ELSE 0 END), 0) as web_takeaway_sales'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as web_takeaway_profit'),
-
-                // Talabat
-                DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "talabat" THEN orders.id END), 0) as talabat_orders'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "talabat" THEN order_items.total ELSE 0 END), 0) as talabat_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "talabat" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as talabat_profit'),
-
-                // Companies
-                DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "companies" THEN orders.id END), 0) as companies_orders'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "companies" THEN order_items.total ELSE 0 END), 0) as companies_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "companies" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as companies_profit'),
 
                 // Customer Segment
                 DB::raw('CASE

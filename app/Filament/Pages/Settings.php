@@ -80,16 +80,6 @@ class Settings extends Page implements HasForms
                                     ->required()
                                     ->placeholder(SettingKey::CASHIER_PRINTER_IP->placeholder()),
 
-                                TextInput::make(SettingKey::DINE_IN_SERVICE_CHARGE->value)
-                                    ->label(SettingKey::DINE_IN_SERVICE_CHARGE->label())
-                                    ->helperText(SettingKey::DINE_IN_SERVICE_CHARGE->helperText())
-                                    ->numeric()
-                                    ->step(0.01)
-                                    ->minValue(0)
-                                    ->maxValue(1)
-                                    ->required()
-                                    ->placeholder(SettingKey::DINE_IN_SERVICE_CHARGE->placeholder()),
-
                                 TextInput::make(SettingKey::SCALE_BARCODE_PREFIX->value)
                                     ->label(SettingKey::SCALE_BARCODE_PREFIX->label())
                                     ->helperText(SettingKey::SCALE_BARCODE_PREFIX->helperText())

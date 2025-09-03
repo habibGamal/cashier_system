@@ -18,7 +18,6 @@ use App\Models\Product;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\Orders\OrderCalculationService;
 use App\Services\Orders\OrderPaymentService;
-use App\Services\Orders\TableManagementService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -35,7 +34,6 @@ class OrderService
         private readonly OrderCreationService $orderCreationService,
         private readonly OrderPaymentService $orderPaymentService,
         private readonly OrderCalculationService $orderCalculationService,
-        private readonly TableManagementService $tableManagementService,
         private readonly OrderCompletionService $orderCompletionService,
         private readonly OrderStockConversionService $orderStockConversionService,
     ) {
@@ -56,7 +54,7 @@ class OrderService
     public function getOrderDetails(int $orderId): Order
     {
         $order = $this->orderRepository->findByIdOrFail($orderId);
-        $order->load(['items.product', 'user', 'customer', 'driver', 'table', 'payments']);
+        $order->load(['items.product', 'user', 'customer', 'driver', 'payments']);
 
         return $order;
     }
@@ -123,24 +121,20 @@ class OrderService
         return $order;
     }
 
-    public function updateNotes(int $orderId, ?string $kitchenNotes = null, ?string $orderNotes = null): Order
+    public function updateNotes(int $orderId, ?string $orderNotes = null): Order
     {
-        $order = $this->orderRepository->findByIdOrFail($orderId);
-
+        $order = $this->orderRepository->findById($orderId);
         $updateData = [];
-        if ($kitchenNotes !== null) {
-            $updateData['kitchen_notes'] = $kitchenNotes;
-        }
+
         if ($orderNotes !== null) {
             $updateData['order_notes'] = $orderNotes;
         }
 
         if (!empty($updateData)) {
             $this->orderRepository->update($order, $updateData);
-            $order->refresh();
         }
 
-        return $order;
+        return $order->fresh();
     }
 
     public function applyDiscount(int $orderId, float $discount, string $discountType): Order
@@ -202,11 +196,6 @@ class OrderService
             // Store the original status to check if we need to restore stock
             $wasCompleted = $order->status === OrderStatus::COMPLETED;
 
-            // Free table if dine-in
-            if ($order->type->requiresTable() && $order->dine_table_number) {
-                $this->tableManagementService->freeTable($order->dine_table_number);
-            }
-
             // Update order status
             $this->orderRepository->update($order, [
                 'status' => OrderStatus::CANCELLED,
@@ -245,36 +234,20 @@ class OrderService
         });
     }
 
-    public function changeOrderType(int $orderId, string $newType, ?string $tableNumber = null): Order
+    public function changeOrderType(int $orderId, string $newType): Order
     {
-        return DB::transaction(function () use ($orderId, $newType, $tableNumber) {
+        return DB::transaction(function () use ($orderId, $newType) {
             $order = $this->orderRepository->findByIdOrFail($orderId);
 
             if (!$order->status->canBeModified()) {
                 throw new OrderException('لا يمكن تغيير نوع الطلب في هذه المرحلة');
             }
 
-            // Handle table management
-            $oldType = $order->type;
             $newOrderType = OrderType::from($newType);
-
-            // Free old table if switching from dine-in
-            if ($oldType->requiresTable() && $order->dine_table_number) {
-                $this->tableManagementService->freeTable($order->dine_table_number);
-            }
-
-            // Reserve new table if switching to dine-in
-            if ($newOrderType->requiresTable()) {
-                if (!$tableNumber) {
-                    throw new OrderException('رقم الطاولة مطلوب للطلبات الداخلية');
-                }
-                $this->tableManagementService->reserveTable($tableNumber, $order->id);
-            }
 
             // Update order
             $this->orderRepository->update($order, [
                 'type' => $newOrderType,
-                'dine_table_number' => $newOrderType->requiresTable() ? $tableNumber : null,
             ]);
 
             $order->refresh();

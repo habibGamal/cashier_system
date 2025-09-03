@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Filament\Notifications\Notification;
 use Exception;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
 use Livewire\Component;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -13,12 +15,13 @@ use Filament\Actions\Action;
 use App\Services\InventoryDailyAggregationService;
 
 
-class GlobalActions extends Component implements HasForms, HasActions
+class GlobalActions extends Component implements HasActions, HasSchemas
 {
     use InteractsWithActions;
-    use InteractsWithForms;
+    use InteractsWithSchemas;
 
-    public function toCashierAction()
+
+    public function toCashierAction(): Action
     {
         return Action::make('toCashier')
             ->label('الكاشير')
@@ -28,7 +31,7 @@ class GlobalActions extends Component implements HasForms, HasActions
             ->visible(auth()->user()->isAdmin());
     }
 
-    public function openDayAction()
+    public function openDayAction(): Action
     {
 
         $isDayClosed = app(InventoryDailyAggregationService::class)->dayStatus() === null;
@@ -48,10 +51,11 @@ class GlobalActions extends Component implements HasForms, HasActions
                     return;
                 }
                 app(InventoryDailyAggregationService::class)->openDay();
-            });
+            })
+        ;
     }
 
-    public function closeDayAction()
+    public function closeDayAction(): Action
     {
         $isDayClosed = app(InventoryDailyAggregationService::class)->dayStatus() === null;
         return Action::make('closeDay')

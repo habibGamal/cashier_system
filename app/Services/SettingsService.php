@@ -12,7 +12,6 @@ class SettingsService
     public const WEBSITE_URL = 'website_url';
     public const CASHIER_PRINTER_IP = 'cashier_printer_ip';
     public const RECEIPT_FOOTER = 'receipt_footer';
-    public const DINE_IN_SERVICE_CHARGE = 'dine_in_service_charge';
     public const RESTAURANT_NAME = 'restaurant_name';
     public const RESTAURANT_PRINT_LOGO = 'restaurant_print_logo';
     public const RESTAURANT_OFFICIAL_LOGO = 'restaurant_official_logo';
@@ -41,15 +40,6 @@ class SettingsService
     public function getReceiptFooter(): string
     {
         return $this->get(SettingKey::RECEIPT_FOOTER->value, SettingKey::RECEIPT_FOOTER->defaultValue());
-    }
-
-    /**
-     * Get dine-in service charge from settings
-     */
-    public function getDineInServiceCharge(): float
-    {
-        $value = $this->get(SettingKey::DINE_IN_SERVICE_CHARGE->value, SettingKey::DINE_IN_SERVICE_CHARGE->defaultValue());
-        return (float) $value;
     }
 
     /**

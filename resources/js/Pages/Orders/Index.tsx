@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
 import { Button, Descriptions, Form, InputNumber, Modal, Popconfirm, Tabs } from 'antd';
 import CashierLayout from '@/Layouts/CashierLayout';
-import { DineInTab } from '@/Components/Orders/Index/DineInTab';
 import { DeliveryTab } from '@/Components/Orders/Index/DeliveryTab';
 import { TakeawayTab } from '@/Components/Orders/Index/TakeawayTab';
-import { TalabatTab } from '@/Components/Orders/Index/TalabatTab';
-import { CompaniesTab } from '@/Components/Orders/Index/CompaniesTab';
 import { DisplayTab } from '@/Components/Orders/Index/DisplayTab';
 import { ReceiveOrdersPaymentsTab } from '@/Components/Orders/Index/ReceiveOrdersPaymentsTab';
 import { ShiftExpensesTab } from '@/Components/Orders/Index/ShiftExpensesTab';
@@ -16,7 +13,6 @@ import type { Order, User } from '@/types';
 
 interface IndexProps {
     orders: Order[];
-    previousPartialPaidOrders: Order[];
     auth: {
         user: User;
     };
@@ -27,17 +23,11 @@ const OrdersIndex: React.FC<IndexProps> = ({
     auth
 }) => {
     const { user } = auth;
-    const dineInOrders = orders.filter(
-        (order) => order.type === 'dine_in' && order.status === 'processing'
-    );
     const takeawayOrders = orders.filter(
         (order) => order.type === 'takeaway' && order.status === 'processing'
     );
     const deliveryOrders = orders.filter(
         (order) => order.type === 'delivery' && order.status === 'processing'
-    );
-    const talabatOrders = orders.filter(
-        (order) => order.type === 'talabat' && order.status === 'processing'
     );
     const webDeliveryOrders = orders.filter(
         (order) => order.type === 'web_delivery' && ['pending', 'processing', 'out_for_delivery'].includes(order.status)
@@ -48,7 +38,7 @@ const OrdersIndex: React.FC<IndexProps> = ({
     const cancelledOrders = orders.filter((order) => order.status === 'cancelled');
     const completedOrders = orders.filter((order) => order.status === 'completed');
 
-    const [tab, setTab] = useState(window.location.hash.replace('#', '') || 'dine_in');
+    const [tab, setTab] = useState(window.location.hash.replace('#', '') || 'delivery');
     const [endShiftModalVisible, setEndShiftModalVisible] = useState(false);
     const [form] = Form.useForm();
 
@@ -63,11 +53,6 @@ const OrdersIndex: React.FC<IndexProps> = ({
 
     const tabItems = [
         {
-            label: 'الصالة',
-            children: <DineInTab orders={dineInOrders} />,
-            key: 'dine_in',
-        },
-        {
             label: 'الديلفري',
             children: <DeliveryTab orders={deliveryOrders} />,
             key: 'delivery',
@@ -76,11 +61,6 @@ const OrdersIndex: React.FC<IndexProps> = ({
             label: 'التيك اواي',
             children: <TakeawayTab orders={takeawayOrders} />,
             key: 'takeaway',
-        },
-        {
-            label: 'طلبات',
-            children: <TalabatTab orders={talabatOrders} />,
-            key: 'talabat',
         },
         {
             label: 'ويب ديلفري',

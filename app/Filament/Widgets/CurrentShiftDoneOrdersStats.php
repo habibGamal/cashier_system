@@ -36,19 +36,6 @@ class CurrentShiftDoneOrdersStats extends BaseWidget
         $orderTypeStats = $this->shiftsReportService->calculateOrderTypeStats($currentShift);
 
         return [
-            Stat::make('الاوردرات الصالة', $orderTypeStats['dineIn']['count'] . ' اوردر')
-                ->description('بقيمة ' . number_format($orderTypeStats['dineIn']['value'], 2) . ' جنيه - ربح ' . number_format($orderTypeStats['dineIn']['profit'], 2) . ' جنيه' .
-                    ($orderTypeStats['dineIn']['count'] > 0 ? ' - متوسط ' . number_format($orderTypeStats['dineIn']['value'] / $orderTypeStats['dineIn']['count'], 2) . ' جنيه' : ''))
-                ->descriptionIcon('heroicon-m-home')
-                ->extraAttributes([
-                    'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{type:'dine_in'}} )
-                        document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    JS
-                ])
-                ->color('success'),
-
             Stat::make('الاوردرات ديليفري', $orderTypeStats['delivery']['count'] . ' اوردر')
                 ->description('بقيمة ' . number_format($orderTypeStats['delivery']['value'], 2) . ' جنيه - ربح ' . number_format($orderTypeStats['delivery']['profit'], 2) . ' جنيه' .
                     ($orderTypeStats['delivery']['count'] > 0 ? ' - متوسط ' . number_format($orderTypeStats['delivery']['value'] / $orderTypeStats['delivery']['count'], 2) . ' جنيه' : ''))
@@ -74,19 +61,6 @@ class CurrentShiftDoneOrdersStats extends BaseWidget
                     JS
                 ])
                 ->color('info'),
-
-            Stat::make('الاوردرات طلبات', $orderTypeStats['talabat']['count'] . ' اوردر')
-                ->description('بقيمة ' . number_format($orderTypeStats['talabat']['value'], 2) . ' جنيه - ربح ' . number_format($orderTypeStats['talabat']['profit'], 2) . ' جنيه' .
-                    ($orderTypeStats['talabat']['count'] > 0 ? ' - متوسط ' . number_format($orderTypeStats['talabat']['value'] / $orderTypeStats['talabat']['count'], 2) . ' جنيه' : ''))
-                ->descriptionIcon('heroicon-m-device-phone-mobile')
-                ->extraAttributes([
-                    'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{type:'talabat'}} )
-                        document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    JS
-                ])
-                ->color('warning'),
 
             Stat::make('الاوردرات اونلاين ديليفري', $orderTypeStats['webDelivery']['count'] . ' اوردر')
                 ->description('بقيمة ' . number_format($orderTypeStats['webDelivery']['value'], 2) . ' جنيه - ربح ' . number_format($orderTypeStats['webDelivery']['profit'], 2) . ' جنيه' .

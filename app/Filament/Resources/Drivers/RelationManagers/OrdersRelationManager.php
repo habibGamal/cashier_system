@@ -52,11 +52,8 @@ class OrdersRelationManager extends RelationManager
                     ->options([
                         OrderType::DELIVERY->value => 'توصيل',
                         OrderType::TAKEAWAY->value => 'استلام',
-                        OrderType::DINE_IN->value => 'تناول في المطعم',
-                        OrderType::TALABAT->value => 'طلبات',
                         OrderType::WEB_DELIVERY->value => 'توصيل ويب',
                         OrderType::WEB_TAKEAWAY->value => 'استلام ويب',
-                        OrderType::COMPANIES->value => 'شركات',
                     ])
                     ->enum(OrderType::class)
                     ->required(),
@@ -134,11 +131,8 @@ class OrdersRelationManager extends RelationManager
                     ->options([
                         OrderType::DELIVERY->value => 'توصيل',
                         OrderType::TAKEAWAY->value => 'استلام',
-                        OrderType::DINE_IN->value => 'تناول في المطعم',
-                        OrderType::TALABAT->value => 'طلبات',
                         OrderType::WEB_DELIVERY->value => 'توصيل ويب',
                         OrderType::WEB_TAKEAWAY->value => 'استلام ويب',
-                        OrderType::COMPANIES->value => 'شركات',
                     ]),
                 SelectFilter::make('shift_ids')->label('الشفتات')
                     ->options(function () {

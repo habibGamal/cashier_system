@@ -121,12 +121,6 @@ class CustomersPerformanceTableWidget extends BaseWidget
                     ->sortable(),
 
                 // Order Type Performance
-                TextColumn::make('dine_in_sales')
-                    ->label('صالة')
-                    ->money('EGP')
-                    ->sortable()
-                    ->toggleable(),
-
                 TextColumn::make('takeaway_sales')
                     ->label('تيك أواي')
                     ->money('EGP')
@@ -150,18 +144,6 @@ class CustomersPerformanceTableWidget extends BaseWidget
                     ->money('EGP')
                     ->sortable()
                     ->toggleable(),
-
-                TextColumn::make('talabat_sales')
-                    ->label('طلبات')
-                    ->money('EGP')
-                    ->sortable()
-                    ->toggleable(),
-
-                // TextColumn::make('companies_sales')
-                //     ->label('شركات')
-                //     ->money('EGP')
-                //     ->sortable()
-                //     ->toggleable(),
             ])
             ->defaultSort('total_sales', 'desc')
             ->paginated([10, 25, 50, 100])

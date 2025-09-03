@@ -44,7 +44,6 @@ import OrderNotesModal from "@/Components/Orders/OrderNotesModal";
 import OrderDiscountModal from "@/Components/Orders/OrderDiscountModal";
 import ChangeOrderTypeModal from "@/Components/Orders/ChangeOrderTypeModal";
 import PaymentModal from "@/Components/Orders/PaymentModal";
-import PrintInKitchenModal from "@/Components/Orders/PrintInKitchenModal";
 import IsAdmin from "@/Components/IsAdmin";
 import LoadingButton from "@/Components/LoadingButton";
 import { useSymbologyScanner } from "@use-symbology-scanner/react";
@@ -109,8 +108,6 @@ export default function ManageOrder({
     const [isChangeOrderTypeModalOpen, setIsChangeOrderTypeModalOpen] =
         useState(false);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-    const [isPrintInKitchenModalOpen, setIsPrintInKitchenModalOpen] =
-        useState(false);
 
     useEffect(() => {
         dispatch({ type: "init", orderItems: initOrderItems, user });
@@ -121,7 +118,6 @@ export default function ManageOrder({
     const orderCancelled = order.status === "cancelled";
     const orderInProcess = order.status === "processing";
     const orderCompleted = order.status === "completed";
-    const isDineIn = order.type === "dine_in";
     const isTakeAway = order.type === "takeaway";
     const isDelivery = order.type === "delivery";
 
@@ -185,10 +181,6 @@ export default function ManageOrder({
         payment(finish);
     };
 
-    const printInKitchen = (finish: () => void) => {
-        save(() => setIsPrintInKitchenModalOpen(true), finish);
-    };
-
     const printWithCanvas = async (finish: () => void) => {
         if (orderInProcess) {
             save(async (page) => {
@@ -226,9 +218,7 @@ export default function ManageOrder({
         //     title: "الطلبات",
         // },
         {
-            title: `${getOrderTypeLabel(order.type)} ${
-                order.dine_table_number ?? ""
-            }`,
+            title: `${getOrderTypeLabel(order.type)}`,
         },
         {
             title: `طلب رقم ${order.order_number} `,
@@ -296,14 +286,6 @@ export default function ManageOrder({
                                 icon={<PrinterOutlined />}
                             >
                                 طباعة الفاتورة
-                            </LoadingButton>
-                            <LoadingButton
-                                disabled={orderCancelled}
-                                onCustomClick={printInKitchen}
-                                size="large"
-                                icon={<PrinterOutlined />}
-                            >
-                                طباعة في المطبخ
                             </LoadingButton>
                             <Button
                                 onClick={() => setIsCustomerModalOpen(true)}
@@ -466,12 +448,6 @@ export default function ManageOrder({
                 <PaymentModal
                     open={isPaymentModalOpen}
                     onCancel={() => setIsPaymentModalOpen(false)}
-                    order={order}
-                    orderItems={orderItems}
-                />
-                <PrintInKitchenModal
-                    open={isPrintInKitchenModalOpen}
-                    onCancel={() => setIsPrintInKitchenModalOpen(false)}
                     order={order}
                     orderItems={orderItems}
                 />

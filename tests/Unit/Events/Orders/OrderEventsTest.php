@@ -32,8 +32,7 @@ describe('Order Events', function () {
         it('broadcasts correct data', function () {
             $order = Order::factory()->create([
                 'order_number' => 123,
-                'dine_table_number' => 'T001',
-                'type' => OrderType::DINE_IN,
+                'type' => OrderType::TAKEAWAY,
             ]);
 
             $event = new OrderCreated($order);
@@ -41,8 +40,7 @@ describe('Order Events', function () {
 
             expect($data['order']['id'])->toBe($order->id);
             expect($data['order']['order_number'])->toBe(123);
-            expect($data['order']['type'])->toBe('صالة');
-            expect($data['order']['table_number'])->toBe('T001');
+            expect($data['order']['type'])->toBe('تيك أواي');
             expect($data['order'])->toHaveKey('created_at');
         });
 

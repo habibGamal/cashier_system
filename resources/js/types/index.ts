@@ -82,10 +82,8 @@ export interface Order {
   total: number;
   profit: number;
   payment_status: 'pending' | 'partial_paid' | 'full_paid';
-  dine_table_number?: string;
-  kitchen_notes?: string;
   order_notes?: string;
-  order_number: string;
+  order_number: number;
   created_at: string;
   updated_at: string;
   customer?: Customer;

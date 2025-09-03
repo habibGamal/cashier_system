@@ -11,7 +11,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             SettingsSeeder::class,
-            TableTypeSeeder::class,
             // CategorySeeder::class,
             // PrinterSeeder::class,
             // SupplierSeeder::class,

@@ -24,8 +24,6 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
             $table->decimal('profit', 10, 2);
             $table->string('payment_status');
-            $table->string('dine_table_number')->nullable();
-            $table->text('kitchen_notes')->nullable();
             $table->text('order_notes')->nullable();
             $table->integer('order_number');
             $table->timestamps();

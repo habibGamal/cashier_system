@@ -69,17 +69,15 @@ class ShiftLoggingService
         $action = "إنشاء طلب جديد رقم #{$orderId}";
 
         $orderTypeMap = [
-            'dine_in' => 'صالة',
             'takeaway' => 'تيك أواي',
             'delivery' => 'توصيل',
-            'companies' => 'شركات',
-            'talabat' => 'طلبات',
+            'web_takeaway' => 'تيك أواي ويب',
+            'web_delivery' => 'توصيل ويب',
         ];
 
         $details = [
             'order_id' => $orderId,
             'order_type' => $orderTypeMap[$orderType] ?? $orderType,
-            'table_number' => $tableNumber,
         ];
 
         $this->logAction($action, $details);
@@ -350,7 +348,6 @@ class ShiftLoggingService
         $translations = [
             'cash' => 'نقدي',
             'card' => 'كارت',
-            'talabat_card' => 'كارت طلبات',
         ];
 
         return $translations[$method] ?? $method;

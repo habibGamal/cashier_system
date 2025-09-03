@@ -10,17 +10,6 @@
     "name": "Cashier User"
   },
   "orders": {
-    "dineIn": {
-      "type": "dine_in",
-      "table_number": "5",
-      "items": [
-        {
-          "product_name": "برجر كلاسيك",
-          "quantity": 2,
-          "notes": "بدون بصل"
-        }
-      ]
-    },
     "delivery": {
       "type": "delivery",
       "customer": {

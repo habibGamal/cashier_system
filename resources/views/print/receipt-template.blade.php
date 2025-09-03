@@ -161,11 +161,6 @@
         <p>تاريخ الطباعة : {{ $printDate }}</p>
         <p>نوع الطلب : {{ $getOrderTypeString($order->type) }} </p>
 
-        {{-- Conditional fields based on order type --}}
-        @if ($order->type === OrderType::DINE_IN && $order->dine_table_number)
-            <p>طاولة رقم {{ $order->dine_table_number }}</p>
-        @endif
-
         {{-- Takeaway: show customer name and phone --}}
         @if (in_array($order->type->value, ['takeaway', 'web_takeaway']))
             <p>اسم العميل : {{ $order->customer?->name ?? '-' }}</p>

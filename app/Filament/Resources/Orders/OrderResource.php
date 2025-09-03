@@ -69,10 +69,6 @@ class OrderResource extends Resource
                             ->label('حالة الدفع')
                             ->badge(),
 
-                        TextEntry::make('dine_table_number')
-                            ->label('رقم الطاولة')
-                            ->placeholder('غير محدد'),
-
                         TextEntry::make('created_at')
                             ->label('تاريخ الإنشاء')
                             ->dateTime('Y-m-d H:i:s'),
@@ -152,10 +148,6 @@ class OrderResource extends Resource
 
                 Section::make('ملاحظات')
                     ->schema([
-                        TextEntry::make('kitchen_notes')
-                            ->label('ملاحظات المطبخ')
-                            ->placeholder('لا توجد ملاحظات'),
-
                         TextEntry::make('order_notes')
                             ->label('ملاحظات الطلب')
                             ->placeholder('لا توجد ملاحظات'),

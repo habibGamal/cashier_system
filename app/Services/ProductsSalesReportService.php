@@ -44,11 +44,6 @@ class ProductsSalesReportService
                 DB::raw('COALESCE(SUM(order_items.total), 0) as total_sales'),
                 DB::raw('COALESCE(SUM(order_items.total - (order_items.cost * order_items.quantity)), 0) as total_profit'),
 
-                // Dine In
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "dine_in" THEN order_items.quantity ELSE 0 END), 0) as dine_in_quantity'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "dine_in" THEN order_items.total ELSE 0 END), 0) as dine_in_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "dine_in" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as dine_in_profit'),
-
                 // Takeaway
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "takeaway" THEN order_items.quantity ELSE 0 END), 0) as takeaway_quantity'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "takeaway" THEN order_items.total ELSE 0 END), 0) as takeaway_sales'),
@@ -68,16 +63,6 @@ class ProductsSalesReportService
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.quantity ELSE 0 END), 0) as web_takeaway_quantity'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total ELSE 0 END), 0) as web_takeaway_sales'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as web_takeaway_profit'),
-
-                // Talabat
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "talabat" THEN order_items.quantity ELSE 0 END), 0) as talabat_quantity'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "talabat" THEN order_items.total ELSE 0 END), 0) as talabat_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "talabat" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as talabat_profit'),
-
-                // Companies
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "companies" THEN order_items.quantity ELSE 0 END), 0) as companies_quantity'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "companies" THEN order_items.total ELSE 0 END), 0) as companies_sales'),
-                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "companies" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as companies_profit'),
             ])
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoin('order_items', function ($join) use ($startDate, $endDate) {

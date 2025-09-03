@@ -187,7 +187,7 @@ export default function CashierLayout({ children, title }: CashierLayoutProps) {
     }, []);
 
     return (
-        <Layout className="min-h-screen" dir="rtl">
+        <Layout className="!min-h-screen" dir="rtl">
             <FloatButton.Group shape="circle" style={{ left: 24 }}>
                 <IsAdmin>
                     <FloatButton
@@ -207,7 +207,6 @@ export default function CashierLayout({ children, title }: CashierLayoutProps) {
                     onClick={logout}
                 />
             </FloatButton.Group>
-
             <Content className="bg-gray-50">
                 <ConfigProvider
                     direction="rtl"

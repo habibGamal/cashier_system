@@ -12,7 +12,6 @@ class OrderCompletionService
 {
     public function __construct(
         private readonly OrderPaymentService $orderPaymentService,
-        private readonly TableManagementService $tableManagementService,
         private readonly OrderCalculationService $orderCalculationService,
     ) {}
 
@@ -50,13 +49,10 @@ class OrderCompletionService
             );
         }
 
-        // Free table if dine-in
-        if ($order->type->requiresTable() && $order->dine_table_number) {
-            $this->tableManagementService->freeTable($order->dine_table_number);
-        }
-
-        // Update order status
-        $order->update(['status' => OrderStatus::COMPLETED]);
+                // Update order status
+        $order->update([
+            'status' => OrderStatus::COMPLETED,
+        ]);
         $order->refresh();
 
         // Fire event
