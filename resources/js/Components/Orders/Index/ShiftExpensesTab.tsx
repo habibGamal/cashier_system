@@ -51,7 +51,7 @@ const ExpenseForm = ({
                 start();
                 onFinish(form, values, finish);
             }}
-            className={`${initialValues ? "" : "isolate "}`}
+            className={`${initialValues ? "" : "isolate "} !p-4`}
             layout="vertical"
         >
             <Typography.Title className="my-0 text-center" level={4}>
@@ -67,7 +67,7 @@ const ExpenseForm = ({
                     },
                 ]}
             >
-                <InputNumber className="w-full" min={0} step={0.01} />
+                <InputNumber className="!w-full" min={0} step={0.01} />
             </Form.Item>
             <Form.Item
                 name="expenseTypeId"

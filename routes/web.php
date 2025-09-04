@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/apply-discount/{order}', [OrderController::class, 'applyDiscount'])->name('applyDiscount');
         Route::post('/link-customer/{order}', [OrderController::class, 'linkCustomer'])->name('linkCustomer');
         Route::post('/link-driver/{order}', [OrderController::class, 'linkDriver'])->name('linkDriver');
+        Route::delete('/destroy/{order}', [OrderController::class, 'destroy'])->name('destroy');
     })->middleware(['shift']);
 
     // Quick operations routes

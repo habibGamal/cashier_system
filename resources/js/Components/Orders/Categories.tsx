@@ -77,13 +77,13 @@ export default function Categories({ categories, dispatch, disabled, user }: Cat
                 }}
             >
                 <Radio.Group
-                    className="grid grid-cols-4 text-center gap-4"
+                    className="!grid grid-cols-4 text-center gap-4"
                     onChange={onChangeCategory}
                     size="large"
                     defaultValue="all"
                     buttonStyle="solid"
                 >
-                    <Radio.Button className="rounded before:hidden! border-none" value="all">
+                    <Radio.Button className="rounded before:hidden border-none" value="all">
                         الكل
                     </Radio.Button>
                     {categories.map((category) => (
@@ -108,7 +108,7 @@ export default function Categories({ categories, dispatch, disabled, user }: Cat
                         key={product.id}
                         type="primary"
                         onClick={() => onAddProduct(product)}
-                        className="w-full h-full min-h-[100px] text-xl font-bold whitespace-normal bg-gray-800"
+                        className="w-full h-full min-h-[100px] !text-xl !font-bold whitespace-normal !bg-gray-800"
                         style={{ height: 'auto', minHeight: '100px' }}
                     >
                         {product.name}

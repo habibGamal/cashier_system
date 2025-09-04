@@ -23,7 +23,7 @@ export const DisplayTab: React.FC<DisplayTabProps> = ({ orders }) => {
             <Row gutter={[24, 16]}>
                 {sortedOrders.length === 0 && (
                     <Empty
-                        className="mx-auto"
+                        className="!mx-auto"
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description="لا يوجد طلبات"
                     />

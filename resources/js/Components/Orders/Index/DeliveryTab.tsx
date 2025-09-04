@@ -28,7 +28,7 @@ export const DeliveryTab: React.FC<DeliveryTabProps> = ({ orders }) => {
                 <Col span={6}>
                     <Button
                         onClick={createOrder}
-                        className="h-32 w-full"
+                        className="!h-32 w-full"
                         type="primary"
                         size="large"
                     >

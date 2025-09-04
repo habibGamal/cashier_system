@@ -11,6 +11,7 @@ import WebDeliveryTab from '@/Components/Orders/Index/WebDeliveryTab';
 import WebTakeawayTab from '@/Components/Orders/Index/WebTakeawayTab';
 import DirectSaleTab from '@/Components/Orders/Index/DirectSaleTab';
 import type { Order, User } from '@/types';
+import getDirectSaleOrder from '@/helpers/getDirectSaleOrder';
 
 interface IndexProps {
     orders: Order[];
@@ -38,13 +39,11 @@ const OrdersIndex: React.FC<IndexProps> = ({
     const webTakeawayOrders = orders.filter(
         (order) => order.type === 'web_takeaway' && ['pending', 'processing'].includes(order.status)
     );
-    const directSaleOrder = orders.find(
-        (order) => order.type === 'direct_sale' && order.status === 'processing'
-    );
+    const directSaleOrder = getDirectSaleOrder(orders);
     const cancelledOrders = orders.filter((order) => order.status === 'cancelled');
     const completedOrders = orders.filter((order) => order.status === 'completed');
 
-    const [tab, setTab] = useState(window.location.hash.replace('#', '') || 'delivery');
+    const [tab, setTab] = useState(window.location.hash.replace('#', '') || 'direct_sale');
     const [endShiftModalVisible, setEndShiftModalVisible] = useState(false);
     const [form] = Form.useForm();
 
@@ -59,6 +58,11 @@ const OrdersIndex: React.FC<IndexProps> = ({
 
     const tabItems = [
         {
+            label: 'بيع مباشر',
+            children: <DirectSaleTab categories={categories} existingOrder={directSaleOrder} />,
+            key: 'direct_sale',
+        },
+        {
             label: 'الديلفري',
             children: <DeliveryTab orders={deliveryOrders} />,
             key: 'delivery',
@@ -67,11 +71,6 @@ const OrdersIndex: React.FC<IndexProps> = ({
             label: 'التيك اواي',
             children: <TakeawayTab orders={takeawayOrders} />,
             key: 'takeaway',
-        },
-        {
-            label: 'بيع مباشر',
-            children: <DirectSaleTab categories={categories} existingOrder={directSaleOrder} />,
-            key: 'direct_sale',
         },
         {
             label: 'ويب ديلفري',

@@ -57,6 +57,10 @@
   @apply p-4 bg-white  border-2 border-gray-200   rounded-xl;
 }
 
+.ant-radio-button-wrapper.border-none {
+  border: none !important;
+}
+
 .ltr {
     direction: ltr;
 }

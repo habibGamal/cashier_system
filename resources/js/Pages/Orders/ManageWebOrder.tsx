@@ -26,7 +26,6 @@ import { useEffect, useReducer, useState } from "react";
 import { orderItemsReducer } from "@/utils/orderItemsReducer";
 import { orderStatus } from "@/helpers/orderState";
 import { orderHeader } from "@/helpers/orderHeader";
-import { printOrder } from "@/helpers/printTemplate";
 import CashierLayout from "@/Layouts/CashierLayout";
 import useModal from "@/hooks/useModal";
 
@@ -35,10 +34,18 @@ import DriverModal from "@/Components/Orders/DriverModal";
 import OrderDiscountModal from "@/Components/Orders/OrderDiscountModal";
 import OrderNotesModal from "@/Components/Orders/OrderNotesModal";
 import WebPaymentModal from "@/Components/Orders/WebPaymentModal";
-import PrintInKitchenModal from "@/Components/Orders/PrintInKitchenModal";
 import OrderItem from "@/Components/Orders/OrderItem";
 import IsAdmin from "@/Components/IsAdmin";
 import LoadingButton from "@/Components/LoadingButton";
+
+// SOLID Architecture Imports
+import { useModalState } from "@/hooks/useModalState";
+import { useOrderActions } from "@/hooks/useOrderActions";
+import { OrderStrategyFactory } from "@/strategies/OrderStrategies";
+import { OrderActionButtons } from "@/Components/Orders/Shared/OrderActionButtons";
+import { OrderDetails } from "@/Components/Orders/Shared/OrderDetails";
+import { IOrderActions, OrderType } from "@/types/OrderManagement";
+import { calculateOrderTotals } from "@/utils/orderCalculations";
 
 interface ManageWebOrderProps {
     order: any;
@@ -51,6 +58,15 @@ export default function ManageWebOrder({
 }: ManageWebOrderProps) {
     const { auth } = usePage().props;
     const user = auth.user as User;
+
+    // SOLID: Dependency Injection - Use strategy pattern
+    const orderStrategy = OrderStrategyFactory.createStrategy(order.type as OrderType);
+    const actionHandlers = useOrderActions(order.type as OrderType);
+    const { modalState, modalActions } = useModalState(
+        order.type === "web_delivery", // include driver modal
+        false // no change order type modal for web orders
+    );
+
     const products = categories.flatMap((category) => category.products);
     const initOrderItems: OrderItemData[] =
         order.items?.map((orderItem: any) => ({
@@ -65,15 +81,15 @@ export default function ManageWebOrder({
     const [orderItems, dispatch] = useReducer(orderItemsReducer, []);
 
     // Modal states using useModal hook
-    const orderNotesModal = useModal();
-    const orderDiscountModal = useModal();
     const paymentModal = useModal();
-    const printInKitchenModal = useModal();
-    const driverModal = useModal();
 
     useEffect(() => {
         dispatch({ type: "init", orderItems: initOrderItems, user });
     }, [order.items]);
+
+    // SOLID: Single Responsibility - Calculate totals and permissions using strategy
+    const calculations = calculateOrderTotals(order, orderItems);
+    const permissions = orderStrategy.getPermissions(order);
 
     const acceptOrder = () => {
         router.post(
@@ -82,32 +98,6 @@ export default function ManageWebOrder({
             {
                 onSuccess: () => message.success("تم قبول الطلب بنجاح"),
                 onError: () => message.error("فشل في قبول الطلب"),
-            }
-        );
-    };
-
-    const save = (
-        callback: (page: any) => void = () => {},
-        finish: () => void = () => {}
-    ) => {
-        // For web orders, we can only update item notes, not quantities
-        const itemsWithNotes = orderItems.map((item) => ({
-            product_id: item.product_id,
-            notes: item.notes,
-        }));
-
-        router.post(
-            `/web-orders/save-order/${order.id}`,
-            {
-                items: itemsWithNotes,
-            },
-            {
-                onSuccess: (page) => {
-                    message.success("تم حفظ الطلب بنجاح");
-                    callback(page);
-                },
-                onError: () => message.error("فشل في حفظ الطلب"),
-                onFinish: () => finish(),
             }
         );
     };
@@ -135,59 +125,14 @@ export default function ManageWebOrder({
         );
     };
 
-    const payment = (finish: () => void = () => {}) => {
-        save(() => paymentModal.showModal(), finish);
-    };
-
-    const printInKitchen = (finish: () => void = () => {}) => {
-        save(() => printInKitchenModal.showModal(), finish);
-    };
-
-    const openDiscountModal = (finish: () => void = () => {}) => {
-        save(() => orderDiscountModal.showModal(), finish);
-    };
-
-    // Keyboard shortcuts
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "F8") {
-                e.preventDefault();
-                save();
-            }
-            if (e.key === "F9") {
-                e.preventDefault();
-                printWithCanvas();
-            }
-        };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [orderItems]);
-
-    const printWithCanvas = async (finish: () => void = () => {}) => {
-        save(async (page) => {
-            await printOrder(
-                page.props.order,
-                orderItems,
-                page.props.receiptFooter?.[0]?.value
-            );
-        }, finish);
-    };
-
-    const getOrderStatus = (status: string) => {
-        const statusConfig = {
-            pending: { color: "orange", text: "في الإنتظار" },
-            processing: { color: "blue", text: "قيد التشغيل" },
-            out_for_delivery: { color: "purple", text: "في طريق التوصيل" },
-            completed: { color: "green", text: "مكتمل" },
-            cancelled: { color: "red", text: "ملغي" },
-        };
-
-        return (
-            statusConfig[status as keyof typeof statusConfig] || {
-                color: "gray",
-                text: status,
-            }
-        );
+    // SOLID: Single Responsibility - Define actions using handlers
+    const orderActions: IOrderActions = {
+        onSave: (finish) => actionHandlers.handleSave(order.id, orderItems, undefined, finish),
+        onPayment: (finish) => {
+            actionHandlers.handleSave(order.id, orderItems, () => paymentModal.showModal(), finish);
+        },
+        onPrint: (finish) => actionHandlers.handlePrint(order.id, order, orderItems, finish),
+        onDiscount: (finish) => actionHandlers.handleDiscount(order.id, orderItems, modalActions, finish),
     };
 
     const disableAllControls = !["pending", "processing"].includes(
@@ -205,7 +150,6 @@ export default function ManageWebOrder({
         string,
         (
             | "printReceipt"
-            | "printKitchen"
             | "driver"
             | "notes"
             | "discount"
@@ -217,14 +161,13 @@ export default function ManageWebOrder({
         pending: ["cancel"],
         processing: [
             "printReceipt",
-            "printKitchen",
             "driver",
             "notes",
             "discount",
             "save",
             "cancel",
         ],
-        completed: ["cancel", "printKitchen", "printReceipt"],
+        completed: ["cancel", "printReceipt"],
         cancelled: [],
         out_for_delivery: ["printReceipt", "driver", "save", "cancel"],
     };
@@ -328,6 +271,81 @@ export default function ManageWebOrder({
             (order.status === "processing" && order.type === "web_takeaway"),
     };
 
+    // Custom action buttons for web orders
+    const customActions = [
+        actionBtn.accept && (
+            <Popconfirm
+                key="accept"
+                title="هل أنت متأكد من قبول الطلب؟"
+                okText="نعم"
+                cancelText="لا"
+                onConfirm={acceptOrder}
+            >
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<CheckCircleOutlined />}
+                >
+                    قبول الطلب
+                </Button>
+            </Popconfirm>
+        ),
+        actionBtn.outForDelivery && (
+            <Popconfirm
+                key="out-for-delivery"
+                title="تأكيد؟"
+                okText="نعم"
+                cancelText="لا"
+                onConfirm={outForDelivery}
+            >
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<CheckCircleOutlined />}
+                >
+                    خرج للتوصيل
+                </Button>
+            </Popconfirm>
+        ),
+        actionBtn.complete && (
+            <Popconfirm
+                key="complete"
+                title="تأكيد؟"
+                okText="نعم"
+                cancelText="لا"
+                onConfirm={() => orderActions.onPayment?.(() => {})}
+            >
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<CheckCircleOutlined />}
+                >
+                    إنهاء الطلب
+                </Button>
+            </Popconfirm>
+        ),
+        (
+            <Popconfirm
+                key="cancel"
+                title="هل أنت متأكد من إلغاء الطلب؟"
+                okText="نعم"
+                cancelText="لا"
+                onConfirm={cancelOrder}
+            >
+                <Button
+                    className="col-span-2"
+                    disabled={
+                        !btnsState[order.status]?.includes("cancel")
+                    }
+                    size="large"
+                    danger
+                >
+                    إلغاء
+                </Button>
+            </Popconfirm>
+        ),
+    ].filter(Boolean);
+
     return (
         <CashierLayout title={`إدارة الطلب ${order.order_number}`}>
             <Head title={`طلب رقم ${order.order_number}`} />
@@ -351,178 +369,24 @@ export default function ManageWebOrder({
 
                 <Row gutter={[16, 16]} className="mt-8">
                     <Col span={8}>
-                        <div className="isolate grid grid-cols-2 gap-4">
-                            <LoadingButton
-                                onCustomClick={printWithCanvas}
-                                disabled={
-                                    !btnsState[order.status]?.includes(
-                                        "printReceipt"
-                                    )
-                                }
-                                size="large"
-                                icon={<PrinterOutlined />}
-                            >
-                                طباعة الفاتورة
-                            </LoadingButton>
+                        {/* SOLID: Single Responsibility - Use dedicated component for action buttons */}
+                        <OrderActionButtons
+                            actions={orderActions}
+                            modalActions={modalActions}
+                            permissions={permissions}
+                            showDriver={isDelivery}
+                            customActions={customActions}
+                        />
 
-                            <LoadingButton
-                                onCustomClick={printInKitchen}
-                                disabled={
-                                    !btnsState[order.status]?.includes(
-                                        "printKitchen"
-                                    )
-                                }
-                                size="large"
-                                icon={<PrinterOutlined />}
-                            >
-                                طباعة في المطبخ
-                            </LoadingButton>
-
-                            {isDelivery && (
-                                <Button
-                                    onClick={() => driverModal.showModal()}
-                                    disabled={
-                                        !btnsState[order.status]?.includes(
-                                            "driver"
-                                        )
-                                    }
-                                    size="large"
-                                    icon={<UserAddOutlined />}
-                                >
-                                    بيانات السائق
-                                </Button>
-                            )}
-
-                            <Button
-                                onClick={() => orderNotesModal.showModal()}
-                                disabled={
-                                    !btnsState[order.status]?.includes("notes")
-                                }
-                                size="large"
-                                icon={<EditOutlined />}
-                                className={`${isDelivery ? "" : "col-span-2"}`}
-                            >
-                                ملاحظات الطلب
-                            </Button>
-
-                            <IsAdmin>
-                                <LoadingButton
-                                    onCustomClick={openDiscountModal}
-                                    disabled={
-                                        !btnsState[order.status]?.includes(
-                                            "discount"
-                                        )
-                                    }
-                                    size="large"
-                                    icon={<PercentageOutlined />}
-                                    className="col-span-2"
-                                >
-                                    خصم
-                                </LoadingButton>
-                            </IsAdmin>
-
-                            <LoadingButton
-                                onCustomClick={(finish) =>
-                                    save(undefined, finish)
-                                }
-                                disabled={disableAllControls}
-                                size="large"
-                                icon={<SaveOutlined />}
-                                type="primary"
-                            >
-                                حفظ
-                            </LoadingButton>
-
-                            {actionBtn.accept && (
-                                <Popconfirm
-                                    title="هل أنت متأكد من قبول الطلب؟"
-                                    okText="نعم"
-                                    cancelText="لا"
-                                    onConfirm={acceptOrder}
-                                >
-                                    <Button
-                                        type="primary"
-                                        size="large"
-                                        icon={<CheckCircleOutlined />}
-                                    >
-                                        قبول الطلب
-                                    </Button>
-                                </Popconfirm>
-                            )}
-
-                            {actionBtn.outForDelivery && (
-                                <Popconfirm
-                                    title="تأكيد؟"
-                                    okText="نعم"
-                                    cancelText="لا"
-                                    onConfirm={outForDelivery}
-                                >
-                                    <Button
-                                        type="primary"
-                                        size="large"
-                                        icon={<CheckCircleOutlined />}
-                                    >
-                                        خرج للتوصيل
-                                    </Button>
-                                </Popconfirm>
-                            )}
-
-                            {actionBtn.complete && (
-                                <Popconfirm
-                                    title="تأكيد؟"
-                                    okText="نعم"
-                                    cancelText="لا"
-                                    onConfirm={() => payment()}
-                                >
-                                    <Button
-                                        type="primary"
-                                        size="large"
-                                        icon={<CheckCircleOutlined />}
-                                    >
-                                        إنهاء الطلب
-                                    </Button>
-                                </Popconfirm>
-                            )}
-
-                            <Popconfirm
-                                title="هل أنت متأكد من إلغاء الطلب؟"
-                                okText="نعم"
-                                cancelText="لا"
-                                onConfirm={cancelOrder}
-                            >
-                                <Button
-                                    className="col-span-2"
-                                    disabled={
-                                        !btnsState[order.status]?.includes(
-                                            "cancel"
-                                        )
-                                    }
-                                    size="large"
-                                    danger
-                                >
-                                    إلغاء
-                                </Button>
-                            </Popconfirm>
-                        </div>
-
-                        <div className="isolate mt-4">
-                            <Typography.Title className="mt-0" level={5}>
-                                تفاصيل الطلب
-                            </Typography.Title>
-                            {orderItems.length === 0 && (
-                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                            )}
-                            {orderItems.map((orderItem) => (
-                                <OrderItem
-                                    key={orderItem.product_id}
-                                    orderItem={orderItem}
-                                    dispatch={dispatch}
-                                    disabled={disableNotesEditing}
-                                    user={user}
-                                    forWeb={true}
-                                />
-                            ))}
-                        </div>
+                        {/* SOLID: Single Responsibility - Use dedicated component for order details */}
+                        <OrderDetails
+                            orderItems={orderItems}
+                            dispatch={dispatch}
+                            disabled={disableNotesEditing}
+                            user={user}
+                            calculations={calculations}
+                            forWeb={true}
+                        />
                     </Col>
 
                     <Col span="16">
@@ -549,14 +413,16 @@ export default function ManageWebOrder({
             </div>
 
             {/* Modals */}
-            <DriverModal
-                open={driverModal.open}
-                onCancel={driverModal.onCancel}
-                order={order}
-            />
+            {modalActions.openDriverModal && (
+                <DriverModal
+                    open={modalState.isDriverModalOpen || false}
+                    onCancel={modalActions.closeDriverModal || (() => {})}
+                    order={order}
+                />
+            )}
             <OrderDiscountModal
-                open={orderDiscountModal.open}
-                onCancel={orderDiscountModal.onCancel}
+                open={modalState.isOrderDiscountModalOpen}
+                onCancel={modalActions.closeOrderDiscountModal}
                 order={order}
             />
             <WebPaymentModal
@@ -565,15 +431,9 @@ export default function ManageWebOrder({
                 order={order}
             />
             <OrderNotesModal
-                open={orderNotesModal.open}
-                onCancel={orderNotesModal.onCancel}
+                open={modalState.isOrderNotesModalOpen}
+                onCancel={modalActions.closeOrderNotesModal}
                 order={order}
-            />
-            <PrintInKitchenModal
-                open={printInKitchenModal.open}
-                onCancel={printInKitchenModal.onCancel}
-                order={order}
-                orderItems={orderItems}
             />
         </CashierLayout>
     );

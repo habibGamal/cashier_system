@@ -616,7 +616,7 @@ class OrderController extends Controller
         $order = $this->orderService->getOrderDetails($order->id);
 
         try {
-            $this->printService->printOrderReceipt($order, $request->input('images'));
+            $this->printService->printOrderReceipt($order);
 
             return back()->with('success', 'تم إرسال طباعة الطلب بنجاح');
         } catch (Exception $e) {
@@ -801,6 +801,49 @@ class OrderController extends Controller
             ], 'error');
 
             return back()->withErrors(['error' => 'حدث خطأ أثناء إنهاء الشيفت: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete a direct sale order and its items
+     * Only allowed for direct sale orders with processing status
+     */
+    public function destroy(Order $order)
+    {
+        try {
+            // Validate order type and status
+            if ($order->type !== OrderType::DIRECT_SALE) {
+                return back()->withErrors(['error' => 'يمكن حذف الطلبات المباشرة فقط']);
+            }
+
+            if ($order->status !== OrderStatus::PROCESSING) {
+                return back()->withErrors(['error' => 'يمكن حذف الطلبات قيد المعالجة فقط']);
+            }
+
+            DB::transaction(function () use ($order) {
+                // Delete order items first (due to foreign key constraints)
+                $order->items()->delete();
+
+                // Delete the order
+                $order->delete();
+            });
+
+            // Log the deletion
+            $this->loggingService->logAction('حذف طلب مباشر', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'total' => $order->total,
+            ]);
+
+            return back()->with('success', 'تم حذف الطلب بنجاح');
+
+        } catch (Exception $e) {
+            $this->loggingService->logAction('فشل في حذف الطلب', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ], 'error');
+
+            return back()->withErrors(['error' => 'حدث خطأ أثناء حذف الطلب: ' . $e->getMessage()]);
         }
     }
 

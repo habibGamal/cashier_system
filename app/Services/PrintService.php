@@ -45,7 +45,7 @@ class PrintService
     /**
      * Print order receipt
      */
-    public function printOrderReceipt(Order $order, array $images): void
+    public function printOrderReceipt(Order $order): void
     {
         PrintOrderReceipt::dispatch($order);
     }

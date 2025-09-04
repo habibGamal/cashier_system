@@ -15,7 +15,7 @@ const StartShift: React.FC = () => {
             <div className="grid place-items-center w-full min-h-[50vh]">
                 <Form
                     name="startShift"
-                    className="isolate min-w-[500px]"
+                    className="isolate min-w-[500px] !p-4"
                     layout="vertical"
                     onFinish={onFinish}
                 >
@@ -24,7 +24,7 @@ const StartShift: React.FC = () => {
                         name="start_cash"
                         rules={[{ required: true, message: 'هذا الحقل مطلوب' }]}
                     >
-                        <InputNumber min={0} className="w-full" placeholder="ادخل النقود المتوفرة" />
+                        <InputNumber min={0} className="!w-full" placeholder="ادخل النقود المتوفرة" />
                     </Form.Item>
 
                     <Form.Item>
