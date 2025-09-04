@@ -18,6 +18,7 @@ export default function ChangeOrderTypeModal({ open, onCancel, order }: ChangeOr
         { value: 'delivery', label: 'دليفري' },
         { value: 'web_delivery', label: 'ويب دليفري' },
         { value: 'web_takeaway', label: 'ويب تيك أواي' },
+        { value: 'direct_sale', label: 'بيع مباشر' },
     ];
 
     const onFinish = (values: any) => {

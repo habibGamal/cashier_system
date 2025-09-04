@@ -247,17 +247,18 @@ class ShiftsReportService
             'takeaway' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'webDelivery' => ['count' => 0, 'value' => 0, 'profit' => 0],
             'webTakeaway' => ['count' => 0, 'value' => 0, 'profit' => 0],
+            'directSale' => ['count' => 0, 'value' => 0, 'profit' => 0],
         ];
 
         foreach ($completedOrders as $order) {
             $key = $this->getStatsKey($order->type);
+            logger()->info($key);
             if ($key) {
                 $stats[$key]['count']++;
                 $stats[$key]['value'] += $order->total;
                 $stats[$key]['profit'] += $order->profit;
             }
         }
-
         return $stats;
     }
 
@@ -271,6 +272,7 @@ class ShiftsReportService
             OrderType::TAKEAWAY => 'takeaway',
             OrderType::WEB_DELIVERY => 'webDelivery',
             OrderType::WEB_TAKEAWAY => 'webTakeaway',
+            OrderType::DIRECT_SALE => 'directSale',
             default => null,
         };
     }

@@ -21,13 +21,14 @@ export default function PartialReceiptTemplate({
     index: number;
 }) {
     const getOrderTypeString = (type: string) => {
-        const typeMap = {
+        const orderTypeLabels = {
             takeaway: "تيك اواي",
             delivery: "ديليفري",
             web_delivery: "اونلاين دليفري",
             web_takeaway: "اونلاين تيك أواي",
-        };
-        return typeMap[type as keyof typeof typeMap] || type;
+            direct_sale: "بيع مباشر",
+        } as const;
+        return orderTypeLabels[type as keyof typeof orderTypeLabels] || type;
     };
     return (
         <div

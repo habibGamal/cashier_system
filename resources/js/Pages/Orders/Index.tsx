@@ -9,10 +9,12 @@ import { ReceiveOrdersPaymentsTab } from '@/Components/Orders/Index/ReceiveOrder
 import { ShiftExpensesTab } from '@/Components/Orders/Index/ShiftExpensesTab';
 import WebDeliveryTab from '@/Components/Orders/Index/WebDeliveryTab';
 import WebTakeawayTab from '@/Components/Orders/Index/WebTakeawayTab';
+import DirectSaleTab from '@/Components/Orders/Index/DirectSaleTab';
 import type { Order, User } from '@/types';
 
 interface IndexProps {
     orders: Order[];
+    categories: any[];
     auth: {
         user: User;
     };
@@ -20,6 +22,7 @@ interface IndexProps {
 
 const OrdersIndex: React.FC<IndexProps> = ({
     orders,
+    categories,
     auth
 }) => {
     const { user } = auth;
@@ -34,6 +37,9 @@ const OrdersIndex: React.FC<IndexProps> = ({
     );
     const webTakeawayOrders = orders.filter(
         (order) => order.type === 'web_takeaway' && ['pending', 'processing'].includes(order.status)
+    );
+    const directSaleOrder = orders.find(
+        (order) => order.type === 'direct_sale' && order.status === 'processing'
     );
     const cancelledOrders = orders.filter((order) => order.status === 'cancelled');
     const completedOrders = orders.filter((order) => order.status === 'completed');
@@ -61,6 +67,11 @@ const OrdersIndex: React.FC<IndexProps> = ({
             label: 'التيك اواي',
             children: <TakeawayTab orders={takeawayOrders} />,
             key: 'takeaway',
+        },
+        {
+            label: 'بيع مباشر',
+            children: <DirectSaleTab categories={categories} existingOrder={directSaleOrder} />,
+            key: 'direct_sale',
         },
         {
             label: 'ويب ديلفري',

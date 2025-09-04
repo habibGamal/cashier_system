@@ -11,13 +11,14 @@ export default function ReceiptTemplate({
     receiptFooter: string;
 }) {
     const getOrderTypeString = (type: string) => {
-        const typeMap = {
+        const orderTypeLabels = {
             takeaway: "تيك أواي",
             delivery: "دليفري",
             web_delivery: "اونلاين دليفري",
             web_takeaway: "اونلاين تيك أواي",
-        };
-        return typeMap[type as keyof typeof typeMap] || type;
+            direct_sale: "بيع مباشر",
+        } as const;
+        return orderTypeLabels[type as keyof typeof orderTypeLabels] || type;
     };
 
 

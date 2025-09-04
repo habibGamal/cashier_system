@@ -13,23 +13,27 @@ export const calculateOrderTotals = (
   orderItems: OrderItemData[]
 ): OrderTotals => {
   const subTotal = orderItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 0),
     0
   );
 
   const tax = subTotal * 0; // Currently no tax
 
   let service = 0;
-  if (order.type === 'delivery') {
+  if (order?.type === 'delivery') {
     service = Number(order.customer?.delivery_cost ?? 0);
-  } else if (order.type === 'dine_in') {
-    service = subTotal * order.service_rate!;
+  } else if (order?.type === 'dine_in') {
+    service = subTotal * (Number(order.service_rate) || 0);
   }
+
   let discount = 0;
-  if (order.temp_discount_percent > 0) {
-    discount = subTotal * (order.temp_discount_percent / 100);
+  const tempDiscountPercent = Number(order?.temp_discount_percent) || 0;
+  const orderDiscount = Number(order?.discount) || 0;
+
+  if (tempDiscountPercent > 0) {
+    discount = subTotal * (tempDiscountPercent / 100);
   } else {
-    discount = order.discount;
+    discount = orderDiscount;
   }
 
   const total = Math.ceil(subTotal + tax + service - discount);
@@ -84,6 +88,7 @@ export const getOrderTypeLabel = (type: string): string => {
     delivery: 'دليفري',
     companies: 'شركات',
     talabat: 'طلبات',
+    direct_sale: 'بيع مباشر',
   };
   return labels[type] || type;
 };

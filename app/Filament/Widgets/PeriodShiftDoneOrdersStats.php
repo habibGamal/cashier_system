@@ -39,6 +39,7 @@ class PeriodShiftDoneOrdersStats extends BaseWidget
             'takeaway' => ['key' => 'takeaway', 'label' => 'الاوردرات تيك اواي', 'icon' => 'heroicon-m-shopping-bag', 'color' => 'warning'],
             'web_delivery' => ['key' => 'webDelivery', 'label' => 'الاوردرات اونلاين ديليفري', 'icon' => 'heroicon-m-globe-alt', 'color' => 'danger'],
             'web_takeaway' => ['key' => 'webTakeaway', 'label' => 'الاوردرات اونلاين تيك اواي', 'icon' => 'heroicon-m-computer-desktop', 'color' => 'info'],
+            'direct_sale' => ['key' => 'directSale', 'label' => 'البيع المباشر', 'icon' => 'heroicon-o-banknotes', 'color' => 'success'],
         ];
 
         foreach ($statsMapping as $enumValue => $config) {

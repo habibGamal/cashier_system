@@ -7,7 +7,7 @@ export interface User {
 }
 
 export type OrderStatus = 'processing' | 'completed' | 'cancelled';
-export type OrderType = 'dine_in' | 'takeaway' | 'delivery' | 'companies' | 'talabat';
+export type OrderType = 'dine_in' | 'takeaway' | 'delivery' | 'companies' | 'talabat' | 'direct_sale';
 export type PaymentMethod = 'cash' | 'card' | 'talabat_card';
 export type PaymentStatus = 'pending' | 'partial_paid' | 'full_paid';
 

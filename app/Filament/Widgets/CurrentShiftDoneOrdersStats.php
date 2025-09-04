@@ -87,6 +87,19 @@ class CurrentShiftDoneOrdersStats extends BaseWidget
                     JS
                 ])
                 ->color('info'),
+
+            Stat::make('البيع المباشر', $orderTypeStats['directSale']['count'] . ' اوردر')
+                ->description('بقيمة ' . number_format($orderTypeStats['directSale']['value'], 2) . ' جنيه - ربح ' . number_format($orderTypeStats['directSale']['profit'], 2) . ' جنيه' .
+                    ($orderTypeStats['directSale']['count'] > 0 ? ' - متوسط ' . number_format($orderTypeStats['directSale']['value'] / $orderTypeStats['directSale']['count'], 2) . ' جنيه' : ''))
+                ->descriptionIcon('heroicon-o-banknotes')
+                ->extraAttributes([
+                    'class' => 'transition hover:scale-105 cursor-pointer',
+                    'wire:click' => <<<JS
+                        \$dispatch('filterUpdate',{filter:{type:'direct_sale'}} )
+                        document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    JS
+                ])
+                ->color('success'),
         ];
     }
 

@@ -66,8 +66,18 @@ class OrderController extends Controller
         // Get expense types
         $expenseTypes = ExpenceType::all();
 
+        // Get categories with products for direct sale tab
+        $categories = Category::with([
+            'products' => function ($query) {
+                $query
+                    ->whereNot('type', ProductType::RawMaterial)
+                    ->where('legacy', false)->orderBy('name');
+            }
+        ])->orderBy('name')->get();
+
         return Inertia::render('Orders/Index', [
             'orders' => $orders,
+            'categories' => $categories,
             'currentShift' => $currentShift,
             'expenses' => $expenses,
             'expenseTypes' => $expenseTypes,
@@ -532,7 +542,7 @@ class OrderController extends Controller
     public function updateOrderType(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'type' => 'required|in:takeaway,delivery,web_delivery,web_takeaway',
+            'type' => 'required|in:takeaway,delivery,web_delivery,web_takeaway,direct_sale',
         ]);
 
         try {
@@ -667,6 +677,11 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required|in:' . implode(',', array_column(OrderType::cases(), 'value')),
+            'items' => 'sometimes|array',
+            'items.*.product_id' => 'required_with:items|integer|exists:products,id',
+            'items.*.quantity' => 'required_with:items|numeric|min:0.001',
+            'items.*.price' => 'required_with:items|numeric|min:0',
+            'items.*.notes' => 'nullable|string',
         ]);
 
         try {
@@ -682,8 +697,21 @@ class OrderController extends Controller
                 'delivery' => OrderType::DELIVERY,
                 'web_delivery' => OrderType::WEB_DELIVERY,
                 'web_takeaway' => OrderType::WEB_TAKEAWAY,
+                'direct_sale' => OrderType::DIRECT_SALE,
                 default => throw new InvalidArgumentException('Invalid order type'),
             };
+
+            // For direct sale orders, check if there's already a processing order
+            if ($orderType === OrderType::DIRECT_SALE) {
+                $existingDirectSaleOrder = Order::where('type', OrderType::DIRECT_SALE)
+                    ->where('status', OrderStatus::PROCESSING)
+                    ->where('shift_id', $currentShift->id)
+                    ->first();
+
+                if ($existingDirectSaleOrder) {
+                    return back()->withErrors(['error' => 'يوجد بالفعل طلب بيع مباشر قيد المعالجة. يرجى إتمام أو إلغاء الطلب الحالي أولاً.']);
+                }
+            }
 
             $createOrderDTO = new CreateOrderDTO(
                 type: $orderType,
@@ -693,15 +721,44 @@ class OrderController extends Controller
 
             $order = $this->orderService->createOrder($createOrderDTO);
 
+            // If items are provided (for direct sale), add them to the order
+            if (isset($validated['items']) && !empty($validated['items'])) {
+                $products = Product::select(['id', 'cost', 'price'])->whereIn('id', array_column($validated['items'], 'product_id'))->get();
+
+                $itemsData = array_map(function ($item) use ($products) {
+                    $product = $products->firstWhere('id', $item['product_id']);
+                    if (!$product) {
+                        throw new Exception('المنتج غير موجود');
+                    }
+                    return [
+                        'product_id' => $product->id,
+                        'quantity' => $item['quantity'],
+                        'price' => (float) $item['price'],
+                        'cost' => (float) $product->cost,
+                        'notes' => $item['notes'] ?? null,
+                    ];
+                }, $validated['items']);
+
+                $this->orderService->updateOrderItems($order->id, $itemsData);
+                $order->refresh();
+            }
+
             // Log order creation
             $this->loggingService->logOrderCreation(
                 $order->id,
                 $validated['type']
             );
 
+            // For direct sale, return back with order data
+            if ($validated['type'] === 'direct_sale') {
+                $order->load(['items.product', 'user', 'customer', 'driver', 'payments']);
+                return back()->with('success', 'تم إنشاء الطلب بنجاح')->with('createdOrder', $order);
+            }
+
             return redirect()->route('orders.manage', $order);
         } catch (Exception $e) {
             logger()->error('Error creating order: ' . $e->getMessage());
+
             return back()->withErrors(['error' => 'حدث خطأ أثناء إنشاء الطلب: ' . $e->getMessage()]);
         }
     }

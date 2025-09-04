@@ -9,6 +9,7 @@
             'talabat' => 'طلبات',
             'web_delivery' => 'اونلاين دليفري',
             'web_takeaway' => 'اونلاين تيك أواي',
+            'direct_sale' => 'بيع مباشر',
         ];
         return $typeMap[$type->value] ?? $type->value;
     };

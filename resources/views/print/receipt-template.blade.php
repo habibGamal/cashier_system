@@ -13,6 +13,7 @@
             'talabat' => 'طلبات',
             'web_delivery' => 'اونلاين دليفري',
             'web_takeaway' => 'اونلاين تيك أواي',
+            'direct_sale' => 'بيع مباشر',
         ];
         return $typeMap[$type->value] ?? $type->value;
     };
@@ -161,8 +162,8 @@
         <p>تاريخ الطباعة : {{ $printDate }}</p>
         <p>نوع الطلب : {{ $getOrderTypeString($order->type) }} </p>
 
-        {{-- Takeaway: show customer name and phone --}}
-        @if (in_array($order->type->value, ['takeaway', 'web_takeaway']))
+        {{-- Takeaway and Direct Sale: show customer name and phone --}}
+        @if (in_array($order->type->value, ['takeaway', 'web_takeaway', 'direct_sale']))
             <p>اسم العميل : {{ $order->customer?->name ?? '-' }}</p>
             <p>رقم الهاتف : {{ $order->customer?->phone ?? '-' }}</p>
         @endif

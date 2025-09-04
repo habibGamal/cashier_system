@@ -73,6 +73,7 @@ class ShiftLoggingService
             'delivery' => 'توصيل',
             'web_takeaway' => 'تيك أواي ويب',
             'web_delivery' => 'توصيل ويب',
+            'direct_sale' => 'بيع مباشر',
         ];
 
         $details = [

@@ -12,6 +12,7 @@ enum OrderType: string implements HasColor, HasIcon, HasLabel
     case DELIVERY = 'delivery';
     case WEB_DELIVERY = 'web_delivery';
     case WEB_TAKEAWAY = 'web_takeaway';
+    case DIRECT_SALE = 'direct_sale';
 
     public function getLabel(): ?string
     {
@@ -20,6 +21,7 @@ enum OrderType: string implements HasColor, HasIcon, HasLabel
             self::DELIVERY => 'دليفري',
             self::WEB_DELIVERY => 'اونلاين دليفري',
             self::WEB_TAKEAWAY => 'اونلاين تيك أواي',
+            self::DIRECT_SALE => 'بيع مباشر',
         };
     }
 
@@ -30,6 +32,7 @@ enum OrderType: string implements HasColor, HasIcon, HasLabel
             self::DELIVERY => 'danger',
             self::WEB_DELIVERY => 'primary',
             self::WEB_TAKEAWAY => 'primary',
+            self::DIRECT_SALE => 'success',
         };
     }
 
@@ -40,6 +43,7 @@ enum OrderType: string implements HasColor, HasIcon, HasLabel
             self::DELIVERY => 'heroicon-o-truck',
             self::WEB_DELIVERY => 'heroicon-o-globe-alt',
             self::WEB_TAKEAWAY => 'heroicon-o-computer-desktop',
+            self::DIRECT_SALE => 'heroicon-o-banknotes',
         };
     }
 

@@ -72,7 +72,7 @@ export interface Order {
   driver_id?: number;
   user_id: number;
   shift_id: number;
-  type: 'dine_in' | 'takeaway' | 'delivery' | 'companies' | 'talabat' | 'web_delivery' | 'web_takeaway';
+  type: 'dine_in' | 'takeaway' | 'delivery' | 'companies' | 'talabat' | 'web_delivery' | 'web_takeaway' | 'direct_sale';
   status: 'pending' | 'processing' | 'ready' | 'out_for_delivery' | 'completed' | 'cancelled';
   sub_total: number;
   tax: number;
