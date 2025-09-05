@@ -7,15 +7,17 @@ import { TakeawayTab } from '@/Components/Orders/Index/TakeawayTab';
 import { DisplayTab } from '@/Components/Orders/Index/DisplayTab';
 import { ReceiveOrdersPaymentsTab } from '@/Components/Orders/Index/ReceiveOrdersPaymentsTab';
 import { ShiftExpensesTab } from '@/Components/Orders/Index/ShiftExpensesTab';
+import { ReturnOrdersTab } from '@/Components/Orders/Index/ReturnOrdersTab';
 import WebDeliveryTab from '@/Components/Orders/Index/WebDeliveryTab';
 import WebTakeawayTab from '@/Components/Orders/Index/WebTakeawayTab';
 import DirectSaleTab from '@/Components/Orders/Index/DirectSaleTab';
-import type { Order, User } from '@/types';
+import type { Order, User, ReturnOrder } from '@/types';
 import getDirectSaleOrder from '@/helpers/getDirectSaleOrder';
 
 interface IndexProps {
     orders: Order[];
     categories: any[];
+    returnOrders?: ReturnOrder[];
     auth: {
         user: User;
     };
@@ -24,6 +26,7 @@ interface IndexProps {
 const OrdersIndex: React.FC<IndexProps> = ({
     orders,
     categories,
+    returnOrders = [],
     auth
 }) => {
     const { user } = auth;
@@ -81,6 +84,11 @@ const OrdersIndex: React.FC<IndexProps> = ({
             label: 'ويب تيك اواي',
             children: <WebTakeawayTab orders={webTakeawayOrders} />,
             key: 'web_takeaway',
+        },
+        {
+            label: 'طلبات الإرجاع',
+            children: <ReturnOrdersTab returnOrders={returnOrders} />,
+            key: 'return_orders',
         },
         {
             label: 'مصاريف',

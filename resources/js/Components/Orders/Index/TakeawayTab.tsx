@@ -1,8 +1,7 @@
 import React from "react";
-import { Link, router } from "@inertiajs/react";
-import { Button, Col, Empty, Row, Typography, Badge } from "antd";
-import { PhoneOutlined } from "@ant-design/icons";
-import { orderStatus } from "@/helpers/orderState";
+import { Col, Empty, Row } from "antd";
+import { OrderCard } from "@/Components/Orders/OrderCard";
+import { CreateOrderButton } from "@/Components/Orders/CreateOrderButton";
 import type { Order } from "@/types";
 
 interface TakeawayTabProps {
@@ -18,53 +17,19 @@ export const TakeawayTab: React.FC<TakeawayTabProps> = ({ orders }) => {
         return a.status > b.status ? -1 : 1;
     });
 
-    const createOrder = () => {
-        router.post(route("orders.store"), { type: "takeaway" });
-    };
-
     return (
         <div>
             <Row gutter={[24, 16]}>
                 <Col span={6}>
-                    <Button
-                        onClick={createOrder}
-                        className="!h-32 w-full"
-                        type="primary"
-                        size="large"
-                    >
-                        <div
-                            className="mt-2"
-                            style={{
-                                fontSize: "18px",
-                                textAlign: "center",
-                                width: "100%",
-                            }}
-                        >
-                            إنشاء طلب تيك اواي
-                        </div>
-                    </Button>
+                    <CreateOrderButton orderType="takeaway" />
                 </Col>
                 {sortedOrders.map((order) => (
                     <Col span={6} key={order.id}>
-                        <Link href={`/orders/manage/${order.id}`}>
-                            <Badge.Ribbon {...orderStatus(order.status)}>
-                                <div className="isolate grid place-items-center gap-4 rounded-sm p-4 border">
-                                    <Typography.Title level={4}>
-                                        # طلب رقم {order.order_number}
-                                    </Typography.Title>
-                                    <Typography.Title
-                                        className="flex items-center gap-2"
-                                        level={5}
-                                    >
-                                        <PhoneOutlined
-                                            style={{ color: "#d7a600" }}
-                                        />
-                                        رقم العميل{" "}
-                                        {order.customer?.phone || "غير معروف"}
-                                    </Typography.Title>
-                                </div>
-                            </Badge.Ribbon>
-                        </Link>
+                        <OrderCard
+                            order={order}
+                            href={`/orders/manage/${order.id}`}
+                            orderType="takeaway"
+                        />
                     </Col>
                 ))}
             </Row>

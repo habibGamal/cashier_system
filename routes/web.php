@@ -49,6 +49,14 @@ Route::middleware('auth')->group(function () {
         Route::delete('/destroy/{order}', [OrderController::class, 'destroy'])->name('destroy');
     })->middleware(['shift']);
 
+    // Return Order Management Routes
+    Route::prefix('return-orders')->name('return-orders.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ReturnOrderController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\ReturnOrderController::class, 'store'])->name('store');
+        Route::get('/{returnOrder}', [\App\Http\Controllers\ReturnOrderController::class, 'show'])->name('show');
+        Route::get('/order/{orderId}/details', [\App\Http\Controllers\ReturnOrderController::class, 'getOrderForReturn'])->name('details');
+    })->middleware(['shift']);
+
     // Quick operations routes
     Route::post('/quick-customer', [OrderController::class, 'quickCustomer'])->name('quickCustomer')->middleware(['shift']);
     Route::post('/quick-driver', [OrderController::class, 'quickDriver'])->name('quickDriver')->middleware(['shift']);

@@ -23,7 +23,6 @@ class OrderCompleted implements ShouldBroadcast
     {
         return [
             new PrivateChannel('shift.' . $this->order->shift_id),
-            new PrivateChannel('kitchen'),
         ];
     }
 

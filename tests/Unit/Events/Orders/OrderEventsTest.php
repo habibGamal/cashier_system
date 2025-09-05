@@ -23,10 +23,9 @@ describe('Order Events', function () {
 
             $channels = $event->broadcastOn();
 
-            expect($channels)->toHaveCount(2);
+            expect($channels)->toHaveCount(1);
             expect($channels[0])->toBeInstanceOf(PrivateChannel::class);
             expect($channels[0]->name)->toBe("private-shift.{$shift->id}");
-            expect($channels[1]->name)->toBe('private-kitchen');
         });
 
         it('broadcasts correct data', function () {
@@ -60,9 +59,8 @@ describe('Order Events', function () {
 
             $channels = $event->broadcastOn();
 
-            expect($channels)->toHaveCount(2);
+            expect($channels)->toHaveCount(1);
             expect($channels[0]->name)->toBe("private-shift.{$shift->id}");
-            expect($channels[1]->name)->toBe('private-kitchen');
         });
 
         it('broadcasts correct data', function () {
@@ -96,9 +94,8 @@ describe('Order Events', function () {
 
             $channels = $event->broadcastOn();
 
-            expect($channels)->toHaveCount(2);
+            expect($channels)->toHaveCount(1);
             expect($channels[0]->name)->toBe("private-shift.{$shift->id}");
-            expect($channels[1]->name)->toBe('private-kitchen');
         });
 
         it('broadcasts correct data with reason', function () {

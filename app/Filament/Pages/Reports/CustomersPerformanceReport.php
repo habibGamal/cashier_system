@@ -12,6 +12,7 @@ use App\Filament\Widgets\CustomerSegmentsWidget;
 use App\Filament\Widgets\CustomerOrderTypePerformanceWidget;
 use App\Filament\Widgets\CustomerActivityTrendWidget;
 use App\Filament\Widgets\CustomersPerformanceTableWidget;
+use App\Filament\Widgets\CustomersReturnOrdersStatsWidget;
 use App\Filament\Traits\AdminAccess;
 use App\Filament\Traits\ViewerAccess;
 use App\Services\CustomersPerformanceReportService;
@@ -77,6 +78,7 @@ class CustomersPerformanceReport extends BaseDashboard
             CustomerSegmentsWidget::class,
             CustomerOrderTypePerformanceWidget::class,
             CustomerActivityTrendWidget::class,
+            CustomersReturnOrdersStatsWidget::class,
             CustomersPerformanceTableWidget::class,
         ];
     }

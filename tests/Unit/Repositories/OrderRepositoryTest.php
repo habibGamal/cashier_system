@@ -171,12 +171,12 @@ describe('OrderRepository', function () {
 
     describe('update', function () {
         it('updates order data', function () {
-            $order = Order::factory()->create(['kitchen_notes' => 'Original notes']);
+            $order = Order::factory()->create(['order_notes' => 'Original notes']);
 
-            $result = $this->repository->update($order, ['kitchen_notes' => 'Updated notes']);
+            $result = $this->repository->update($order, ['order_notes' => 'Updated notes']);
 
             expect($result)->toBeTrue();
-            expect($order->fresh()->kitchen_notes)->toBe('Updated notes');
+            expect($order->fresh()->order_notes)->toBe('Updated notes');
         });
     });
 

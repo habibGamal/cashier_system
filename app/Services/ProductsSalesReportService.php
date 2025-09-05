@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ReturnOrder;
 use App\Models\Category;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
@@ -63,6 +64,11 @@ class ProductsSalesReportService
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.quantity ELSE 0 END), 0) as web_takeaway_quantity'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total ELSE 0 END), 0) as web_takeaway_sales'),
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "web_takeaway" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as web_takeaway_profit'),
+
+                // Direct Sale
+                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "direct_sale" THEN order_items.quantity ELSE 0 END), 0) as direct_sale_quantity'),
+                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "direct_sale" THEN order_items.total ELSE 0 END), 0) as direct_sale_sales'),
+                DB::raw('COALESCE(SUM(CASE WHEN orders.type = "direct_sale" THEN order_items.total - (order_items.cost * order_items.quantity) ELSE 0 END), 0) as direct_sale_profit'),
             ])
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoin('order_items', function ($join) use ($startDate, $endDate) {
@@ -86,6 +92,52 @@ class ProductsSalesReportService
                 ;
             })
             ->groupBy('products.id', 'products.name', 'products.price', 'products.cost', 'products.type', 'categories.name');
+    }
+
+    /**
+     * Get products return orders performance data
+     */
+    public function getProductsReturnOrdersPerformanceQuery(?string $startDate = null, ?string $endDate = null)
+    {
+        return Product::query()
+            ->whereNot('products.type', ProductType::RawMaterial)
+            ->select([
+                'products.id',
+                'products.name',
+                'products.price',
+                'products.cost',
+                'categories.name as category_name',
+
+                // Return orders data (only completed returns)
+                DB::raw('COALESCE(COUNT(DISTINCT return_orders.id), 0) as return_orders_count'),
+                DB::raw('COALESCE(SUM(return_items.quantity), 0) as total_returned_quantity'),
+                DB::raw('COALESCE(SUM(return_items.total), 0) as total_returned_value'),
+                DB::raw('COALESCE(SUM(return_orders.refund_amount), 0) as total_refund_amount'),
+            ])
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('return_items', function ($join) use ($startDate, $endDate) {
+                $join->on('products.id', '=', 'return_items.product_id')
+                    ->whereExists(function ($query) use ($startDate, $endDate) {
+                        $query->select(DB::raw(1))
+                            ->from('return_orders')
+                            ->whereColumn('return_orders.id', 'return_items.return_order_id')
+                            ->where('return_orders.status', 'completed')
+                            ->whereBetween('return_orders.created_at', [
+                                $startDate ? Carbon::parse($startDate)->startOfDay() : now()->subDays(30)->startOfDay(),
+                                $endDate ? Carbon::parse($endDate)->endOfDay() : now()->endOfDay()
+                            ]);
+                    });
+            })
+            ->leftJoin('return_orders', function ($join) use ($startDate, $endDate) {
+                $join->on('return_items.return_order_id', '=', 'return_orders.id')
+                    ->where('return_orders.status', 'completed')
+                    ->whereBetween('return_orders.created_at', [
+                        $startDate ? Carbon::parse($startDate)->startOfDay() : now()->subDays(30)->startOfDay(),
+                        $endDate ? Carbon::parse($endDate)->endOfDay() : now()->endOfDay()
+                    ]);
+            })
+            ->groupBy('products.id', 'products.name', 'products.price', 'products.cost', 'categories.name')
+            ->havingRaw('total_returned_quantity > 0');
     }
 
     /**
@@ -182,6 +234,79 @@ class ProductsSalesReportService
             'avg_profit_margin' => $summary->avg_profit_margin,
             'best_selling_product' => $bestSellingProduct,
             'most_profitable_product' => $mostProfitableProduct,
+        ];
+    }
+
+    /**
+     * Get return orders summary for the period
+     */
+    public function getReturnOrdersSummary(?string $startDate = null, ?string $endDate = null): array
+    {
+        $summary = DB::table('return_orders as ro')
+            ->select([
+                DB::raw('COUNT(DISTINCT ro.id) as total_return_orders'),
+                DB::raw('SUM(ro.refund_amount) as total_refund_amount'),
+                DB::raw('SUM(ri.quantity) as total_returned_quantity'),
+                DB::raw('SUM(ri.total) as total_returned_value'),
+                DB::raw('AVG(ro.refund_amount) as avg_refund_amount'),
+                DB::raw('COUNT(DISTINCT ri.product_id) as products_returned_count'),
+            ])
+            ->leftJoin('return_items as ri', 'ro.id', '=', 'ri.return_order_id')
+            ->where('ro.status', 'completed')
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+            })
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+            })
+            ->first();
+
+        // Get most returned product
+        $mostReturnedProduct = DB::table('return_items as ri')
+            ->select([
+                'p.id',
+                'p.name',
+                DB::raw('SUM(ri.quantity) as total_returned_quantity'),
+                DB::raw('SUM(ri.total) as total_returned_value'),
+                DB::raw('COUNT(DISTINCT ri.return_order_id) as return_orders_count'),
+            ])
+            ->leftJoin('products as p', 'ri.product_id', '=', 'p.id')
+            ->leftJoin('return_orders as ro', function ($join) use ($startDate, $endDate) {
+                $join->on('ri.return_order_id', '=', 'ro.id')
+                    ->where('ro.status', 'completed')
+                    ->when($startDate, function ($query) use ($startDate) {
+                        $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+                    })
+                    ->when($endDate, function ($query) use ($endDate) {
+                        $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+                    });
+            })
+            ->whereNotNull('p.id')
+            ->groupBy('p.id', 'p.name')
+            ->orderByDesc('total_returned_quantity')
+            ->limit(1)
+            ->first();
+
+        if (!$summary) {
+            return [
+                'total_return_orders' => 0,
+                'total_refund_amount' => 0,
+                'total_returned_quantity' => 0,
+                'total_returned_value' => 0,
+                'avg_refund_amount' => 0,
+                'products_returned_count' => 0,
+                'most_returned_product' => null,
+            ];
+        }
+
+        return [
+            'total_return_orders' => $summary->total_return_orders ?? 0,
+            'total_refund_amount' => $summary->total_refund_amount ?? 0,
+            'total_returned_quantity' => $summary->total_returned_quantity ?? 0,
+            'total_returned_value' => $summary->total_returned_value ?? 0,
+            'avg_refund_amount' => $summary->avg_refund_amount ?? 0,
+            'products_returned_count' => $summary->products_returned_count ?? 0,
+            'most_returned_product' => $mostReturnedProduct,
         ];
     }
 

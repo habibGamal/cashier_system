@@ -1,6 +1,5 @@
-import { Link } from '@inertiajs/react'
-import { Badge, Col, Empty, Row, Typography } from 'antd'
-import { PhoneOutlined } from '@ant-design/icons'
+import { Col, Empty, Row } from 'antd'
+import { OrderCard } from '@/Components/Orders/OrderCard'
 import { Order } from '@/types'
 
 interface WebTakeawayProps {
@@ -25,46 +24,14 @@ export default function WebTakeawayTab({ orders }: WebTakeawayProps) {
   return (
     <Row gutter={[24, 16]}>
       {sortedOrders.map((order) => (
-        <WebTakeawayOrder key={order.id} order={order} />
+        <Col span={6} key={order.id}>
+          <OrderCard
+            order={order}
+            href={`/web-orders/manage-web-order/${order.id}`}
+            orderType="web-takeaway"
+          />
+        </Col>
       ))}
     </Row>
-  )
-}
-
-interface WebTakeawayOrderProps {
-  order: Order
-}
-
-const WebTakeawayOrder = ({ order }: WebTakeawayOrderProps) => {
-  const getOrderStatus = (status: string) => {
-    const statusConfig = {
-      pending: { color: 'orange', text: 'في الإنتظار' },
-      processing: { color: 'blue', text: 'قيد التشغيل' },
-      out_for_delivery: { color: 'purple', text: 'في طريق التوصيل' },
-      completed: { color: 'green', text: 'مكتمل' },
-      cancelled: { color: 'red', text: 'ملغي' },
-    }
-
-    return statusConfig[status as keyof typeof statusConfig] || { color: 'gray', text: status }
-  }
-
-  const statusInfo = getOrderStatus(order.status)
-
-  return (
-    <Col span={6}>
-      <Link href={`/web-orders/manage-web-order/${order.id}`}>
-        <Badge.Ribbon color={statusInfo.color} text={statusInfo.text}>
-          <div className="isolate grid place-items-center gap-4 rounded-sm border border-gray-200 p-4 hover:shadow-lg transition-shadow">
-            <Typography.Title level={4} className="mb-0">
-              # طلب رقم {order.order_number}
-            </Typography.Title>
-            <Typography.Title className="flex items-center gap-2 mb-0 text-amber-600" level={5}>
-              <PhoneOutlined size={16} />
-              رقم العميل {order.customer?.phone || 'غير معروف'}
-            </Typography.Title>
-          </div>
-        </Badge.Ribbon>
-      </Link>
-    </Col>
   )
 }

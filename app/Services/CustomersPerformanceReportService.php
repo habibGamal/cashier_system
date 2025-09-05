@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ReturnOrder;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use Illuminate\Support\Facades\DB;
@@ -278,5 +279,113 @@ class CustomersPerformanceReportService
                 'description' => sprintf('أداء المبيعات والأرباح حتى %s', $end->format('d/m/Y')),
             ];
         }
+    }
+
+    /**
+     * Get customers return orders performance data
+     */
+    public function getCustomersReturnOrdersPerformanceQuery(?string $startDate = null, ?string $endDate = null)
+    {
+        return Customer::query()
+            ->select([
+                'customers.id',
+                'customers.name',
+                'customers.phone',
+                'customers.region',
+
+                // Return orders data (only completed returns)
+                DB::raw('COALESCE(COUNT(DISTINCT return_orders.id), 0) as return_orders_count'),
+                DB::raw('COALESCE(SUM(return_orders.refund_amount), 0) as total_refund_amount'),
+                DB::raw('COALESCE(AVG(return_orders.refund_amount), 0) as avg_refund_amount'),
+                DB::raw('COALESCE(SUM(return_items.quantity), 0) as total_returned_quantity'),
+                DB::raw('COALESCE(SUM(return_items.total), 0) as total_returned_value'),
+                DB::raw('MAX(return_orders.created_at) as last_return_date'),
+                DB::raw('MIN(return_orders.created_at) as first_return_date'),
+            ])
+            ->leftJoin('return_orders', function ($join) use ($startDate, $endDate) {
+                $join->on('customers.id', '=', 'return_orders.customer_id')
+                    ->where('return_orders.status', 'completed')
+                    ->when($startDate, function ($query) use ($startDate) {
+                        $query->where('return_orders.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+                    })
+                    ->when($endDate, function ($query) use ($endDate) {
+                        $query->where('return_orders.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+                    });
+            })
+            ->leftJoin('return_items', 'return_orders.id', '=', 'return_items.return_order_id')
+            ->groupBy('customers.id', 'customers.name', 'customers.phone', 'customers.region')
+            ->havingRaw('return_orders_count > 0')
+            ->orderByDesc('return_orders_count');
+    }
+
+    /**
+     * Get return orders summary for customers
+     */
+    public function getCustomersReturnOrdersSummary(?string $startDate = null, ?string $endDate = null): array
+    {
+        $summary = DB::table('return_orders as ro')
+            ->select([
+                DB::raw('COUNT(DISTINCT ro.id) as total_return_orders'),
+                DB::raw('COUNT(DISTINCT ro.customer_id) as customers_with_returns'),
+                DB::raw('SUM(ro.refund_amount) as total_refund_amount'),
+                DB::raw('AVG(ro.refund_amount) as avg_refund_amount'),
+                DB::raw('SUM(ri.quantity) as total_returned_quantity'),
+                DB::raw('SUM(ri.total) as total_returned_value'),
+            ])
+            ->leftJoin('return_items as ri', 'ro.id', '=', 'ri.return_order_id')
+            ->where('ro.status', 'completed')
+            ->whereNotNull('ro.customer_id')
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+            })
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+            })
+            ->first();
+
+        // Get customer with most returns
+        $topReturningCustomer = DB::table('return_orders as ro')
+            ->select([
+                'c.id',
+                'c.name',
+                'c.phone',
+                DB::raw('COUNT(ro.id) as return_orders_count'),
+                DB::raw('SUM(ro.refund_amount) as total_refund_amount'),
+            ])
+            ->leftJoin('customers as c', 'ro.customer_id', '=', 'c.id')
+            ->where('ro.status', 'completed')
+            ->whereNotNull('ro.customer_id')
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+            })
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+            })
+            ->groupBy('c.id', 'c.name', 'c.phone')
+            ->orderByDesc('return_orders_count')
+            ->limit(1)
+            ->first();
+
+        if (!$summary) {
+            return [
+                'total_return_orders' => 0,
+                'customers_with_returns' => 0,
+                'total_refund_amount' => 0,
+                'avg_refund_amount' => 0,
+                'total_returned_quantity' => 0,
+                'total_returned_value' => 0,
+                'top_returning_customer' => null,
+            ];
+        }
+
+        return [
+            'total_return_orders' => $summary->total_return_orders ?? 0,
+            'customers_with_returns' => $summary->customers_with_returns ?? 0,
+            'total_refund_amount' => $summary->total_refund_amount ?? 0,
+            'avg_refund_amount' => $summary->avg_refund_amount ?? 0,
+            'total_returned_quantity' => $summary->total_returned_quantity ?? 0,
+            'total_returned_value' => $summary->total_returned_value ?? 0,
+            'top_returning_customer' => $topReturningCustomer,
+        ];
     }
 }

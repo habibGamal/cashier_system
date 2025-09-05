@@ -89,6 +89,11 @@ class Order extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function returnOrders(): HasMany
+    {
+        return $this->hasMany(ReturnOrder::class);
+    }
+
     // Computed attributes
     public function getTypeStringAttribute(): string
     {

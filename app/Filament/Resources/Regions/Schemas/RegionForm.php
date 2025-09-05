@@ -7,9 +7,9 @@ use Filament\Schemas\Schema;
 
 class RegionForm
 {
-    public static function make(): Schema
+    public static function configure(Schema $schema): Schema
     {
-        return Schema::make()
+        return $schema
             ->components([
                 TextInput::make('name')
                     ->label('اسم المنطقة')

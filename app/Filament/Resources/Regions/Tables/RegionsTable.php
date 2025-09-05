@@ -12,7 +12,7 @@ use Filament\Actions\DeleteBulkAction;
 
 class RegionsTable
 {
-    public static function make(Table $table): Table
+    public static function configure(Table $table): Table
     {
         return $table
             ->columns([

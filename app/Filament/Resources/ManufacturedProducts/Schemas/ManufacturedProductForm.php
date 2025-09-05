@@ -22,6 +22,7 @@ class ManufacturedProductForm
         return $schema
             ->components([
                 Section::make('معلومات المنتج')
+                    ->columnSpan('full')
                     ->schema([
                         TextInput::make('name')
                             ->label('اسم المنتج')
@@ -90,7 +91,8 @@ class ManufacturedProductForm
                     ])
                     ->columns(3),
 
-                Section::make('مكونات المنتج (الوصفة)')
+                Section::make('مكونات المنتج')
+                    ->columnSpan('full')
                     ->extraAttributes([
                         'x-init' => <<<JS
                                 const updateTotal = () => {

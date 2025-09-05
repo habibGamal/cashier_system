@@ -29,6 +29,7 @@ class ProductCostManagementService
                 $newQuantity = $item->quantity;
                 $newCost = $item->price;
                 $oldQuantity = $item->product->inventoryItem->quantity ?? 0;
+                $oldQuantity = $oldQuantity < 0 ? 0 : $oldQuantity;
                 $oldCost = $item->product->cost ?? 0;
 
                 $newAverageCost = ($oldCost * $oldQuantity + $newCost * $newQuantity) / ($oldQuantity + $newQuantity);

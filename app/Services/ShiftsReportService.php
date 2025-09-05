@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Shift;
 use App\Models\Order;
+use App\Models\ReturnOrder;
 use App\Models\ExpenceType;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
@@ -21,7 +22,7 @@ class ShiftsReportService
     {
         return Shift::where('closed', false)
             ->where('end_at', null)
-            ->with(['orders', 'expenses', 'user'])
+            ->with(['orders', 'expenses', 'user', 'returnOrders'])
             ->first();
     }
 
@@ -31,7 +32,7 @@ class ShiftsReportService
      */
     public function getShiftsInPeriodQuery(?string $startDate = null, ?string $endDate = null, ?array $shiftIds = null)
     {
-        $query = Shift::query()->with(['orders', 'expenses', 'user']);
+        $query = Shift::query()->with(['orders', 'expenses', 'user', 'returnOrders']);
 
         if ($shiftIds && !empty($shiftIds)) {
             $query->whereIn('id', $shiftIds);
@@ -145,6 +146,45 @@ class ShiftsReportService
     }
 
     /**
+     * Calculate return orders statistics for a shift
+     */
+    public function calculateReturnOrdersStats(Shift $shift): array
+    {
+        // Only consider completed return orders
+        $returnOrders = $shift->returnOrders()
+            ->where('status', 'completed')
+            ->with('items')
+            ->get();
+
+        $totalReturns = $returnOrders->count();
+        $totalRefundAmount = $returnOrders->sum('refund_amount');
+
+        // Calculate total items returned
+        $totalItemsReturned = 0;
+        $totalItemsValue = 0;
+        foreach ($returnOrders as $returnOrder) {
+            $totalItemsReturned += $returnOrder->items->sum('quantity');
+            $totalItemsValue += $returnOrder->items->sum('total');
+        }
+
+        // Calculate average return value
+        $avgReturnValue = $totalReturns > 0 ? $totalRefundAmount / $totalReturns : 0;
+
+        // Return rate vs total sales
+        $completedOrdersTotal = $shift->orders()->where('status', OrderStatus::COMPLETED)->sum('total');
+        $returnRate = $completedOrdersTotal > 0 ? ($totalRefundAmount / $completedOrdersTotal) * 100 : 0;
+
+        return [
+            'totalReturns' => $totalReturns,
+            'totalRefundAmount' => $totalRefundAmount,
+            'totalItemsReturned' => $totalItemsReturned,
+            'totalItemsValue' => $totalItemsValue,
+            'avgReturnValue' => $avgReturnValue,
+            'returnRate' => $returnRate,
+        ];
+    }
+
+    /**
      * Calculate aggregated statistics for multiple shifts
      */
     public function calculatePeriodStats(?string $startDate = null, ?string $endDate = null, ?array $shiftIds = null)
@@ -197,6 +237,17 @@ class ShiftsReportService
                 'expenses.shift_id'
             )->first();
 
+        // Get return orders data (only completed)
+        $returnOrdersData = (clone $shiftsQuery)
+            ->select([
+                DB::raw('COUNT(return_orders.id) as total_returns'),
+                DB::raw('SUM(return_orders.refund_amount) as total_refund_amount'),
+            ])
+            ->leftJoin(
+                'return_orders',
+                fn($join) => $join->on('shifts.id', '=', 'return_orders.shift_id')
+                    ->where('return_orders.status', 'completed')
+            )->first();
         $totalStats = [
             'sales' => $ordersData->sales ?? 0,
             'profit' => $ordersData->profit ?? 0,
@@ -210,9 +261,15 @@ class ShiftsReportService
             'avgReceiptValue' => ($ordersData->total_orders ?? 0) > 0 ? ($ordersData->sales ?? 0) / ($ordersData->total_orders ?? 1) : 0,
             'profitPercent' => ($ordersData->sales ?? 0) > 0 ? (($ordersData->profit ?? 0) / ($ordersData->sales ?? 1)) * 100 : 0,
             'totalOrders' => $ordersData->total_orders ?? 0,
+
+            // Return orders stats
+            'totalReturns' => $returnOrdersData->total_returns ?? 0,
+            'totalRefundAmount' => $returnOrdersData->total_refund_amount ?? 0,
+            'returnRate' => ($ordersData->sales ?? 0) > 0 ? (($returnOrdersData->total_refund_amount ?? 0) / ($ordersData->sales ?? 1)) * 100 : 0,
         ];
         return $totalStats;
     }
+
 
     /**
      * Calculate order statistics by status for a shift

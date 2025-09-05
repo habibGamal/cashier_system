@@ -25,10 +25,12 @@ class PeriodWithShiftFilterFormComponent
                 ])
                 ->default('period')
                 ->inline()
-                ->reactive(),
+                ->reactive()
+                ->columnSpan('full'),
 
             Section::make('اختيار الشفتات')
                 ->description($shiftDescription)
+                ->columnSpan('full')
                 ->schema([
                     Select::make('shifts')
                         ->label('الشفتات')
@@ -55,6 +57,7 @@ class PeriodWithShiftFilterFormComponent
 
             Section::make('فترة التقرير')
                 ->description($periodDescription)
+                ->columnSpan('full')
                 ->schema([
                     Select::make('presetPeriod')
                         ->label('فترات محددة مسبقاً')

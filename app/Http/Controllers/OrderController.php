@@ -15,6 +15,7 @@ use App\Models\Payment;
 use App\Models\OrderItem;
 use App\Models\Expense;
 use App\Models\ExpenceType;
+use App\Models\ReturnOrder;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
@@ -57,6 +58,12 @@ class OrderController extends Controller
 
         $orders = $this->orderService->getShiftOrders($currentShift->id);
 
+        // Get current shift return orders
+        $returnOrders = ReturnOrder::with(['order', 'customer', 'user', 'items.product'])
+            ->where('shift_id', $currentShift->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         // Get current shift expenses
         $expenses = Expense::with('expenceType')
             ->where('shift_id', $currentShift->id)
@@ -78,9 +85,11 @@ class OrderController extends Controller
         return Inertia::render('Orders/Index', [
             'orders' => $orders,
             'categories' => $categories,
+            'returnOrders' => $returnOrders,
             'currentShift' => $currentShift,
             'expenses' => $expenses,
             'expenseTypes' => $expenseTypes,
+            'regions' => Region::all(),
         ]);
     }
 

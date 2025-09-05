@@ -10,6 +10,8 @@ use App\Filament\Widgets\TopProductsByProfitWidget;
 use App\Filament\Widgets\OrderTypePerformanceWidget;
 use App\Filament\Widgets\CategoryPerformanceWidget;
 use App\Filament\Widgets\ProductsSalesTableWidget;
+use App\Filament\Widgets\ProductsReturnOrdersStatsWidget;
+use App\Filament\Widgets\TopReturnedProductsWidget;
 use App\Filament\Traits\AdminAccess;
 use App\Filament\Traits\ViewerAccess;
 use App\Services\ProductsSalesReportService;
@@ -73,6 +75,8 @@ class ProductsSalesPerformanceReport extends BaseDashboard
             TopProductsByProfitWidget::class,
             OrderTypePerformanceWidget::class,
             CategoryPerformanceWidget::class,
+            ProductsReturnOrdersStatsWidget::class,
+            TopReturnedProductsWidget::class,
             ProductsSalesTableWidget::class,
         ];
     }

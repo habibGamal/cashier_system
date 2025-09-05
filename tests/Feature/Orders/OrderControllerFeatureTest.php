@@ -769,41 +769,11 @@ describe('OrderController Feature Tests', function () {
             $response->assertSessionHasErrors('ids.0');
         });
 
-        it('prints kitchen order successfully', function () {
-            $response = $this->post(route('print.kitchen'), [
-                'images' => [
-                    [
-                        'printerId' => (string)$this->printer->id,
-                        'image' => 'base64_image_data',
-                    ],
-                ],
-            ]);
-
-            // Test that the endpoint is accessible and redirects properly
-            // Network connection errors are expected in test environment
-            $response->assertRedirect();
-        });
-
         it('opens cashier drawer successfully', function () {
             $response = $this->post(route('cashier.openDrawer'));
 
             $response->assertRedirect()
                 ->assertSessionHas('success', 'تم فتح درج الكاشير بنجاح');
-        });
-
-        it('validates kitchen printing data', function () {
-            $response = $this->post(route('print.kitchen'), [
-                'images' => [
-                    [
-                        // Missing required fields
-                    ],
-                ],
-            ]);
-
-            $response->assertSessionHasErrors([
-                'images.0.printerId',
-                'images.0.image',
-            ]);
         });
     });
 

@@ -131,7 +131,10 @@ class CurrentShiftExpensesTable extends BaseWidget
                     ->color(function ($record) {
                         $current = $record->total_amount ?? 0;
                         $monthlyRate = $record->avg_month_rate ?? 0;
-                        if ($monthlyRate > 0 && $current > $monthlyRate) {
+                        $daysInMonth = now()->daysInMonth;
+                        $dailyRate = $monthlyRate > 0 ? ($monthlyRate / $daysInMonth) : 0;
+
+                        if ($dailyRate > 0 && $current > $dailyRate) {
                             return 'danger';
                         }
                         return 'success';
@@ -143,6 +146,7 @@ class CurrentShiftExpensesTable extends BaseWidget
                     ->suffix(' جنيه')
                     ->alignCenter()
                     ->placeholder('غير محدد')
+                    ->state(fn ($record) => $record->avg_month_rate)
                     ->color('info'),
 
                 TextColumn::make('budget_status')
@@ -150,41 +154,46 @@ class CurrentShiftExpensesTable extends BaseWidget
                     ->state(function ($record) {
                         $current = $record->total_amount ?? 0;
                         $monthlyRate = $record->avg_month_rate ?? 0;
+                        $daysInMonth = now()->daysInMonth;
+                        $dailyRate = $monthlyRate > 0 ? ($monthlyRate / $daysInMonth) : 0;
 
                         if ($monthlyRate == 0) {
                             return 'غير محدد';
                         }
 
-                        // For current shift, we compare against monthly budget
-                        // since expenses should be tracked daily/per shift against monthly budget
-                        if ($current > $monthlyRate) {
-                            $excess = $current - $monthlyRate;
+                        // Compare current shift total against daily budget (monthly budget spread over current month's days)
+                        if ($current > $dailyRate) {
+                            $excess = $current - $dailyRate;
                             return 'تجاوز بـ ' . number_format($excess, 2) . ' ج';
                         } else {
-                            $remaining = $monthlyRate - $current;
+                            $remaining = $dailyRate - $current;
                             return 'متبقي ' . number_format($remaining, 2) . ' ج';
                         }
                     })
                     ->color(function ($record) {
                         $current = $record->total_amount ?? 0;
                         $monthlyRate = $record->avg_month_rate ?? 0;
+                        $daysInMonth = now()->daysInMonth;
+                        $dailyRate = $monthlyRate > 0 ? ($monthlyRate / $daysInMonth) : 0;
 
                         if ($monthlyRate == 0) {
                             return 'gray';
                         }
 
-                        return $current > $monthlyRate ? 'danger' : 'success';
+                        return $current > $dailyRate ? 'danger' : 'success';
                     })
                     ->alignCenter()
                     ->icon(function ($record) {
                         $current = $record->total_amount ?? 0;
                         $monthlyRate = $record->avg_month_rate ?? 0;
+                        $daysInMonth = now()->daysInMonth;
+                        $dailyRate = $monthlyRate > 0 ? ($monthlyRate / $daysInMonth) : 0;
 
                         if ($monthlyRate == 0) {
                             return 'heroicon-o-question-mark-circle';
                         }
 
-                        return $current > $monthlyRate ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-check-circle';
+                        return $current > $dailyRate ? 'heroicon-o-exclamation-triangle' : 'heroicon-o-check-circle';
                     }),
             ])
             ->defaultSort('total_amount', 'desc')

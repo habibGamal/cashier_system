@@ -15,8 +15,3 @@ Broadcast::channel('web-orders', function ($user) {
 Broadcast::channel('shift.{shiftId}', function ($user, $shiftId) {
     return $user !== null; // Any authenticated user can listen to shift updates
 });
-
-// Kitchen channel
-Broadcast::channel('kitchen', function ($user) {
-    return $user !== null; // Any authenticated user can listen to kitchen updates
-});

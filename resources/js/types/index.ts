@@ -55,6 +55,8 @@ export interface OrderItem {
   price: number;
   notes?: string;
   product: Product;
+  available_for_return?: number;
+  already_returned?: number;
 }
 
 export interface Payment {
@@ -63,6 +65,48 @@ export interface Payment {
   method: 'cash' | 'card' | 'talabat_card';
   amount: number;
   user_id: number;
+}
+
+export interface ReturnItem {
+  id: number;
+  return_order_id: number;
+  order_item_id: number;
+  product_id: number;
+  quantity: number;
+  original_price: number;
+  original_cost: number;
+  return_price: number;
+  total: number;
+  reason?: string;
+  product: Product;
+  order_item: OrderItem;
+}
+
+export interface ReturnOrder {
+  id: number;
+  order_id: number;
+  customer_id?: number;
+  user_id: number;
+  shift_id: number;
+  return_number: number;
+  status: string;
+  refund_amount: number;
+  reason?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  order: Order;
+  customer?: Customer;
+  user: User;
+  items: ReturnItem[];
+}
+
+export interface ReturnItemData {
+  order_item_id: number;
+  product_id: number;
+  quantity: number;
+  return_price: number;
+  reason?: string;
 }
 
 export interface Order {
@@ -94,15 +138,6 @@ export interface Order {
 }
 
 export interface OrderItemData {
-  product_id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  notes?: string;
-  initial_quantity?: number;
-}
-
-export interface KitchenItemForPrint {
   product_id: number;
   name: string;
   price: number;

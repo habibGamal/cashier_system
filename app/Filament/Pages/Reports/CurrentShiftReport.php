@@ -7,6 +7,7 @@ use App\Filament\Widgets\CurrentShiftInfoStats;
 use App\Filament\Widgets\CurrentShiftMoneyInfoStats;
 use App\Filament\Widgets\CurrentShiftOrdersStats;
 use App\Filament\Widgets\CurrentShiftDoneOrdersStats;
+use App\Filament\Widgets\CurrentShiftReturnOrdersStats;
 use App\Filament\Widgets\CurrentShiftOrdersTable;
 use App\Filament\Widgets\CurrentShiftExpensesDetailsTable;
 use App\Filament\Widgets\CurrentShiftExpensesTable;
@@ -56,6 +57,7 @@ class CurrentShiftReport extends BaseDashboard
             CurrentShiftMoneyInfoStats::class,
             CurrentShiftOrdersStats::class,
             CurrentShiftDoneOrdersStats::class,
+            CurrentShiftReturnOrdersStats::class,
             CurrentShiftOrdersTable::class,
             CurrentShiftExpensesDetailsTable::class,
             CurrentShiftExpensesTable::class,

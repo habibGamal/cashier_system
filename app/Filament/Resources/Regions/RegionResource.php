@@ -41,12 +41,12 @@ class RegionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return RegionForm::make();
+        return RegionForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return RegionsTable::make($table);
+        return RegionsTable::configure($table);
     }
 
     public static function getPages(): array

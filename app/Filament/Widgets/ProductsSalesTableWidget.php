@@ -90,11 +90,6 @@ class ProductsSalesTableWidget extends BaseWidget
                     ),
 
                 // Order Type Performance
-                TextColumn::make('dine_in_sales')
-                    ->label('صالة')
-                    ->money('EGP')
-                    ->sortable(),
-
                 TextColumn::make('takeaway_sales')
                     ->label('تيك أواي')
                     ->money('EGP')
@@ -115,15 +110,10 @@ class ProductsSalesTableWidget extends BaseWidget
                     ->money('EGP')
                     ->sortable(),
 
-                TextColumn::make('talabat_sales')
-                    ->label('طلبات')
+                TextColumn::make('direct_sale_sales')
+                    ->label('بيع مباشر')
                     ->money('EGP')
                     ->sortable(),
-
-                // TextColumn::make('companies_sales')
-                //     ->label('شركات')
-                //     ->money('EGP')
-                //     ->sortable(),
             ])
             ->defaultSort('total_sales', 'desc')
             ->paginated([10, 25, 50, 100])

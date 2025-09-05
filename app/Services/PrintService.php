@@ -51,15 +51,6 @@ class PrintService
     }
 
     /**
-     * Print kitchen receipt - Disabled (kitchen functionality removed)
-     */
-    public function printKitchenReceipt($orderId, $items): void
-    {
-        // Kitchen printing functionality has been removed
-        Log::info("Kitchen printing is disabled for order {$orderId}");
-    }
-
-    /**
      * Open the cashier drawer
      */
     public function openCashierDrawer(): void
@@ -82,107 +73,6 @@ class PrintService
                 $printer->close();
             }
         }
-    }
-
-    /**
-     * Prepare and validate kitchen items data (deprecated)
-     */
-    private function prepareKitchenItems(array $items): array
-    {
-        $preparedItems = [];
-
-        foreach ($items as $item) {
-            // Validate required fields
-            if (!isset($item['product_id']) || !isset($item['quantity'])) {
-                Log::warning('Invalid item data: missing product_id or quantity', $item);
-                continue;
-            }
-
-            $preparedItem = [
-                'product_id' => (int) $item['product_id'],
-                'quantity' => (int) $item['quantity'],
-                'notes' => $item['notes'] ?? null,
-            ];
-
-            // Get product name if not provided
-            if (isset($item['name'])) {
-                $preparedItem['name'] = $item['name'];
-            } else {
-                $product = Product::find($item['product_id']);
-                $preparedItem['name'] = $product ? $product->name : "المنتج رقم {$item['product_id']}";
-            }
-
-            $preparedItems[] = $preparedItem;
-        }
-
-        return $preparedItems;
-    }
-
-    /**
-     * Print kitchen order to a specific printer
-     */
-    public function printKitchenToPrinter(Order $order, array $orderItems, int $printerId): void
-    {
-        try {
-            $printer = \App\Models\Printer::findOrFail($printerId);
-
-            if (!$printer->ip_address) {
-                Log::warning("Printer {$printer->name} has no IP address configured");
-                return;
-            }
-            Log::info("Printing kitchen order to printer {$printer->name} ({$printer->ip_address})");
-
-            // ---------- 1. Generate HTML content using kitchen template ----------
-            $html = $this->generateKitchenHtml($order, $orderItems);
-            // ---------- 2. Convert HTML to image using Browsershot ----------
-            $tempImagePath = tempnam(sys_get_temp_dir(), 'kitchen_browsershot_') . '.png';
-
-
-            Browsershot::html($html)
-                ->windowSize(572, 100) // Kitchen receipt width
-                ->setOption('executablePath', '/usr/bin/chromium-browser')
-                ->setEnvironmentOptions([
-                    'XDG_CONFIG_HOME' => base_path('.puppeteer'), // custom cache dir
-                    'HOME' => base_path('.puppeteer')             // fallback
-                ])
-                ->setRemoteInstance('127.0.0.1', 9222)
-                ->dismissDialogs()
-                ->ignoreHttpsErrors()
-                ->fullPage()
-                ->save($tempImagePath);
-            // ---------- 3. Print via escpos-php ----------
-            $connector = $this->createConnector($printer->ip_address);
-            $escposPrinter = new Printer($connector);
-            $escposPrinter->setJustification(Printer::JUSTIFY_CENTER);
-
-            // Load and print image
-            $escposImage = EscposImage::load($tempImagePath);
-            $escposPrinter->bitImage($escposImage);
-            $escposPrinter->feed(3);
-            $escposPrinter->cut();
-
-            // Clean up
-            unlink($tempImagePath);
-            $escposPrinter->close();
-
-            Log::info("Kitchen order printed successfully to printer {$printer->name}");
-
-        } catch (Exception $e) {
-            Log::error("Error printing kitchen order to printer {$printerId}: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Generate HTML content for kitchen receipt printing
-     */
-    private function generateKitchenHtml(Order $order, array $orderItems): string
-    {
-        // Use Blade view to render the kitchen receipt
-        return view('print.kitchen-template', [
-            'order' => $order,
-            'orderItems' => $orderItems,
-        ])->render();
     }
 
     /**

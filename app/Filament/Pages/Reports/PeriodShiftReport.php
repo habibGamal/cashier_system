@@ -8,6 +8,7 @@ use App\Filament\Widgets\PeriodShiftInfoStats;
 use App\Filament\Widgets\PeriodShiftMoneyInfoStats;
 use App\Filament\Widgets\PeriodShiftOrdersStats;
 use App\Filament\Widgets\PeriodShiftDoneOrdersStats;
+use App\Filament\Widgets\PeriodShiftReturnOrdersStats;
 use App\Filament\Widgets\PeriodShiftOrdersTable;
 use App\Filament\Widgets\PeriodShiftExpensesDetailsTable;
 use App\Filament\Widgets\PeriodShiftExpensesTable;
@@ -78,6 +79,7 @@ class PeriodShiftReport extends BaseDashboard
         return [
             PeriodShiftInfoStats::class,
             PeriodShiftMoneyInfoStats::class,
+            PeriodShiftReturnOrdersStats::class,
             PeriodShiftOrdersStats::class,
             PeriodShiftDoneOrdersStats::class,
             PeriodShiftOrdersTable::class,

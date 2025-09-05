@@ -170,6 +170,75 @@ class OrderStockConversionService
     }
 
     /**
+     * Add stock items back when items are returned (for return orders)
+     */
+    public function addStockForReturnOrder(\App\Models\ReturnOrder $returnOrder): bool
+    {
+        try {
+            $stockItems = $this->convertReturnItemsToStockItems($returnOrder);
+
+            if (empty($stockItems)) {
+                return true;
+            }
+
+            return $this->stockService->addStock(
+                $stockItems,
+                MovementReason::ORDER_RETURN,
+                $returnOrder
+            );
+
+        } catch (Exception $e) {
+            Log::error("Failed to add stock back for return order", [
+                'return_order_id' => $returnOrder->id,
+                'order_id' => $returnOrder->order_id,
+                'error' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Convert return items to stock items for stock restoration
+     */
+    private function convertReturnItemsToStockItems(\App\Models\ReturnOrder $returnOrder): array
+    {
+        $stockItems = [];
+
+        foreach ($returnOrder->items as $returnItem) {
+            $product = $returnItem->product;
+
+            switch ($product->type) {
+                case ProductType::Manufactured:
+                    // Break down manufactured product into its components
+                    $componentItems = $this->getManufacturedProductComponents($product, $returnItem->quantity);
+                    $stockItems = array_merge($stockItems, $componentItems);
+                    break;
+
+                case ProductType::Consumable:
+                    // Add consumable item directly
+                    $stockItems[] = [
+                        'product_id' => $product->id,
+                        'quantity' => $returnItem->quantity,
+                    ];
+                    break;
+
+                case ProductType::RawMaterial:
+                    // Raw materials can't be sold directly in orders
+                    Log::warning("Raw material found in return items", [
+                        'return_order_id' => $returnOrder->id,
+                        'product_id' => $product->id,
+                        'product_name' => $product->name
+                    ]);
+                    break;
+            }
+        }
+
+        // Optimize by summing up common components
+        return $this->optimizeStockItems($stockItems);
+    }
+
+    /**
      * Validate if order can be completed based on stock availability
      */
     public function validateOrderStockAvailability(Order $order): array
@@ -213,5 +282,42 @@ class OrderStockConversionService
         }
 
         return $requirements;
+    }
+
+    /**
+     * Remove stock for cancelled return order (reverse of addStockForReturnOrder)
+     */
+    public function removeStockForCancelledReturn(\App\Models\ReturnOrder $returnOrder): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $stockItems = $this->convertReturnItemsToStockItems($returnOrder);
+
+            // Use StockService to remove stock (reverse of what was added during return)
+            $result = $this->stockService->removeStock(
+                $stockItems,
+                MovementReason::ORDER_RETURN, // Use existing ORDER_RETURN reason for consistency
+                $returnOrder
+            );
+
+            if ($result) {
+                Log::info("Stock removed for cancelled return", [
+                    'return_order_id' => $returnOrder->id,
+                    'items_count' => count($stockItems),
+                ]);
+            }
+
+            DB::commit();
+            return $result;
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to remove stock for cancelled return: " . $e->getMessage(), [
+                'return_order_id' => $returnOrder->id,
+                'items' => $returnOrder->items->count()
+            ]);
+            throw $e;
+        }
     }
 }
