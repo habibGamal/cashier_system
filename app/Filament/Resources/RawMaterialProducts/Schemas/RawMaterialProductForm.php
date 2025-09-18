@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\RawMaterialProducts\Schemas;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
+use App\Models\Category;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use App\Models\Category;
 
 class RawMaterialProductForm
 {
@@ -38,6 +38,12 @@ class RawMaterialProductForm
                     ->required()
                     ->numeric()
                     ->default(0),
+                TextInput::make('avg_purchase_quantity')
+                    ->label('متوسط كمية الشراء')
+                    ->required()
+                    ->numeric()
+                    ->default(1)
+                    ->helperText('الكمية المعتادة التي يتم شراؤها من هذا المنتج'),
                 Select::make('unit')
                     ->label('الوحدة')
                     ->options([

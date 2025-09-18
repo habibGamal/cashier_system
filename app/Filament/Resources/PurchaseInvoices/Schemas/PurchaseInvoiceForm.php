@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources\PurchaseInvoices\Schemas;
 
-use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Actions;
-use App\Filament\Actions\Forms\ProductImporterAction;
 use App\Filament\Actions\Forms\LowStockImporterAction;
+use App\Filament\Actions\Forms\ProductImporterAction;
 use App\Filament\Components\Forms\ProductSelector;
 use App\Models\User;
 use App\Services\Resources\PurchaseInvoiceCalculatorService;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class PurchaseInvoiceForm
 {
@@ -65,12 +65,12 @@ class PurchaseInvoiceForm
 
                 Section::make('أصناف الفاتورة')
                     ->extraAttributes([
-                        "x-init" => PurchaseInvoiceCalculatorService::getJavaScriptCalculation(),
+                        'x-init' => PurchaseInvoiceCalculatorService::getJavaScriptCalculation(),
                     ])
                     ->schema([
                         Actions::make([
                             ProductImporterAction::make('importProducts'),
-                            LowStockImporterAction::make('importLowStock')
+                            LowStockImporterAction::make('importLowStock'),
                         ])
                             ->alignStart(),
                         ProductSelector::make()
@@ -78,7 +78,7 @@ class PurchaseInvoiceForm
 
                         Repeater::make('items')
                             ->label('الأصناف')
-                            ->relationship('items', fn($query) => $query->with('product'))
+                            ->relationship('items', fn ($query) => $query->with('product'))
                             ->table([
                                 TableColumn::make('المنتج')->width('200px'),
                                 TableColumn::make('الكمية')->width('100px'),
@@ -90,8 +90,10 @@ class PurchaseInvoiceForm
                                 TextInput::make('product_name')
                                     ->label('المنتج')
                                     ->formatStateUsing(function ($record) {
-                                        if (!$record)
+                                        if (! $record) {
                                             return 'غير محدد';
+                                        }
+
                                         return $record->product_name != null ? $record->product_name : $record->product->name;
                                     })
                                     ->dehydrated(false)
@@ -102,16 +104,14 @@ class PurchaseInvoiceForm
                                     ->numeric()
                                     ->required()
                                     ->default(1)
-                                    ->minValue(1)
-                                ,
+                                    ->minValue(1),
 
                                 TextInput::make('price')
                                     ->label('سعر الوحدة (ج.م)')
                                     ->numeric()
                                     ->required()
                                     ->minValue(0)
-                                    ->prefix('ج.م')
-                                ,
+                                    ->prefix('ج.م'),
 
                                 TextInput::make('total')
                                     ->label('الإجمالي (ج.م)')
@@ -132,6 +132,6 @@ class PurchaseInvoiceForm
                             })
                             ->collapsible(),
                     ]),
-            ]);
+            ])->columns(1);
     }
 }

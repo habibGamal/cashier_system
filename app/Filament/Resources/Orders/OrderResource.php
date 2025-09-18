@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources\Orders;
 
-use App\Filament\Resources\Orders\Tables\OrdersTable;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\IconEntry;
-use App\Filament\Resources\Orders\RelationManagers\ItemsRelationManager;
-use App\Filament\Resources\Orders\RelationManagers\PaymentsRelationManager;
 use App\Filament\Resources\Orders\Pages\ListOrders;
 use App\Filament\Resources\Orders\Pages\ViewOrder;
+use App\Filament\Resources\Orders\RelationManagers\ItemsRelationManager;
+use App\Filament\Resources\Orders\RelationManagers\PaymentsRelationManager;
+use App\Filament\Resources\Orders\Tables\OrdersTable;
 use App\Filament\Traits\AdminAccess;
 use App\Models\Order;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -23,7 +23,7 @@ class OrderResource extends Resource
 
     protected static ?string $model = Order::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $navigationLabel = 'الطلبات';
 
@@ -31,7 +31,7 @@ class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'الطلبات';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المطعم';
 
     protected static ?int $navigationSort = 1;
 
@@ -104,7 +104,6 @@ class OrderResource extends Resource
                             ->placeholder('غير محدد'),
                     ])
                     ->columns(2)
-                    ->collapsed()
                     ->collapsible(),
 
                 Section::make('التفاصيل المالية')
@@ -153,7 +152,6 @@ class OrderResource extends Resource
                             ->placeholder('لا توجد ملاحظات'),
                     ])
                     ->columns(1)
-                    ->collapsed()
                     ->collapsible(),
 
                 Section::make('معلومات إضافية')
@@ -170,7 +168,6 @@ class OrderResource extends Resource
                             ->placeholder('غير محدد'),
                     ])
                     ->columns(3)
-                    ->collapsed()
                     ->collapsible(),
             ]);
     }

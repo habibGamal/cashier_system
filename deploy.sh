@@ -1,9 +1,8 @@
 #!/bin/sh
 set -e
-cd /var/www/turbo_restaurant
+cd /var/www/turbo_restaurant/larament
 git reset --hard
 git pull
-cd /var/www/turbo_restaurant/larament
 composer install
 npm install
 npm run build

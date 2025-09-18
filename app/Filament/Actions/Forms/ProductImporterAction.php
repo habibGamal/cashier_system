@@ -2,17 +2,15 @@
 
 namespace App\Filament\Actions\Forms;
 
-use Filament\Actions\Action;
 use App\Enums\ProductType;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use App\Models\Category;
 use App\Models\Product;
+use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class ProductImporterAction extends Action
 {
@@ -26,7 +24,6 @@ class ProductImporterAction extends Action
 
         return $this;
     }
-
 
     public static function getDefaultName(): ?string
     {
@@ -55,9 +52,7 @@ class ProductImporterAction extends Action
                     ->placeholder('جميع الفئات')
                     ->options(Category::all()->pluck('name', 'id'))
                     ->reactive()
-                    ->afterStateUpdated(fn($state, callable $set) => $set('selected_products', []))
-                ,
-
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('selected_products', [])),
 
                 CheckboxList::make('selected_products')
                     ->label('اختر المنتجات للاستيراد')
@@ -74,14 +69,16 @@ class ProductImporterAction extends Action
 
                         // Filter by search term if provided
                         if ($search = $get('search_filter')) {
-                            $query->where('name', 'like', '%' . $search . '%');
+                            $query->where('name', 'like', '%'.$search.'%');
                         }
                         $this->products = $query->get();
+
                         return $this->products->mapWithKeys(function ($product) {
                             $price = $product->cost ?? $product->price;
                             $categoryName = $product->category ? $product->category->name : 'بدون فئة';
+
                             return [
-                                $product->id => $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ')'
+                                $product->id => $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')',
                             ];
                         });
                     })
@@ -91,7 +88,7 @@ class ProductImporterAction extends Action
                     ->reactive()
                     ->afterStateUpdated(function (Set $set, Get $get, $state) {
                         // When selected_products is updated, also update selected_collection to match
-                        $set('selected_collection', collect([...$get('selected_collection'), ...$state])->unique()->values());
+                        $set('selected_collection', collect([...$get('selected_collection'), ...$state])->unique()->values()->toArray());
                     })
                     ->descriptions(function (Get $get) {
 
@@ -102,15 +99,15 @@ class ProductImporterAction extends Action
                             if ($product->unit) {
                                 $description .= " | الوحدة: {$product->unit}";
                             }
+
                             return [$product->id => $description];
                         });
-                    })
+                    }),
             ])
             ->action(function (array $data, Set $set, Get $get) {
                 $selectedProducts = $data['selected_collection'] ?? [];
                 $products = Product::whereIn('id', $selectedProducts)->get();
                 $currentItems = $get('items') ?? [];
-
                 // Get existing product IDs to avoid duplicates
                 $existingProductIds = collect($currentItems)->pluck('product_id')->filter()->toArray();
 
@@ -121,6 +118,7 @@ class ProductImporterAction extends Action
                     // Skip if product already exists in the list
                     if (in_array($productId, $existingProductIds)) {
                         $skippedCount++;
+
                         continue;
                     }
 
@@ -135,12 +133,11 @@ class ProductImporterAction extends Action
                             'quantity' => $quantity,
                             'price' => $price,
                             'total' => $total,
-                            ...($this->additional ? ($this->additional)($product) : [])
+                            ...($this->additional ? ($this->additional)($product) : []),
                         ];
                         $addedCount++;
                     }
                 }
-
                 $set('items', $currentItems);
 
                 // Recalculate invoice total

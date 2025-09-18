@@ -2,18 +2,15 @@
 
 namespace App\Filament\Actions\Forms;
 
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Utilities\Get;
 use App\Enums\ProductType;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\InventoryItem;
+use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class LowStockImporterAction extends Action
 {
@@ -37,7 +34,7 @@ class LowStockImporterAction extends Action
     {
         parent::setUp();
         $this->products = collect();
-        $this->label('استيراد المنتجات منخفضة المخزون')
+        $this->label('استيراد المنتجات حسب معدل الشراء')
             ->icon('heroicon-m-exclamation-triangle')
             ->color('warning')
             ->form([
@@ -46,8 +43,7 @@ class LowStockImporterAction extends Action
                     ->placeholder('جميع الفئات')
                     ->options(Category::all()->pluck('name', 'id'))
                     ->reactive()
-                    ->afterStateUpdated(fn($state, callable $set) => $set('selected_products', []))
-                ,
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('selected_products', [])),
 
                 CheckboxList::make('selected_products')
                     ->label('المنتجات منخفضة المخزون')
@@ -61,7 +57,7 @@ class LowStockImporterAction extends Action
                             ])
                             ->with(['category', 'inventoryItem'])
                             ->whereHas('inventoryItem', function ($inventoryQuery) {
-                                $inventoryQuery->whereRaw('quantity < (SELECT min_stock FROM products WHERE products.id = inventory_items.product_id)');
+                                $inventoryQuery->whereRaw('quantity < (SELECT avg_purchase_quantity FROM products WHERE products.id = inventory_items.product_id)');
                             });
 
                         // Filter by category if selected
@@ -75,11 +71,11 @@ class LowStockImporterAction extends Action
                             $price = $product->cost ?? $product->price;
                             $categoryName = $product->category ? $product->category->name : 'بدون فئة';
                             $currentStock = $product->inventoryItem ? $product->inventoryItem->quantity : 0;
-                            $minStock = $product->min_stock ?? 0;
-                            $needed = max(0, $minStock - $currentStock);
+                            $avgPurchaseQty = $product->avg_purchase_quantity ?? 1;
+                            $needed = $avgPurchaseQty - $currentStock;
 
                             return [
-                                $product->id => $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ') - مطلوب: ' . $needed
+                                $product->id => $product->name.' - '.$price.' ج.م'.' ('.$categoryName.') - مقترح: '.$needed,
                             ];
                         });
                     })
@@ -93,9 +89,9 @@ class LowStockImporterAction extends Action
                             $price = $product->price ?? 0;
                             $currentStock = $product->inventoryItem ? $product->inventoryItem->quantity : 0;
                             $minStock = $product->min_stock ?? 0;
-                            $needed = max(0, $minStock - $currentStock);
+                            $avgPurchaseQty = $product->avg_purchase_quantity ?? 1;
 
-                            $description = "المخزون الحالي: {$currentStock} | الحد الأدنى: {$minStock} | المطلوب: {$needed}";
+                            $description = "المخزون الحالي: {$currentStock} | الحد الأدنى: {$minStock} | متوسط كمية الشراء: {$avgPurchaseQty}";
                             $description .= " | سعر التكلفة: {$cost} ج.م | سعر البيع: {$price} ج.م";
 
                             if ($product->unit) {
@@ -104,7 +100,7 @@ class LowStockImporterAction extends Action
 
                             return [$product->id => $description];
                         });
-                    })
+                    }),
             ])
             ->action(function (array $data, Set $set, Get $get) {
                 $selectedProducts = $data['selected_products'] ?? [];
@@ -115,6 +111,7 @@ class LowStockImporterAction extends Action
                         ->body('يرجى اختيار المنتجات التي تريد إضافتها')
                         ->warning()
                         ->send();
+
                     return;
                 }
 
@@ -134,15 +131,15 @@ class LowStockImporterAction extends Action
                     // Skip if product already exists in the list
                     if (in_array($productId, $existingProductIds)) {
                         $skippedCount++;
+
                         continue;
                     }
 
                     $product = $products->where('id', $productId)->first();
                     if ($product) {
                         $price = $product->cost ?? $product->price;
-                        $currentStock = $product->inventoryItem ? $product->inventoryItem->quantity : 0;
-                        $minStock = $product->min_stock ?? 0;
-                        $quantity = max(1, $minStock - $currentStock); // Calculate needed quantity
+                        $avgPurchaseQty = $product->avg_purchase_quantity ?? 1;
+                        $quantity = $avgPurchaseQty; // Use average purchase quantity
                         $total = $quantity * $price;
 
                         $currentItems[] = [
@@ -151,7 +148,7 @@ class LowStockImporterAction extends Action
                             'quantity' => $quantity,
                             'price' => $price,
                             'total' => $total,
-                            ...($this->additional ? ($this->additional)($product) : [])
+                            ...($this->additional ? ($this->additional)($product) : []),
                         ];
                         $addedCount++;
                     }
@@ -173,13 +170,13 @@ class LowStockImporterAction extends Action
                 }
 
                 Notification::make()
-                    ->title('تم استيراد المنتجات منخفضة المخزون')
+                    ->title('تم استيراد المنتجات حسب معدل الشراء')
                     ->body($message)
                     ->success()
                     ->send();
             })
-            ->modalHeading('استيراد المنتجات منخفضة المخزون')
-            ->modalSubheading('هذه المنتجات تحتاج إلى إعادة تخزين لأن مخزونها أقل من الحد الأدنى المطلوب. الكمية المقترحة هي الفرق بين المخزون الحالي والحد الأدنى.')
+            ->modalHeading('استيراد المنتجات حسب معدل الشراء')
+            ->modalSubheading('هذه المنتجات تحتاج إلى إعادة تخزين لأن مخزونها أقل من الحد الأدنى المطلوب. الكمية المقترحة هي متوسط كمية الشراء المعتادة.')
             ->modalWidth('2xl')
             ->slideOver();
     }

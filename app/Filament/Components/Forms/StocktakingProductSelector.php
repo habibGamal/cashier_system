@@ -2,13 +2,12 @@
 
 namespace App\Filament\Components\Forms;
 
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Forms\Components\Select;
-use App\Models\Product;
-use App\Models\Category;
 use App\Enums\ProductType;
+use App\Models\Product;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class StocktakingProductSelector extends Select
 {
@@ -25,27 +24,27 @@ class StocktakingProductSelector extends Select
                     ProductType::RawMaterial,
                     ProductType::Consumable,
                 ])
-                ->with(['category', 'inventoryItem'])
-                ->get();
+                    ->with(['category', 'inventoryItem'])
+                    ->get();
 
                 return $products->mapWithKeys(function ($product) {
                     $price = $product->cost ?? $product->price;
                     $categoryName = $product->category ? $product->category->name : 'بدون فئة';
                     $currentStock = $product->inventoryItem ? $product->inventoryItem->quantity : 0;
 
-                    $label = $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ')';
+                    $label = $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')';
 
                     return [$product->id => $label];
                 });
             })
             ->live()
             ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                if (!$state) {
+                if (! $state) {
                     return;
                 }
 
                 $product = Product::with('inventoryItem')->find($state);
-                if (!$product) {
+                if (! $product) {
                     return;
                 }
 
@@ -63,6 +62,7 @@ class StocktakingProductSelector extends Select
 
                     // Reset the select
                     $set('stocktaking_product_selector', null);
+
                     return;
                 }
 
@@ -108,7 +108,7 @@ class StocktakingProductSelector extends Select
             ->dehydrated(false); // Don't save this field's value
     }
 
-    public static function make(string $name = 'stocktaking_product_selector'): static
+    public static function make(?string $name = 'stocktaking_product_selector'): static
     {
         return parent::make($name);
     }

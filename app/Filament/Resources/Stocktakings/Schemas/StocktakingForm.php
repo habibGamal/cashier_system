@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\Stocktakings\Schemas;
 
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Actions;
 use App\Filament\Actions\Forms\StocktakingProductImporterAction;
 use App\Filament\Components\Forms\StocktakingProductSelector;
 use App\Models\User;
 use App\Services\Resources\StocktakingCalculatorService;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class StocktakingForm
 {
@@ -48,7 +48,7 @@ class StocktakingForm
 
                 Section::make('أصناف الجرد')
                     ->extraAttributes([
-                        "x-init" => StocktakingCalculatorService::getJavaScriptCalculation(),
+                        'x-init' => StocktakingCalculatorService::getJavaScriptCalculation(),
                     ])
                     ->schema([
                         Actions::make([
@@ -59,7 +59,7 @@ class StocktakingForm
                             ->columnSpanFull(),
                         Repeater::make('items')
                             ->label('الأصناف')
-                            ->relationship('items', fn($query) => $query->with('product'))
+                            ->relationship('items', fn ($query) => $query->with('product'))
                             ->table([
                                 TableColumn::make('المنتج')->width('150px'),
                                 TableColumn::make('الكمية الفعلية')->width('120px'),
@@ -118,6 +118,6 @@ class StocktakingForm
                             })
                             ->collapsible(),
                     ]),
-            ]);
+            ])->columns(1);
     }
 }

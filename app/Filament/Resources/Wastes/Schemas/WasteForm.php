@@ -49,16 +49,16 @@ class WasteForm
 
                 Section::make('الأصناف التالفة')
                     ->extraAttributes([
-                        "x-init" => WasteCalculatorService::getJavaScriptCalculation(),
+                        'x-init' => WasteCalculatorService::getJavaScriptCalculation(),
                     ])
                     ->schema([
                         Actions::make([
                             ProductImporterAction::make('importProducts')
-                            ->additionalProps(function (Product $product) {
-                                return [
-                                    'stock_quantity' => $product->inventoryItem?->quantity ?? 0,
-                                ];
-                            }),
+                                ->additionalProps(function (Product $product) {
+                                    return [
+                                        'stock_quantity' => $product->inventoryItem?->quantity ?? 0,
+                                    ];
+                                }),
                         ])
                             ->alignStart(),
 
@@ -66,7 +66,7 @@ class WasteForm
                             ->columnSpanFull(),
                         Repeater::make('items')
                             ->label('الأصناف')
-                            ->relationship('items', fn($query) => $query->with('product.inventoryItem'))
+                            ->relationship('items', fn ($query) => $query->with('product.inventoryItem'))
                             ->table([
                                 TableColumn::make('المنتج')->width('200px'),
                                 TableColumn::make('الكمية الحالية')->width('100px'),
@@ -88,7 +88,7 @@ class WasteForm
                                 TextInput::make('stock_quantity')
                                     ->label('الكمية')
                                     ->formatStateUsing(function ($record) {
-                                        return ($record->product?->inventoryItem->quantity ?? 'غير محدد');
+                                        return $record->product?->inventoryItem->quantity ?? 'غير محدد';
                                     })
                                     ->disabled(),
 
@@ -98,7 +98,6 @@ class WasteForm
                                     ->required()
                                     ->default(1)
                                     ->minValue(1),
-
 
                                 TextInput::make('price')
                                     ->label('سعر الوحدة (ج.م)')
@@ -125,6 +124,6 @@ class WasteForm
                             })
                             ->collapsible(),
                     ]),
-            ]);
+            ])->columns(1);
     }
 }

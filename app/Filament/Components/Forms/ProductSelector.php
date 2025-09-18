@@ -3,12 +3,11 @@
 namespace App\Filament\Components\Forms;
 
 use App\Enums\ProductType;
-use Filament\Schemas\Components\Utilities\Set;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Forms\Components\Select;
 use App\Models\Product;
-use App\Models\Category;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class ProductSelector extends Select
 {
@@ -17,6 +16,7 @@ class ProductSelector extends Select
     public function additionalProps(callable $additional): static
     {
         $this->additionalPropsCallback = $additional;
+
         return $this;
     }
 
@@ -56,19 +56,19 @@ class ProductSelector extends Select
                     $price = $product->cost ?? $product->price;
                     $categoryName = $product->category ? $product->category->name : 'بدون فئة';
 
-                    $label = $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ')';
+                    $label = $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')';
 
                     return [$product->id => $label];
                 });
             })
             ->live()
             ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                if (!$state) {
+                if (! $state) {
                     return;
                 }
 
                 $product = Product::find($state);
-                if (!$product) {
+                if (! $product) {
                     return;
                 }
 
@@ -85,6 +85,7 @@ class ProductSelector extends Select
 
                     // Reset the select
                     $set('product_selector', null);
+
                     return;
                 }
 
@@ -125,7 +126,7 @@ class ProductSelector extends Select
             ->dehydrated(false); // Don't save this field's value
     }
 
-    public static function make(string $name = 'product_selector'): static
+    public static function make(?string $name = 'product_selector'): static
     {
         return parent::make($name);
     }
