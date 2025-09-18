@@ -36,6 +36,8 @@ class CurrentShiftMoneyInfoStats extends BaseWidget
 
         $stats = $this->shiftsReportService->calculateShiftStats($currentShift);
 
+        $returnStats = $this->shiftsReportService->calculateReturnOrdersStats($currentShift);
+
         return [
             Stat::make('المبيعات', number_format($stats['sales'], 2) . ' جنيه')
                 ->description('إجمالي المبيعات المكتملة')
@@ -100,7 +102,7 @@ class CurrentShiftMoneyInfoStats extends BaseWidget
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('primary'),
 
-            $this->getAvailableCashStat($currentShift, $stats),
+            $this->getAvailableCashStat($currentShift, $stats,$returnStats),
         ];
     }
 
@@ -109,12 +111,12 @@ class CurrentShiftMoneyInfoStats extends BaseWidget
         return $this->shiftsReportService->getCurrentShift();
     }
 
-    private function getAvailableCashStat(Shift $shift, array $stats): Stat
+    private function getAvailableCashStat(Shift $shift, array $stats , array $returnStats): Stat
     {
-        $availableCash = (float) $shift->start_cash + $stats['cashPayments'] - $stats['expenses'];
+        $availableCash = (float) $shift->start_cash + $stats['cashPayments'] - $stats['expenses'] - $returnStats['totalRefundAmount'];
 
         return Stat::make('النقدية المتاحة', number_format($availableCash, 2) . ' جنيه')
-            ->description('النقدية المتاحة في الدرج')
+            ->description('النقدية المتاحة في الدرج (بداية الشيفت + المدفوعات النقدية - المصروفات - إجمالي المرتجعات = النقدية المتاحة) جنيه')
             ->descriptionIcon('heroicon-m-currency-dollar')
             ->color($availableCash >= 0 ? 'success' : 'danger');
     }

@@ -55,9 +55,9 @@ class CurrentShiftReport extends BaseDashboard
         return [
             CurrentShiftInfoStats::class,
             CurrentShiftMoneyInfoStats::class,
+            CurrentShiftReturnOrdersStats::class,
             CurrentShiftOrdersStats::class,
             CurrentShiftDoneOrdersStats::class,
-            CurrentShiftReturnOrdersStats::class,
             CurrentShiftOrdersTable::class,
             CurrentShiftExpensesDetailsTable::class,
             CurrentShiftExpensesTable::class,
