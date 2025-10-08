@@ -21,7 +21,7 @@
     $receiptFooter = setting(SettingKey::RECEIPT_FOOTER);
     $logoPath =
         setting(SettingKey::RESTAURANT_PRINT_LOGO) !== ''
-            ? public_path(Storage::url(setting(SettingKey::RESTAURANT_PRINT_LOGO)))
+            ? public_path(setting(SettingKey::RESTAURANT_PRINT_LOGO))
             : null;
 
     // Format dates
