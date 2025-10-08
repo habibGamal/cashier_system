@@ -397,6 +397,7 @@ class SpecificDataImportService extends ExcelImportService
 
             // Get barcode if exists
             $barcode = $data['barcode'] ?? null;
+            $stock = $data['الكميات المستلمه'] ?? null;
 
             $product = Product::updateOrCreate(
                 ['name' => $productName],
@@ -410,6 +411,11 @@ class SpecificDataImportService extends ExcelImportService
                     'barcode' => $barcode,
                 ]
             );
+
+            if ($stock !== null)
+                $product->inventoryItem()->update(
+                    ['quantity' => $stock]
+                );
 
             return [
                 'success' => true,
