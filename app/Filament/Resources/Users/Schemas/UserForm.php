@@ -15,9 +15,9 @@ use Illuminate\Validation\Rules\Password;
 
 class UserForm
 {
-    public static function make(): Schema
+    public static function configure(Schema $schema): Schema
     {
-        return Schema::make()
+        return $schema
             ->components([
                 Section::make()
                     ->schema([
@@ -56,7 +56,7 @@ class UserForm
                             ->label('الدور')
                             ->options(UserRole::class)
                             ->required(),
-                    ]),
+                    ])->columnSpanFull(),
             ]);
     }
 }

@@ -47,7 +47,8 @@ class PrintService
      */
     public function printOrderReceipt(Order $order): void
     {
-        PrintOrderReceipt::dispatch($order);
+        // PrintOrderReceipt::dispatch($order);
+        $this->printOrderViaBrowsershot($order);
     }
 
     /**
@@ -138,11 +139,11 @@ class PrintService
             $start = microtime(true);
             Browsershot::html($html)
                 ->windowSize(567, 1200) // Thermal printer width (72mm ≈ 576px at 203dpi)
-                // ->setOption('executablePath', '/usr/bin/chromium-browser')
-                // ->setEnvironmentOptions([
-                //     'XDG_CONFIG_HOME' => base_path('.puppeteer'), // custom cache dir
-                //     'HOME' => base_path('.puppeteer')             // fallback
-                // ])
+                ->setOption('executablePath', '/usr/bin/chromium-browser')
+                ->setEnvironmentOptions([
+                    'XDG_CONFIG_HOME' => base_path('.puppeteer'), // custom cache dir
+                    'HOME' => base_path('.puppeteer')             // fallback
+                ])
                 ->setRemoteInstance('127.0.0.1', 9222) // Use remote instance for Puppeteer
                 ->dismissDialogs()
                 ->ignoreHttpsErrors()

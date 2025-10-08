@@ -209,6 +209,7 @@ class Settings extends Page implements HasForms
                 ->send();
 
         } catch (Exception $e) {
+            logger()->error('Error saving settings: ' . $e->getMessage());
             Notification::make()
                 ->title('خطأ في حفظ الإعدادات')
                 ->body('حدث خطأ أثناء محاولة حفظ الإعدادات. يرجى المحاولة مرة أخرى.')
