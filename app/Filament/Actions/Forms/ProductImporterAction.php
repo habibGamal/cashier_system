@@ -52,7 +52,7 @@ class ProductImporterAction extends Action
                     ->placeholder('جميع الفئات')
                     ->options(Category::all()->pluck('name', 'id'))
                     ->reactive()
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('selected_products', [])),
+                    ->afterStateUpdated(fn($state, callable $set) => $set('selected_products', [])),
 
                 CheckboxList::make('selected_products')
                     ->label('اختر المنتجات للاستيراد')
@@ -69,7 +69,7 @@ class ProductImporterAction extends Action
 
                         // Filter by search term if provided
                         if ($search = $get('search_filter')) {
-                            $query->where('name', 'like', '%'.$search.'%');
+                            $query->where('name', 'like', '%' . $search . '%');
                         }
                         $this->products = $query->get();
 
@@ -78,7 +78,7 @@ class ProductImporterAction extends Action
                             $categoryName = $product->category ? $product->category->name : 'بدون فئة';
 
                             return [
-                                $product->id => $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')',
+                                $product->id => $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ')',
                             ];
                         });
                     })
@@ -86,10 +86,15 @@ class ProductImporterAction extends Action
                     ->bulkToggleable()
                     ->columns(1)
                     ->reactive()
-                    ->afterStateUpdated(function (Set $set, Get $get, $state) {
-                        // When selected_products is updated, also update selected_collection to match
-                        $set('selected_collection', collect([...$get('selected_collection'), ...$state])->unique()->values()->toArray());
-                    })
+                    // ->afterStateUpdated(function (Set $set, Get $get, $state) {
+                    //     // When selected_products is updated, also update selected_collection to match
+                    //     $set('selected_collection', collect([...$get('selected_collection'), ...$state])->unique()->values()->toArray());
+                    // })
+                    ->afterStateUpdatedJs(
+                        <<<'JS'
+                            $set('selected_collection', ([...new Set([...( $get('selected_collection') || [] ), ...( $state || [] )])]).filter(Boolean));
+                        JS
+                    )
                     ->descriptions(function (Get $get) {
 
                         return $this->products->mapWithKeys(function ($product) {

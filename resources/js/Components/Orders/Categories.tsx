@@ -49,9 +49,12 @@ export default function Categories({ categories, dispatch, disabled, user }: Cat
             ? allProducts
             : categories.find((category) => category.id === selectedCategory)?.products || [];
 
-        setProducts(productsToFilter.filter((product) =>
-            product.name.toLowerCase().includes(value.toLowerCase())
-        ));
+        const q = value.toLowerCase();
+        setProducts(productsToFilter.filter((product) => {
+            const name = (product.name || '').toLowerCase();
+            const barcode = (product.barcode ?? '').toString().toLowerCase();
+            return name.includes(q) || barcode.includes(q);
+        }));
     };
 
     return (
