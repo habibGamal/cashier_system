@@ -48,13 +48,26 @@ class StockReportTable extends BaseWidget
                         'inventory_items.id as inventory_item_id',
                         'inventory_items.quantity as actual_remaining_quantity',
                         // end quantity of the previous day
-                        DB::raw('COALESCE(SUM(startDailyMovements.end_quantity), 0) as start_quantity'),
+                        DB::raw(
+                            "(
+                            SELECT COALESCE(dm.end_quantity, 0)
+                            FROM inventory_item_movement_daily dm
+                            WHERE dm.product_id = products.id
+                            AND dm.date = (
+                                SELECT MAX(d.date)
+                                FROM inventory_item_movement_daily d
+                                WHERE d.product_id = products.id
+                                    AND d.date < '{$startDate}'
+                            )
+                            ORDER BY dm.id DESC
+                            LIMIT 1
+                        ) AS start_quantity"
+                        ),
                         DB::raw('COALESCE(SUM(dailyMovements.incoming_quantity), 0) as incoming'),
                         DB::raw('COALESCE(SUM(dailyMovements.sales_quantity), 0) - COALESCE(SUM(dailyMovements.return_sales_quantity), 0) as sales'),
                         DB::raw('COALESCE(SUM(dailyMovements.return_waste_quantity), 0) as return_waste'),
                         // DB::raw('COALESCE(SUM(dailyMovements.return_sales_quantity), 0) as return_sales'),
                         // Created at of startDailyMovements
-                        DB::raw('MAX(startDailyMovements.created_at) as start_created_at'),
 
                         DB::raw("(SELECT dm.created_at
                                             FROM inventory_item_movement_daily dm
@@ -77,15 +90,6 @@ class StockReportTable extends BaseWidget
                     ->leftJoin('inventory_item_movement_daily as dailyMovements', function ($join) use ($startDate, $endDate) {
                         $join->on('products.id', '=', 'dailyMovements.product_id')
                             ->whereBetween('dailyMovements.date', [$startDate, $endDate]);
-                    })
-                    ->leftJoin('inventory_item_movement_daily as startDailyMovements', function ($join) use ($startDate, $endDate) {
-                        $join->on('products.id', '=', 'startDailyMovements.product_id')
-                            ->whereRaw('startDailyMovements.date = (
-                                SELECT MAX(d.date)
-                                FROM inventory_item_movement_daily d
-                                WHERE d.product_id = products.id
-                                AND d.date < ?
-                            )', [$startDate]);
                     })
                     ->groupBy([
                         'products.id',
