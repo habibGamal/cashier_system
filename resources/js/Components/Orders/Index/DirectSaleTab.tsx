@@ -89,6 +89,7 @@ export const DirectSaleTab: React.FC<DirectSaleTabProps> = ({
 
     const barcodeScanner = (symbol: string, type: any) => {
         const barcode = symbol;
+        console.log("Scanned barcode:", barcode);
         dispatch({
             type: "addByBarcode",
             barcode: barcode,
@@ -103,7 +104,7 @@ export const DirectSaleTab: React.FC<DirectSaleTabProps> = ({
         scannerOptions: {
             prefix: "",
             suffix: "",
-            maxDelay: 50,
+            maxDelay: 100,
         },
     });
     // SOLID: Single Responsibility - Define actions using handlers
