@@ -10,6 +10,7 @@ enum SettingKey: string
     case RESTAURANT_NAME = 'restaurant_name';
     case RESTAURANT_PRINT_LOGO = 'restaurant_print_logo';
     case RESTAURANT_OFFICIAL_LOGO = 'restaurant_official_logo';
+    case RECEIPT_FOOTER_BARCODE = 'receipt_footer_barcode';
     case NODE_TYPE = 'node_type';
     case MASTER_NODE_LINK = 'master_node_link';
     case SCALE_BARCODE_PREFIX = 'scale_barcode_prefix';
@@ -26,6 +27,7 @@ enum SettingKey: string
             self::RESTAURANT_NAME => '-------',
             self::RESTAURANT_PRINT_LOGO => '',
             self::RESTAURANT_OFFICIAL_LOGO => '/images/logo.jpg',
+            self::RECEIPT_FOOTER_BARCODE => '',
             self::NODE_TYPE => 'independent',
             self::MASTER_NODE_LINK => 'http://127.0.0.1:38794',
             self::SCALE_BARCODE_PREFIX => '23',
@@ -44,6 +46,7 @@ enum SettingKey: string
             self::RESTAURANT_NAME => ['required', 'string', 'max:255'],
             self::RESTAURANT_PRINT_LOGO => ['nullable', 'string', 'max:255'],
             self::RESTAURANT_OFFICIAL_LOGO => ['nullable', 'string', 'max:255'],
+            self::RECEIPT_FOOTER_BARCODE => ['nullable', 'string', 'max:255'],
             self::NODE_TYPE => ['required', 'in:master,slave,independent'],
             self::MASTER_NODE_LINK => ['nullable', 'url', 'max:255'],
             self::SCALE_BARCODE_PREFIX => ['required', 'string', 'regex:/^\d{1,4}$/', 'max:4'],
@@ -62,6 +65,7 @@ enum SettingKey: string
             self::RESTAURANT_NAME => 'اسم المطعم',
             self::RESTAURANT_PRINT_LOGO => 'شعار المطعم للطباعة',
             self::RESTAURANT_OFFICIAL_LOGO => 'الشعار الرسمي للمطعم',
+            self::RECEIPT_FOOTER_BARCODE => 'باركود تذييل الفاتورة',
             self::NODE_TYPE => 'نوع النقطة الحالية',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية',
             self::SCALE_BARCODE_PREFIX => 'بادئة باركود الميزان',
@@ -80,6 +84,7 @@ enum SettingKey: string
             self::RESTAURANT_NAME => 'اسم المطعم الذي سيظهر في الفواتير والتقارير',
             self::RESTAURANT_PRINT_LOGO => 'شعار المطعم للطباعة (يفضل ملف خفيف وبالأبيض والأسود PNG للطابعات)',
             self::RESTAURANT_OFFICIAL_LOGO => 'الشعار الرسمي للمطعم (سيتم حفظه في public/images/logo.jpg)',
+            self::RECEIPT_FOOTER_BARCODE => 'باركود يظهر في نهاية الفاتورة المطبوعة (PNG)',
             self::NODE_TYPE => 'تحديد نوع النقطة الحالية في شبكة الفروع',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية (مطلوب فقط إذا كان النوع عبارة عن فرع)',
             self::SCALE_BARCODE_PREFIX => 'البادئة المستخدمة لتحديد باركود المنتجات الموزونة (مثال: 23)',
@@ -115,6 +120,7 @@ enum SettingKey: string
             self::RESTAURANT_NAME => is_string($value) && strlen($value) > 0,
             self::RESTAURANT_PRINT_LOGO => true, // Always valid for file path
             self::RESTAURANT_OFFICIAL_LOGO => true, // Always valid for file path
+            self::RECEIPT_FOOTER_BARCODE => true, // Always valid for file path
             self::NODE_TYPE => in_array($value, ['master', 'slave', 'independent']),
             self::MASTER_NODE_LINK => !$value || filter_var($value, FILTER_VALIDATE_URL) !== false,
             self::SCALE_BARCODE_PREFIX => is_string($value) && preg_match('/^\d{1,4}$/', $value),

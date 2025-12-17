@@ -23,6 +23,10 @@
         setting(SettingKey::RESTAURANT_PRINT_LOGO) !== ''
             ? Storage::path(setting(SettingKey::RESTAURANT_PRINT_LOGO))
             : null;
+    $barcodePath =
+        setting(SettingKey::RECEIPT_FOOTER_BARCODE) !== ''
+            ? Storage::path(setting(SettingKey::RECEIPT_FOOTER_BARCODE))
+            : null;
 
     // Format dates
     $orderDate = $order->created_at->setTimezone('Africa/Cairo')->format('d/m/Y H:i:s');
@@ -39,6 +43,7 @@
         return "data:{$mimeType};base64,{$base64}";
     };
     $footerLogo = $imgToDataUri(public_path('images/turbo.png'));
+    $footerBarcode = $barcodePath ? $imgToDataUri($barcodePath) : null;
 @endphp
 
 <!DOCTYPE html>
@@ -227,6 +232,10 @@
             <p>{{ $order->order_notes }}</p>
         @endif
         <p class="footer-text">{{ $receiptFooter }}</p>
+
+        @if ($footerBarcode)
+            <img class="turbo-logo" src="{{ $footerBarcode }}" alt="Footer Barcode" />
+        @endif
 
         <img class="turbo-logo" src="{{ $footerLogo }}" alt="Turbo Logo" />
 

@@ -155,6 +155,17 @@ class Settings extends Page implements HasForms
                                         }
                                     }),
                             ]),
+
+                        FileUpload::make(SettingKey::RECEIPT_FOOTER_BARCODE->value)
+                            ->label(SettingKey::RECEIPT_FOOTER_BARCODE->label())
+                            ->helperText(SettingKey::RECEIPT_FOOTER_BARCODE->helperText())
+                            ->image()
+                            ->imageEditor()
+                            ->directory('barcodes')
+                            ->visibility('public')
+                            ->moveFiles()
+                            ->acceptedFileTypes(['image/png'])
+                            ->maxSize(2048),
                     ]),
 
                 Section::make('إدارة الفروع')
