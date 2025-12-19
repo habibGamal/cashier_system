@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Button, InputNumber, Tag, Typography, Modal, Input } from "antd";
+import { usePage } from "@inertiajs/react";
 import {
     MinusCircleOutlined,
     PlusCircleOutlined,
     DeleteOutlined,
     EditOutlined,
     DollarOutlined,
+    PercentageOutlined,
 } from "@ant-design/icons";
 
-import { OrderItemData, OrderItemAction, User } from "@/types";
+import { OrderItemData, OrderItemAction, User, PageProps } from "@/types";
 import { formatCurrency } from "@/utils/orderCalculations";
 import ItemDiscountModal from "./ItemDiscountModal";
 
@@ -29,9 +31,18 @@ export default function OrderItem({
     user,
     forWeb,
 }: OrderItemProps) {
+    // Get settings from page props
+    const { allowCashierDiscounts, allowCashierItemChanges } = usePage<PageProps>().props;
+
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
     const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
     const [notes, setNotes] = useState(orderItem.notes || "");
+
+    // Check if user can apply discounts (admin always, cashier if allowed)
+    const canApplyDiscount = user.role === 'admin' || allowCashierDiscounts;
+
+    // Check if user can change items (admin always, cashier if allowed)
+    const canChangeItems = user.role === 'admin' || allowCashierItemChanges;
 
     // For web orders, disable quantity changes but allow notes editing
     const quantityDisabled = disabled || forWeb;
@@ -172,13 +183,13 @@ export default function OrderItem({
                         )}
                     </div>
                     <div className="flex gap-4">
-                        {user.role === 'admin' && (
+                        {canApplyDiscount && (
                             <Button
                                 disabled={disabled}
                                 onClick={onOpenDiscountModal}
                                 type={hasDiscount ? "primary" : "default"}
                                 className="icon-button"
-                                icon={<DollarOutlined />}
+                                icon={<PercentageOutlined />}
                                 size="small"
                                 style={hasDiscount ? { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } : {}}
                             />

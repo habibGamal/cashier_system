@@ -175,6 +175,9 @@ export type PageProps<T = {}> = T & {
   };
   receiptFooter?: string;
   scaleBarcodePrefix?: string;
+  allowCashierDiscounts?: boolean;
+  allowCashierCancelOrders?: boolean;
+  allowCashierItemChanges?: boolean;
 };
 
 export interface ManageOrderProps extends PageProps {

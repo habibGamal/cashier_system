@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'receiptFooter' => $settingsService->getReceiptFooter(),
             'scaleBarcodePrefix' => $settingsService->getScaleBarcodePrefix(),
+            'allowCashierDiscounts' => (bool) $settingsService->get('allow_cashier_discounts', '0'),
+            'allowCashierCancelOrders' => (bool) $settingsService->get('allow_cashier_cancel_orders', '0'),
+            'allowCashierItemChanges' => (bool) $settingsService->get('allow_cashier_item_changes', '0'),
         ];
     }
 }

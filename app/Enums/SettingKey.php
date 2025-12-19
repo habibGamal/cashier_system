@@ -15,6 +15,11 @@ enum SettingKey: string
     case MASTER_NODE_LINK = 'master_node_link';
     case SCALE_BARCODE_PREFIX = 'scale_barcode_prefix';
 
+    // Cashier Permissions
+    case ALLOW_CASHIER_DISCOUNTS = 'allow_cashier_discounts';
+    case ALLOW_CASHIER_CANCEL_ORDERS = 'allow_cashier_cancel_orders';
+    case ALLOW_CASHIER_ITEM_CHANGES = 'allow_cashier_item_changes';
+
     /**
      * Get default value for this setting
      */
@@ -31,6 +36,9 @@ enum SettingKey: string
             self::NODE_TYPE => 'independent',
             self::MASTER_NODE_LINK => 'http://127.0.0.1:38794',
             self::SCALE_BARCODE_PREFIX => '23',
+            self::ALLOW_CASHIER_DISCOUNTS => '0',
+            self::ALLOW_CASHIER_CANCEL_ORDERS => '0',
+            self::ALLOW_CASHIER_ITEM_CHANGES => '0',
         };
     }
 
@@ -50,6 +58,9 @@ enum SettingKey: string
             self::NODE_TYPE => ['required', 'in:master,slave,independent'],
             self::MASTER_NODE_LINK => ['nullable', 'url', 'max:255'],
             self::SCALE_BARCODE_PREFIX => ['required', 'string', 'regex:/^\d{1,4}$/', 'max:4'],
+            self::ALLOW_CASHIER_DISCOUNTS => ['required', 'boolean'],
+            self::ALLOW_CASHIER_CANCEL_ORDERS => ['required', 'boolean'],
+            self::ALLOW_CASHIER_ITEM_CHANGES => ['required', 'boolean'],
         };
     }
 
@@ -69,6 +80,9 @@ enum SettingKey: string
             self::NODE_TYPE => 'نوع النقطة الحالية',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية',
             self::SCALE_BARCODE_PREFIX => 'بادئة باركود الميزان',
+            self::ALLOW_CASHIER_DISCOUNTS => 'السماح للكاشير بتطبيق الخصومات',
+            self::ALLOW_CASHIER_CANCEL_ORDERS => 'السماح للكاشير بإلغاء الطلبات',
+            self::ALLOW_CASHIER_ITEM_CHANGES => 'السماح للكاشير بتعديل الأصناف',
         };
     }
 
@@ -88,6 +102,9 @@ enum SettingKey: string
             self::NODE_TYPE => 'تحديد نوع النقطة الحالية في شبكة الفروع',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية (مطلوب فقط إذا كان النوع عبارة عن فرع)',
             self::SCALE_BARCODE_PREFIX => 'البادئة المستخدمة لتحديد باركود المنتجات الموزونة (مثال: 23)',
+            self::ALLOW_CASHIER_DISCOUNTS => 'تفعيل هذا الخيار يسمح للكاشير بتطبيق الخصومات على الطلبات والأصناف',
+            self::ALLOW_CASHIER_CANCEL_ORDERS => 'تفعيل هذا الخيار يسمح للكاشير بإلغاء أو مسح الطلبات',
+            self::ALLOW_CASHIER_ITEM_CHANGES => 'تفعيل هذا الخيار يسمح للكاشير بحذف الأصناف أو تعديل الكميات',
         };
     }
 
@@ -105,6 +122,7 @@ enum SettingKey: string
             self::NODE_TYPE => 'اختر نوع النقطة',
             self::MASTER_NODE_LINK => 'http://127.0.0.1:38794',
             self::SCALE_BARCODE_PREFIX => '23',
+            default => '',
         };
     }
 
@@ -124,6 +142,9 @@ enum SettingKey: string
             self::NODE_TYPE => in_array($value, ['master', 'slave', 'independent']),
             self::MASTER_NODE_LINK => !$value || filter_var($value, FILTER_VALIDATE_URL) !== false,
             self::SCALE_BARCODE_PREFIX => is_string($value) && preg_match('/^\d{1,4}$/', $value),
+            self::ALLOW_CASHIER_DISCOUNTS,
+            self::ALLOW_CASHIER_CANCEL_ORDERS,
+            self::ALLOW_CASHIER_ITEM_CHANGES => in_array($value, ['0', '1', 0, 1, true, false], true),
         };
     }
 }

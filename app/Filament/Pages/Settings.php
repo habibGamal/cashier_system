@@ -194,6 +194,29 @@ class Settings extends Page implements HasForms
                                     ->required(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
                             ]),
                     ]),
+
+                Section::make('إعدادات صلاحيات الكاشير')
+                    ->description('التحكم في صلاحيات موظفي الكاشير')
+                    ->icon('heroicon-m-shield-check')
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                \Filament\Forms\Components\Toggle::make(SettingKey::ALLOW_CASHIER_DISCOUNTS->value)
+                                    ->label(SettingKey::ALLOW_CASHIER_DISCOUNTS->label())
+                                    ->helperText(SettingKey::ALLOW_CASHIER_DISCOUNTS->helperText())
+                                    ->default(false),
+
+                                \Filament\Forms\Components\Toggle::make(SettingKey::ALLOW_CASHIER_CANCEL_ORDERS->value)
+                                    ->label(SettingKey::ALLOW_CASHIER_CANCEL_ORDERS->label())
+                                    ->helperText(SettingKey::ALLOW_CASHIER_CANCEL_ORDERS->helperText())
+                                    ->default(false),
+
+                                \Filament\Forms\Components\Toggle::make(SettingKey::ALLOW_CASHIER_ITEM_CHANGES->value)
+                                    ->label(SettingKey::ALLOW_CASHIER_ITEM_CHANGES->label())
+                                    ->helperText(SettingKey::ALLOW_CASHIER_ITEM_CHANGES->helperText())
+                                    ->default(false),
+                            ]),
+                    ]),
             ])
             ->statePath('data');
     }

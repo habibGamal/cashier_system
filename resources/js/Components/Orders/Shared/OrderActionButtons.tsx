@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Button, Popconfirm } from "antd";
+import { usePage } from "@inertiajs/react";
 import {
     CheckCircleOutlined,
     EditOutlined,
@@ -9,8 +10,8 @@ import {
     UserAddOutlined,
 } from "@ant-design/icons";
 import LoadingButton from "@/Components/LoadingButton";
-import IsAdmin from "@/Components/IsAdmin";
 import { IOrderActions, IModalActions } from "@/types/OrderManagement";
+import { PageProps } from "@/types";
 
 interface OrderActionButtonsProps {
     actions: IOrderActions;
@@ -38,6 +39,9 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     showChangeOrderType = false,
     customActions = [],
 }) => {
+    // Get settings from page props
+    const { auth, allowCashierDiscounts, allowCashierCancelOrders } = usePage<PageProps>().props;
+
     // Add keyboard shortcuts
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
@@ -51,25 +55,25 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
                 case 'F1': // F1 for Save
                     event.preventDefault();
                     if (permissions.canSave && actions.onSave) {
-                        actions.onSave(() => {});
+                        actions.onSave(() => { });
                     }
                     break;
                 case 'F2': // F2 for Print
                     event.preventDefault();
                     if (permissions.canPrint && actions.onPrint) {
-                        actions.onPrint(() => {});
+                        actions.onPrint(() => { });
                     }
                     break;
                 case 'F3': // F3 for Complete Order
                     event.preventDefault();
                     if (permissions.canComplete && actions.onPayment) {
-                        actions.onPayment(() => {});
+                        actions.onPayment(() => { });
                     }
                     break;
                 case 'F4': // F4 for Discount
                     event.preventDefault();
                     if (permissions.canDiscount && actions.onDiscount) {
-                        actions.onDiscount(() => {});
+                        actions.onDiscount(() => { });
                     }
                     break;
                 case 'F6': // F6 for Clear Order (skipping F5)
@@ -108,7 +112,7 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
     return (
         <div className="isolate grid grid-cols-2 gap-4">
             <LoadingButton
-                onCustomClick={actions.onPrint || (() => {})}
+                onCustomClick={actions.onPrint || (() => { })}
                 size="large"
                 icon={<PrinterOutlined />}
                 className="col-span-2"
@@ -174,10 +178,11 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
                 </Button>
             )}
 
-            <IsAdmin>
+            {/* Discount button - visible to admin always, or to cashier if allowCashierDiscounts is enabled */}
+            {(auth.user?.role === 'admin' || allowCashierDiscounts) && (
                 <LoadingButton
                     disabled={!permissions.canDiscount}
-                    onCustomClick={actions.onDiscount || (() => {})}
+                    onCustomClick={actions.onDiscount || (() => { })}
                     size="large"
                     icon={<PercentageOutlined />}
                     className="col-span-2"
@@ -185,11 +190,11 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
                 >
                     خصم
                 </LoadingButton>
-            </IsAdmin>
+            )}
 
             <LoadingButton
                 disabled={!permissions.canSave}
-                onCustomClick={actions.onSave || (() => {})}
+                onCustomClick={actions.onSave || (() => { })}
                 size="large"
                 icon={<SaveOutlined />}
                 type="primary"
@@ -200,7 +205,7 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
 
             <LoadingButton
                 disabled={!permissions.canComplete}
-                onCustomClick={actions.onPayment || (() => {})}
+                onCustomClick={actions.onPayment || (() => { })}
                 size="large"
                 icon={<CheckCircleOutlined />}
                 type="primary"
