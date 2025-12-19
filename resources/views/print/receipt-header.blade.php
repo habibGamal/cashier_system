@@ -18,17 +18,11 @@
         return $typeMap[$type->value] ?? $type->value;
     };
 
-    $receiptFooter = setting(SettingKey::RECEIPT_FOOTER);
     $logoPath =
         setting(SettingKey::RESTAURANT_PRINT_LOGO) !== ''
-        ? Storage::path(setting(SettingKey::RESTAURANT_PRINT_LOGO))
+        ? public_path(Storage::url(setting(SettingKey::RESTAURANT_PRINT_LOGO)))
         : null;
-    $qrLogoPath =
-        setting(SettingKey::RECEIPT_FOOTER_BARCODE) !== ''
-        ? Storage::path(setting(SettingKey::RECEIPT_FOOTER_BARCODE))
-        : null;
-    logger()->info($qrLogoPath);
-    logger()->info($logoPath);
+
     // Format dates
     $orderDate = $order->created_at->setTimezone('Africa/Cairo')->format('d/m/Y H:i:s');
     $printDate = now()->setTimezone('Africa/Cairo')->format('d/m/Y H:i:s');
@@ -43,7 +37,6 @@
         $mimeType = mime_content_type($imagePath);
         return "data:{$mimeType};base64,{$base64}";
     };
-    $footerLogo = $imgToDataUri(public_path('images/turbo.png'));
 @endphp
 
 <!DOCTYPE html>
@@ -52,10 +45,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt</title>
+    <title>Receipt Header</title>
     <style>
-        /* @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700&display=swap'); */
-
         * {
             margin: 0;
             padding: 0;
@@ -64,7 +55,6 @@
         }
 
         body {
-            /* font-family: sans-serif; */
             font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif;
             direction: rtl;
             font-size: 22px;
@@ -72,29 +62,27 @@
             line-height: 1.4;
             color: black;
             background: white;
-            padding: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
             width: 572px;
             direction: rtl;
         }
 
         .receipt {
             width: 100%;
-            space-y: 16px;
         }
 
-        .receipt>* {
-            margin-bottom: 16px;
-        }
+        .receipt>* {}
 
         .logo {
             display: block;
             margin: 0 auto;
-            width: 250px;
-            max-width: 60mm;
+            width: 200px;
+            max-width: 50mm;
         }
 
         .order-number {
-            font-size: 36px;
+            font-size: 48px;
             text-align: center;
             font-weight: bold;
         }
@@ -107,7 +95,7 @@
             width: 100%;
             border-collapse: collapse;
             border: 2px solid black;
-            margin: 16px 0;
+            /* margin: 16px 0; */
         }
 
         th,
@@ -126,7 +114,7 @@
 
         .product-cell {
             text-align: right;
-            max-width: 200px;
+            width: 150px;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -136,42 +124,6 @@
             font-size: 18px;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .reference {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .footer-text {
-            white-space: pre-line;
-            text-align: center;
-        }
-
-        .turbo-logo {
-            display: block;
-            margin: 20px auto;
-            width: 200px;
-            max-width: 50mm;
-        }
-
-        .footer-logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin: 20px auto;
-            text-align: center;
-        }
-
-        .footer-logos img {
-            width: 150px;
-            max-width: 40mm;
-        }
-
-        .company-info {
-            text-align: center;
-            font-size: 18px;
         }
     </style>
 </head>
@@ -193,7 +145,6 @@
         <p>تاريخ الطباعة : {{ $printDate }}</p>
         <p>نوع الطلب : {{ $getOrderTypeString($order->type) }} </p>
 
-        {{-- Takeaway: show customer name and phone --}}
         <p>اسم العميل : {{ $order->customer?->name ?? '-' }}</p>
         <p>رقم الهاتف : {{ $order->customer?->phone ?? '-' }}</p>
 
@@ -215,7 +166,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($order->items as $item)
+                @foreach ($items as $item)
                     @php
                         $itemSubtotal = $item->quantity * $item->price;
                         $itemDiscount = $item->item_discount ?? 0;
@@ -240,48 +191,6 @@
                 @endforeach
             </tbody>
         </table>
-
-        <table>
-            <tbody>
-                <tr>
-                    <td>اجمالي الطلب</td>
-                    <td class="number-cell">{{ number_format($order->sub_total, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>الخصم</td>
-                    <td class="number-cell">{{ number_format($order->discount, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>الخدمة</td>
-                    <td class="number-cell">{{ number_format($order->service, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>الضريبة</td>
-                    <td class="number-cell">{{ number_format($order->tax, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>الاجمالي النهائي</td>
-                    <td class="number-cell">{{ ceil($order->total) }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <p class="reference">الرقم المرجعي - {{ $order->id }}</p>
-        @if ($order->order_notes)
-            <p>{{ $order->order_notes }}</p>
-        @endif
-        <p class="footer-text">{{ $receiptFooter }}</p>
-
-        <div class="footer-logos">
-            @if ($qrLogoPath)
-                <img src="{{ $imgToDataUri($qrLogoPath) }}" alt="Restaurant QR Logo" />
-            @else
-                <img src="{{ $footerLogo }}" alt="Turbo Logo" />
-            @endif
-        </div>
-
-        <p class="company-info">Turbo Software Space</p>
-        <p class="center">{{ $printDate }}</p>
     </div>
 </body>
 

@@ -75,7 +75,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('إدارة المصروفات')
                     ->collapsible(),
                 NavigationGroup::make()
-                    ->label('إدارة المطعم')
+                    ->label('إدارة الشركة')
                     ->collapsible(),
                 NavigationGroup::make()
                     ->label('إدارة النظام')

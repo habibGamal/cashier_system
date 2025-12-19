@@ -16,6 +16,9 @@ export class OrderService implements IOrderService {
             quantity: item.quantity,
             price: item.price,
             notes: item.notes || null,
+            item_discount: item.item_discount ?? 0,
+            item_discount_type: item.item_discount_type ?? null,
+            item_discount_percent: item.item_discount_percent ?? null,
         }));
 
         return new Promise((resolve, reject) => {

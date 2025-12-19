@@ -27,7 +27,7 @@ class CustomerResource extends Resource
 
     protected static ?string $model = Customer::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationLabel = 'العملاء';
 
@@ -35,7 +35,7 @@ class CustomerResource extends Resource
 
     protected static ?string $pluralModelLabel = 'العملاء';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة الشركة';
 
     protected static ?int $navigationSort = 2;
 

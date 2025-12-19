@@ -19,6 +19,9 @@ class SaveOrderRequest extends FormRequest
             'items.*.quantity' => 'required|numeric|min:0.001',
             'items.*.price' => 'required|numeric|min:0',
             'items.*.notes' => 'nullable|string|max:500',
+            'items.*.item_discount' => 'nullable|numeric|min:0',
+            'items.*.item_discount_type' => 'nullable|string|in:percent,value',
+            'items.*.item_discount_percent' => 'nullable|numeric|min:0|max:100',
         ];
     }
 

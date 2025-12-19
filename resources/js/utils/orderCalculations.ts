@@ -26,14 +26,34 @@ export const calculateOrderTotals = (
     service = subTotal * (Number(order.service_rate) || 0);
   }
 
-  let discount = 0;
-  const tempDiscountPercent = Number(order?.temp_discount_percent) || 0;
-  const orderDiscount = Number(order?.discount) || 0;
+  // Check for item-level discounts first
+  const hasItemDiscounts = orderItems.some(item => (item.item_discount ?? 0) > 0);
 
-  if (tempDiscountPercent > 0) {
-    discount = subTotal * (tempDiscountPercent / 100);
+  let discount = 0;
+  if (hasItemDiscounts) {
+    // Sum item-level discounts
+    discount = orderItems.reduce((acc, item) => {
+      const itemSubtotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
+      let itemDiscount = 0;
+
+      if (item.item_discount_type === 'percent' && item.item_discount_percent) {
+        itemDiscount = itemSubtotal * (item.item_discount_percent / 100);
+      } else {
+        itemDiscount = item.item_discount ?? 0;
+      }
+
+      return acc + Math.min(itemDiscount, itemSubtotal);
+    }, 0);
   } else {
-    discount = orderDiscount;
+    // Use order-level discount
+    const tempDiscountPercent = Number(order?.temp_discount_percent) || 0;
+    const orderDiscount = Number(order?.discount) || 0;
+
+    if (tempDiscountPercent > 0) {
+      discount = subTotal * (tempDiscountPercent / 100);
+    } else {
+      discount = orderDiscount;
+    }
   }
 
   const total = Math.ceil(subTotal + tax + service - discount);
@@ -48,12 +68,12 @@ export const calculateOrderTotals = (
 };
 
 export const formatCurrency = (amount: number): string => {
-    try {
-        return `${Number(amount).toFixed(1)} ج.م`;
-    } catch (error) {
-        console.error('Error formatting currency:', error);
-        return '0.0 ج.م';
-    }
+  try {
+    return `${Number(amount).toFixed(1)} ج.م`;
+  } catch (error) {
+    console.error('Error formatting currency:', error);
+    return '0.0 ج.م';
+  }
 };
 
 export const getOrderStatusConfig = (status: string) => {

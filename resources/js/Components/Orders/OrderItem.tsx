@@ -5,10 +5,12 @@ import {
     PlusCircleOutlined,
     DeleteOutlined,
     EditOutlined,
+    DollarOutlined,
 } from "@ant-design/icons";
 
 import { OrderItemData, OrderItemAction, User } from "@/types";
 import { formatCurrency } from "@/utils/orderCalculations";
+import ItemDiscountModal from "./ItemDiscountModal";
 
 const { TextArea } = Input;
 
@@ -28,10 +30,28 @@ export default function OrderItem({
     forWeb,
 }: OrderItemProps) {
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+    const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
     const [notes, setNotes] = useState(orderItem.notes || "");
 
     // For web orders, disable quantity changes but allow notes editing
     const quantityDisabled = disabled || forWeb;
+
+    // Calculate item discount
+    const itemSubtotal = orderItem.price * orderItem.quantity;
+    let itemDiscount = 0;
+
+    if (orderItem.item_discount_type === 'percent' && orderItem.item_discount_percent) {
+        itemDiscount = itemSubtotal * (orderItem.item_discount_percent / 100);
+    } else {
+        itemDiscount = orderItem.item_discount ?? 0;
+    }
+
+    // Ensure discount doesn't exceed subtotal
+    itemDiscount = Math.min(itemDiscount, itemSubtotal);
+    const itemTotal = itemSubtotal - itemDiscount;
+
+    // Check if item has discount applied
+    const hasDiscount = itemDiscount > 0;
 
     const onChangeQuantity = (quantity: number | null) => {
         if (quantity !== null) {
@@ -69,6 +89,10 @@ export default function OrderItem({
     const onOpenNotesModal = () => {
         setNotes(orderItem.notes || "");
         setIsNotesModalOpen(true);
+    };
+
+    const onOpenDiscountModal = () => {
+        setIsDiscountModalOpen(true);
     };
 
     return (
@@ -115,19 +139,50 @@ export default function OrderItem({
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <Typography.Text>
-                        السعر :
-                        <Tag
-                            className="mx-4 text-lg"
-                            bordered={false}
-                            color="success"
-                        >
-                            {formatCurrency(
-                                orderItem.price * orderItem.quantity
-                            )}
-                        </Tag>
-                    </Typography.Text>
+                    <div className="flex flex-col gap-1">
+                        <Typography.Text>
+                            السعر :
+                            <Tag
+                                className="mx-4 text-lg"
+                                bordered={false}
+                                color={hasDiscount ? "default" : "success"}
+                                style={hasDiscount ? { textDecoration: 'line-through' } : {}}
+                            >
+                                {formatCurrency(itemSubtotal)}
+                            </Tag>
+                        </Typography.Text>
+                        {hasDiscount && (
+                            <>
+                                <Typography.Text>
+                                    الخصم :
+                                    <Tag className="mx-4" color="error">
+                                        {formatCurrency(itemDiscount)}
+                                        {orderItem.item_discount_type === 'percent' &&
+                                            ` (${orderItem.item_discount_percent}%)`
+                                        }
+                                    </Tag>
+                                </Typography.Text>
+                                <Typography.Text strong>
+                                    الإجمالي :
+                                    <Tag className="mx-4 text-lg" color="blue">
+                                        {formatCurrency(itemTotal)}
+                                    </Tag>
+                                </Typography.Text>
+                            </>
+                        )}
+                    </div>
                     <div className="flex gap-4">
+                        {user.role === 'admin' && (
+                            <Button
+                                disabled={disabled}
+                                onClick={onOpenDiscountModal}
+                                type={hasDiscount ? "primary" : "default"}
+                                className="icon-button"
+                                icon={<DollarOutlined />}
+                                size="small"
+                                style={hasDiscount ? { backgroundColor: '#ff4d4f', borderColor: '#ff4d4f' } : {}}
+                            />
+                        )}
                         <Button
                             disabled={quantityDisabled}
                             onClick={onDelete}
@@ -164,6 +219,15 @@ export default function OrderItem({
                     rows={4}
                 />
             </Modal>
+
+            <ItemDiscountModal
+                open={isDiscountModalOpen}
+                onCancel={() => setIsDiscountModalOpen(false)}
+                orderItem={orderItem}
+                dispatch={dispatch}
+                user={user}
+            />
         </>
     );
 }
+

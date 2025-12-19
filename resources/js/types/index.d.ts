@@ -94,6 +94,10 @@ export interface OrderItemData {
     quantity: number;
     notes?: string;
     initial_quantity?: number;
+    item_discount?: number;
+    item_discount_type?: string;      // 'percent' | 'value'
+    item_discount_percent?: number;
+    product?: Product;
 }
 
 export type OrderItemAction =
@@ -103,7 +107,9 @@ export type OrderItemAction =
     | { type: 'decrement'; id: number; user: User }
     | { type: 'changeQuantity'; id: number; quantity: number; user: User }
     | { type: 'changeNotes'; id: number; notes: string; user: User }
+    | { type: 'changeItemDiscount'; id: number; discount: number; discountType: string; discountPercent?: number; user: User }
     | { type: 'delete'; id: number; user: User }
+    | { type: 'addByBarcode'; barcode: string; scalePrefix: string; products: Product[]; user: User }
     | { type: 'init'; orderItems: OrderItemData[]; user: User };
 
 export interface ManageOrderProps {

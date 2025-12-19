@@ -72,6 +72,9 @@ export const DirectSaleTab: React.FC<DirectSaleTabProps> = ({
                     quantity: item.quantity,
                     notes: item.notes,
                     initial_quantity: item.quantity,
+                    item_discount: item.item_discount,
+                    item_discount_type: item.item_discount_type,
+                    item_discount_percent: item.item_discount_percent,
                 })
             );
             dispatch({ type: "init", orderItems: transformedItems, user });
@@ -85,7 +88,7 @@ export const DirectSaleTab: React.FC<DirectSaleTabProps> = ({
     const calculations = calculateOrderTotals(currentOrder as any, orderItems);
     const permissions = orderStrategy.getPermissions(currentOrder as Order);
 
-    const onSaveCallback = (page: Page<PageProps>) => {};
+    const onSaveCallback = (page: Page<PageProps>) => { };
 
     const barcodeScanner = (symbol: string, type: any) => {
         const barcode = symbol;

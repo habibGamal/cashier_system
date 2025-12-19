@@ -23,9 +23,9 @@ class RegionResource extends Resource
 
     protected static ?string $model = Region::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة الشركة';
 
     protected static ?int $navigationSort = 4;
 

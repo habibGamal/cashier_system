@@ -31,7 +31,7 @@ class OrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'الطلبات';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة الشركة';
 
     protected static ?int $navigationSort = 1;
 
@@ -137,7 +137,7 @@ class OrderResource extends Resource
                         TextEntry::make('remaining_amount')
                             ->label('المبلغ المتبقي')
                             ->money('EGP')
-                            ->color(fn ($record) => $record->remaining_amount > 0 ? 'danger' : 'success'),
+                            ->color(fn($record) => $record->remaining_amount > 0 ? 'danger' : 'success'),
 
                         TextEntry::make('profit')
                             ->label('الربح')

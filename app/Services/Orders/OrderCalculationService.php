@@ -12,7 +12,8 @@ class OrderCalculationService
 
     public function __construct(
         private readonly OrderRepositoryInterface $orderRepository,
-    ) {}
+    ) {
+    }
 
     public function calculateOrderTotals(Order $order): Order
     {
@@ -53,6 +54,13 @@ class OrderCalculationService
     {
         $order->load('items');
 
+        // Clear all item-level discounts when applying order-level discount (mutual exclusivity)
+        $order->items()->update([
+            'item_discount' => 0,
+            'item_discount_type' => null,
+            'item_discount_percent' => null,
+        ]);
+
         // Reset existing discounts
         $updateData = [
             'discount' => 0,
@@ -90,6 +98,24 @@ class OrderCalculationService
 
     private function calculateDiscount(Order $order, float $subtotal): float
     {
+        // Check for item-level discounts first
+        $hasItemDiscounts = $order->items->some(fn($item) => ($item->item_discount ?? 0) > 0);
+
+        if ($hasItemDiscounts) {
+            // Sum all item-level discounts
+            return $order->items->sum(function ($item) {
+                $itemSubtotal = $item->price * $item->quantity;
+
+                if ($item->item_discount_type === 'percent' && $item->item_discount_percent) {
+                    $discount = $itemSubtotal * ($item->item_discount_percent / 100);
+                    return min($discount, $itemSubtotal);
+                }
+
+                return min($item->item_discount ?? 0, $itemSubtotal);
+            });
+        }
+
+        // Fall back to order-level discount
         if ($order->temp_discount_percent > 0) {
             return ($order->temp_discount_percent / 100) * $subtotal;
         }
@@ -103,3 +129,4 @@ class OrderCalculationService
         return $total - $totalCost;
     }
 }
+

@@ -15,7 +15,8 @@ class OrderCreationService
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly OrderItemRepositoryInterface $orderItemRepository,
         private readonly OrderCalculationService $orderCalculationService,
-    ) {}
+    ) {
+    }
 
     public function create(CreateOrderDTO $createOrderDTO): Order
     {
@@ -36,7 +37,6 @@ class OrderCreationService
         // Recalculate order totals
         $order->refresh();
         $order->load('items');
-
         $this->orderCalculationService->calculateOrderTotals($order);
 
         return $order;

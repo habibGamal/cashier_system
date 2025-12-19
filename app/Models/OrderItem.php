@@ -18,6 +18,9 @@ class OrderItem extends Model
         'cost',
         'total',
         'notes',
+        'item_discount',
+        'item_discount_type',
+        'item_discount_percent',
     ];
 
     protected $casts = [
@@ -25,6 +28,8 @@ class OrderItem extends Model
         'price' => 'decimal:2',
         'cost' => 'decimal:2',
         'total' => 'decimal:2',
+        'item_discount' => 'decimal:2',
+        'item_discount_percent' => 'decimal:2',
     ];
 
     public function order(): BelongsTo

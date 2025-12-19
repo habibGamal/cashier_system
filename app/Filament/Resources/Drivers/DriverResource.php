@@ -20,9 +20,9 @@ class DriverResource extends Resource
 
     protected static ?string $model = Driver::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-user-circle';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة الشركة';
 
     protected static ?int $navigationSort = 3;
 

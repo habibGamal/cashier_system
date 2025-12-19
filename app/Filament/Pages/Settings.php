@@ -29,11 +29,11 @@ class Settings extends Page implements HasForms
 {
     use InteractsWithForms, AdminAccess;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected string $view = 'filament.pages.settings';
     protected static ?string $navigationLabel = 'الإعدادات';
     protected static ?string $title = 'إعدادات النظام';
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة النظام';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة النظام';
     protected static ?int $navigationSort = 100;
 
     public ?array $data = [];
@@ -96,8 +96,8 @@ class Settings extends Page implements HasForms
                             ->maxLength(500),
                     ]),
 
-                Section::make('إعدادات المطعم')
-                    ->description('معلومات المطعم الأساسية')
+                Section::make('إعدادات الشركة')
+                    ->description('معلومات الشركة الأساسية')
                     ->icon('heroicon-m-building-storefront')
                     ->schema([
                         TextInput::make(SettingKey::RESTAURANT_NAME->value)

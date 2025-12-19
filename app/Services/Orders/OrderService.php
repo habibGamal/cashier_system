@@ -81,6 +81,9 @@ class OrderService
                     'price' => (float) $product->price,
                     'cost' => (float) $product->cost,
                     'notes' => $item['notes'] ?? null,
+                    'item_discount' => $item['item_discount'] ?? 0,
+                    'item_discount_type' => $item['item_discount_type'] ?? null,
+                    'item_discount_percent' => $item['item_discount_percent'] ?? null,
                 ];
             }, $itemsData);
 

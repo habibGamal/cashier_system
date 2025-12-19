@@ -1,0 +1,495 @@
+[
+    [
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php",
+            "line": 878,
+            "function": "make",
+            "class": "Illuminate\\Database\\Eloquent\\RelationNotFoundException",
+            "type": "::"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Relations\\Relation.php",
+            "line": 120,
+            "function": "{closure:Illuminate\\Database\\Eloquent\\Builder::getRelation():874}",
+            "class": "Illuminate\\Database\\Eloquent\\Builder",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php",
+            "line": 874,
+            "function": "noConstraints",
+            "class": "Illuminate\\Database\\Eloquent\\Relations\\Relation",
+            "type": "::"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php",
+            "line": 848,
+            "function": "getRelation",
+            "class": "Illuminate\\Database\\Eloquent\\Builder",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Builder.php",
+            "line": 828,
+            "function": "eagerLoadRelation",
+            "class": "Illuminate\\Database\\Eloquent\\Builder",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Model.php",
+            "line": 724,
+            "function": "eagerLoadRelations",
+            "class": "Illuminate\\Database\\Eloquent\\Builder",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\app\\Services\\PrintService.php",
+            "line": 380,
+            "function": "load",
+            "class": "Illuminate\\Database\\Eloquent\\Model",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\app\\Services\\PrintService.php",
+            "line": 72,
+            "function": "printOrderProcess",
+            "class": "App\\Services\\PrintService",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\app\\Http\\Controllers\\OrderController.php",
+            "line": 628,
+            "function": "printOrderReceipt",
+            "class": "App\\Services\\PrintService",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php",
+            "line": 47,
+            "function": "printReceipt",
+            "class": "App\\Http\\Controllers\\OrderController",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php",
+            "line": 266,
+            "function": "dispatch",
+            "class": "Illuminate\\Routing\\ControllerDispatcher",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php",
+            "line": 212,
+            "function": "runController",
+            "class": "Illuminate\\Routing\\Route",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php",
+            "line": 808,
+            "function": "run",
+            "class": "Illuminate\\Routing\\Route",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 170,
+            "function": "{closure:Illuminate\\Routing\\Router::runRouteWithinStack():807}",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\boost\\src\\Middleware\\InjectBoost.php",
+            "line": 22,
+            "function": "{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():168}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Laravel\\Boost\\Middleware\\InjectBoost",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\barryvdh\\laravel-debugbar\\src\\Middleware\\InjectDebugbar.php",
+            "line": 66,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Barryvdh\\Debugbar\\Middleware\\InjectDebugbar",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\AddLinkHeadersForPreloadedAssets.php",
+            "line": 20,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\AddLinkHeadersForPreloadedAssets",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\inertiajs\\inertia-laravel\\src\\Middleware.php",
+            "line": 96,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Inertia\\Middleware",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php",
+            "line": 51,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Routing\\Middleware\\SubstituteBindings",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php",
+            "line": 64,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Auth\\Middleware\\Authenticate",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken.php",
+            "line": 88,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\VerifyCsrfToken",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\View\\Middleware\\ShareErrorsFromSession.php",
+            "line": 49,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\View\\Middleware\\ShareErrorsFromSession",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Session\\Middleware\\StartSession.php",
+            "line": 121,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Session\\Middleware\\StartSession.php",
+            "line": 64,
+            "function": "handleStatefulRequest",
+            "class": "Illuminate\\Session\\Middleware\\StartSession",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Session\\Middleware\\StartSession",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse.php",
+            "line": 37,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Cookie\\Middleware\\EncryptCookies.php",
+            "line": 75,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Cookie\\Middleware\\EncryptCookies",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 127,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php",
+            "line": 807,
+            "function": "then",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php",
+            "line": 786,
+            "function": "runRouteWithinStack",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php",
+            "line": 750,
+            "function": "runRoute",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php",
+            "line": 739,
+            "function": "dispatchToRoute",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php",
+            "line": 201,
+            "function": "dispatch",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 170,
+            "function": "{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():198}",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\livewire\\livewire\\src\\Features\\SupportDisablingBackButtonCache\\DisableBackButtonCacheMiddleware.php",
+            "line": 19,
+            "function": "{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():168}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Livewire\\Features\\SupportDisablingBackButtonCache\\DisableBackButtonCacheMiddleware",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\barryvdh\\laravel-debugbar\\src\\Middleware\\InjectDebugbar.php",
+            "line": 66,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Barryvdh\\Debugbar\\Middleware\\InjectDebugbar",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php",
+            "line": 21,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php",
+            "line": 31,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php",
+            "line": 21,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php",
+            "line": 51,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php",
+            "line": 27,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\ValidatePostSize",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php",
+            "line": 110,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php",
+            "line": 49,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\HandleCors",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php",
+            "line": 58,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\TrustProxies",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php",
+            "line": 22,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php",
+            "line": 127,
+            "function": "{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():184}:185}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php",
+            "line": 176,
+            "function": "then",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php",
+            "line": 145,
+            "function": "sendRequestThroughRouter",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php",
+            "line": 1220,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\public\\index.php",
+            "line": 17,
+            "function": "handleRequest",
+            "class": "Illuminate\\Foundation\\Application",
+            "type": "->"
+        },
+        {
+            "file": "E:\\cashier_system\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php",
+            "line": 23,
+            "args": [
+                "E:\\cashier_system\\public\\index.php"
+            ],
+            "function": "require_once"
+        }
+    ]
+]
