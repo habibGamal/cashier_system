@@ -228,7 +228,7 @@ class OrderController extends Controller
             // Log order completion
             $this->loggingService->logOrderCompletion($order->id, $paymentsData, (float) $completedOrder->total);
 
-            return redirect()->to(route('orders.index') .'#' . $order->type->value)
+            return redirect()->to(route('orders.index') . '#' . $order->type->value)
                 ->with('success', 'تم إنهاء الطلب بنجاح');
         } catch (Exception $e) {
             $this->loggingService->logAction('فشل في إتمام الطلب', [
@@ -691,6 +691,9 @@ class OrderController extends Controller
             'items.*.quantity' => 'required_with:items|numeric|min:0.001',
             'items.*.price' => 'required_with:items|numeric|min:0',
             'items.*.notes' => 'nullable|string',
+            'items.*.item_discount' => 'nullable|numeric|min:0',
+            'items.*.item_discount_percent' => 'nullable|numeric|min:0|max:100',
+            'items.*.item_discount_type' => 'nullable|string|in:value,percent',
         ]);
 
         try {
@@ -745,6 +748,9 @@ class OrderController extends Controller
                         'price' => (float) $item['price'],
                         'cost' => (float) $product->cost,
                         'notes' => $item['notes'] ?? null,
+                        'item_discount' => $item['item_discount'] ?? null,
+                        'item_discount_percent' => $item['item_discount_percent'] ?? null,
+                        'item_discount_type' => $item['item_discount_type'] ?? null,
                     ];
                 }, $validated['items']);
 
