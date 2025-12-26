@@ -75,7 +75,7 @@ class LowStockImporterAction extends Action
                             $needed = $avgPurchaseQty - $currentStock;
 
                             return [
-                                $product->id => $product->name.' - '.$price.' ج.م'.' ('.$categoryName.') - مقترح: '.$needed,
+                                $product->id => $product->name.' - '.$price.' '.currency_symbol().' ('.$categoryName.') - مقترح: '.$needed,
                             ];
                         });
                     })
@@ -92,7 +92,7 @@ class LowStockImporterAction extends Action
                             $avgPurchaseQty = $product->avg_purchase_quantity ?? 1;
 
                             $description = "المخزون الحالي: {$currentStock} | الحد الأدنى: {$minStock} | متوسط كمية الشراء: {$avgPurchaseQty}";
-                            $description .= " | سعر التكلفة: {$cost} ج.م | سعر البيع: {$price} ج.م";
+                            $description .= " | سعر التكلفة: {$cost} ".currency_symbol()." | سعر البيع: {$price} ".currency_symbol();
 
                             if ($product->unit) {
                                 $description .= " | الوحدة: {$product->unit}";

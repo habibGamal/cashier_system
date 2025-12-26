@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use App\Models\Region;
 use Exception;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class CustomersTable
@@ -48,7 +48,7 @@ class CustomersTable
 
                 TextColumn::make('delivery_cost')
                     ->label('تكلفة التوصيل')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('address')
@@ -93,11 +93,11 @@ class CustomersTable
                         TextInput::make('delivery_cost_from')
                             ->label('من')
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                         TextInput::make('delivery_cost_to')
                             ->label('إلى')
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

@@ -2,38 +2,40 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Exception;
-use App\Filament\Traits\AdminAccess;
-use App\Services\SettingsService;
-use App\Services\PrintService;
-use App\Services\BranchService;
-use App\Models\Category;
 use App\Enums\SettingKey;
+use App\Filament\Traits\AdminAccess;
+use App\Services\PrintService;
+use App\Services\SettingsService;
+use Exception;
 use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class Settings extends Page implements HasForms
 {
-    use InteractsWithForms, AdminAccess;
+    use AdminAccess, InteractsWithForms;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected string $view = 'filament.pages.settings';
+
     protected static ?string $navigationLabel = 'الإعدادات';
+
     protected static ?string $title = 'إعدادات النظام';
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة النظام';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة النظام';
+
     protected static ?int $navigationSort = 100;
 
     public ?array $data = [];
@@ -179,8 +181,8 @@ class Settings extends Page implements HasForms
                                     ->helperText(SettingKey::MASTER_NODE_LINK->helperText())
                                     ->url()
                                     ->placeholder(SettingKey::MASTER_NODE_LINK->placeholder())
-                                    ->visible(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave')
-                                    ->required(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
+                                    ->visible(fn (Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave')
+                                    ->required(fn (Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
                             ]),
                     ]),
 
@@ -247,7 +249,7 @@ class Settings extends Page implements HasForms
                 ->send();
 
         } catch (Exception $e) {
-            logger()->error('Error saving settings: ' . $e->getMessage());
+            logger()->error('Error saving settings: '.$e->getMessage());
             Notification::make()
                 ->title('خطأ في حفظ الإعدادات')
                 ->body('حدث خطأ أثناء محاولة حفظ الإعدادات. يرجى المحاولة مرة أخرى.')
@@ -300,12 +302,13 @@ class Settings extends Page implements HasForms
         } catch (Exception $e) {
             Notification::make()
                 ->title('فشل في اختبار الطابعة')
-                ->body('حدث خطأ أثناء محاولة اختبار الطابعة: ' . $e->getMessage())
+                ->body('حدث خطأ أثناء محاولة اختبار الطابعة: '.$e->getMessage())
                 ->icon('heroicon-o-x-circle')
                 ->iconColor('danger')
                 ->send();
         }
     }
+
     protected function getFormActions(): array
     {
         $actions = [
@@ -335,5 +338,4 @@ class Settings extends Page implements HasForms
 
         return $actions;
     }
-
 }

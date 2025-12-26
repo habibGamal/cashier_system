@@ -9,6 +9,7 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class CustomerSegmentsWidget extends ChartWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -95,6 +96,6 @@ class CustomerSegmentsWidget extends ChartWidget
 
     public function getDescription(): ?string
     {
-        return 'توزيع العملاء حسب مستوى نشاطهم: VIP (5000+ ج.م، 20+ طلب)، مخلصين (2000+ ج.م، 10+ طلب)، عاديين (5+ طلبات)، جدد (أقل من 5 طلبات)';
+        return 'توزيع العملاء حسب مستوى نشاطهم: VIP (5000+ '.currency_symbol().'، 20+ طلب)، مخلصين (2000+ '.currency_symbol().'، 10+ طلب)، عاديين (5+ طلبات)، جدد (أقل من 5 طلبات)';
     }
 }

@@ -4,13 +4,13 @@ namespace App\Filament\Widgets;
 
 use App\Models\Shift;
 use App\Services\ShiftsReportService;
-use App\Enums\OrderStatus;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class CurrentShiftOrdersStats extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     protected ShiftsReportService $shiftsReportService;
@@ -19,6 +19,7 @@ class CurrentShiftOrdersStats extends BaseWidget
     {
         $this->shiftsReportService = app(ShiftsReportService::class);
     }
+
     public function getHeading(): string
     {
         return 'حالة الاوردرات';
@@ -28,44 +29,44 @@ class CurrentShiftOrdersStats extends BaseWidget
     {
         $currentShift = $this->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             return [];
         }
 
         $orderStats = $this->shiftsReportService->calculateOrderStats($currentShift);
 
         return [
-            Stat::make('الاوردرات المكتملة', $orderStats['completed']['count'] . ' اوردر')
-                ->description('بقيمة ' . number_format($orderStats['completed']['value'], 2) . ' جنيه - ربح ' . number_format($orderStats['completed']['profit'], 2) . ' جنيه')
+            Stat::make('الاوردرات المكتملة', $orderStats['completed']['count'].' اوردر')
+                ->description('بقيمة '.format_money($orderStats['completed']['value']).' - ربح '.format_money($orderStats['completed']['profit']))
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->extraAttributes([
                     'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{status:'completed'}} )
+                    'wire:click' => <<<'JS'
+                        $dispatch('filterUpdate',{filter:{status:'completed'}} )
                         document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     JS
                 ])
                 ->color('success'),
 
-            Stat::make('الاوردرات تحت التشغيل', $orderStats['processing']['count'] . ' اوردر')
-                ->description('بقيمة ' . number_format($orderStats['processing']['value'], 2) . ' جنيه - ربح ' . number_format($orderStats['processing']['profit'], 2) . ' جنيه')
+            Stat::make('الاوردرات تحت التشغيل', $orderStats['processing']['count'].' اوردر')
+                ->description('بقيمة '.format_money($orderStats['processing']['value']).' - ربح '.format_money($orderStats['processing']['profit']))
                 ->descriptionIcon('heroicon-m-clock')
                 ->extraAttributes([
                     'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{status:'processing'}} )
+                    'wire:click' => <<<'JS'
+                        $dispatch('filterUpdate',{filter:{status:'processing'}} )
                         document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     JS
                 ])
                 ->color('warning'),
 
-            Stat::make('الاوردرات الملغية', $orderStats['cancelled']['count'] . ' اوردر')
-                ->description('بقيمة ' . number_format($orderStats['cancelled']['value'], 2) . ' جنيه - ربح ' . number_format($orderStats['cancelled']['profit'], 2) . ' جنيه')
+            Stat::make('الاوردرات الملغية', $orderStats['cancelled']['count'].' اوردر')
+                ->description('بقيمة '.format_money($orderStats['cancelled']['value']).' - ربح '.format_money($orderStats['cancelled']['profit']))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->extraAttributes([
                     'class' => 'transition hover:scale-105 cursor-pointer',
-                    'wire:click' => <<<JS
-                        \$dispatch('filterUpdate',{filter:{status:'cancelled'}} )
+                    'wire:click' => <<<'JS'
+                        $dispatch('filterUpdate',{filter:{status:'cancelled'}} )
                         document.getElementById('orders_table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     JS
                 ])

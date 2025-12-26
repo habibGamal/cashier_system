@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Wastes\Pages;
 
-use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\Wastes\WasteResource;
 use App\Services\Resources\WasteCalculatorService;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditWaste extends EditRecord

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Stocktakings\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class StocktakingInfolist
 {
@@ -22,7 +22,7 @@ class StocktakingInfolist
 
                         TextEntry::make('total')
                             ->label('إجمالي الفرق')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('closed_at')
                             ->label('الحالة')
@@ -30,7 +30,7 @@ class StocktakingInfolist
                                 return $state ? 'مغلق' : 'مفتوح';
                             })
                             ->badge()
-                            ->color(fn($state): string => $state ? 'success' : 'warning'),
+                            ->color(fn ($state): string => $state ? 'success' : 'warning'),
 
                         TextEntry::make('created_at')
                             ->label('تاريخ الإنشاء')

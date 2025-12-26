@@ -52,7 +52,7 @@ class ProductImporterAction extends Action
                     ->placeholder('جميع الفئات')
                     ->options(Category::all()->pluck('name', 'id'))
                     ->reactive()
-                    ->afterStateUpdated(fn($state, callable $set) => $set('selected_products', [])),
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('selected_products', [])),
 
                 CheckboxList::make('selected_products')
                     ->label('اختر المنتجات للاستيراد')
@@ -69,7 +69,7 @@ class ProductImporterAction extends Action
 
                         // Filter by search term if provided
                         if ($search = $get('search_filter')) {
-                            $query->where('name', 'like', '%' . $search . '%');
+                            $query->where('name', 'like', '%'.$search.'%');
                         }
                         $this->products = $query->get();
 
@@ -78,7 +78,7 @@ class ProductImporterAction extends Action
                             $categoryName = $product->category ? $product->category->name : 'بدون فئة';
 
                             return [
-                                $product->id => $product->name . ' - ' . $price . ' ج.م' . ' (' . $categoryName . ')',
+                                $product->id => $product->name.' - '.$price.' '.currency_symbol().' ('.$categoryName.')',
                             ];
                         });
                     })
@@ -100,7 +100,7 @@ class ProductImporterAction extends Action
                         return $this->products->mapWithKeys(function ($product) {
                             $cost = $product->cost ?? 0;
                             $price = $product->price ?? 0;
-                            $description = "سعر التكلفة: {$cost} ج.م | سعر البيع: {$price} ج.م";
+                            $description = "سعر التكلفة: {$cost} ".currency_symbol()." | سعر البيع: {$price} ".currency_symbol();
                             if ($product->unit) {
                                 $description .= " | الوحدة: {$product->unit}";
                             }

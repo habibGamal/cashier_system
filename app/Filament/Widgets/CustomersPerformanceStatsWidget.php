@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Services\CustomersPerformanceReportService;
+use Filament\Support\Enums\IconPosition;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Filament\Support\Enums\IconPosition;
 
 class CustomersPerformanceStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -37,17 +38,17 @@ class CustomersPerformanceStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-shopping-bag', IconPosition::Before)
                 ->color('info'),
 
-            Stat::make('إجمالي قيمة المبيعات', number_format($summary['total_sales'], 2) . ' ج.م')
+            Stat::make('إجمالي قيمة المبيعات', format_money($summary['total_sales']))
                 ->description('إجمالي قيمة المبيعات لجميع العملاء المسجلين')
                 ->descriptionIcon('heroicon-m-banknotes', IconPosition::Before)
                 ->color('success'),
 
-            Stat::make('إجمالي الأرباح', number_format($summary['total_profit'], 2) . ' ج.م')
+            Stat::make('إجمالي الأرباح', format_money($summary['total_profit']))
                 ->description('إجمالي الأرباح المحققة من العملاء')
                 ->descriptionIcon('heroicon-m-chart-bar', IconPosition::Before)
                 ->color('warning'),
 
-            Stat::make('متوسط قيمة الطلب', number_format($summary['avg_order_value'], 2) . ' ج.م')
+            Stat::make('متوسط قيمة الطلب', format_money($summary['avg_order_value']))
                 ->description('متوسط قيمة الطلب الواحد')
                 ->descriptionIcon('heroicon-m-calculator', IconPosition::Before)
                 ->color('info'),
@@ -59,28 +60,28 @@ class CustomersPerformanceStatsWidget extends BaseWidget
 
             Stat::make('أفضل عميل بالمبيعات', $summary['top_customer_by_sales']?->name ?? 'لا يوجد')
                 ->description($summary['top_customer_by_sales'] ?
-                    number_format($summary['top_customer_by_sales']->total_sales, 2) . ' ج.م' :
+                    format_money($summary['top_customer_by_sales']->total_sales) :
                     'لا توجد مبيعات')
                 ->descriptionIcon('heroicon-m-trophy', IconPosition::Before)
                 ->color('success'),
 
             Stat::make('أفضل عميل بالربح', $summary['top_customer_by_profit']?->name ?? 'لا يوجد')
                 ->description($summary['top_customer_by_profit'] ?
-                    number_format($summary['top_customer_by_profit']->total_profit, 2) . ' ج.م' :
+                    format_money($summary['top_customer_by_profit']->total_profit) :
                     'لا توجد مبيعات')
                 ->descriptionIcon('heroicon-m-trophy', IconPosition::Before)
                 ->color('warning'),
 
             Stat::make('أكثر عميل طلباً', $summary['most_frequent_customer']?->name ?? 'لا يوجد')
                 ->description($summary['most_frequent_customer'] ?
-                    $summary['most_frequent_customer']->total_orders . ' طلب' :
+                    $summary['most_frequent_customer']->total_orders.' طلب' :
                     'لا توجد طلبات')
                 ->descriptionIcon('heroicon-m-star', IconPosition::Before)
                 ->color('primary'),
 
             Stat::make('أعلى متوسط قيمة طلب', $summary['highest_avg_order_customer']?->name ?? 'لا يوجد')
                 ->description($summary['highest_avg_order_customer'] ?
-                    number_format($summary['highest_avg_order_customer']->avg_order_value, 2) . ' ج.م' :
+                    format_money($summary['highest_avg_order_customer']->avg_order_value) :
                     'لا توجد طلبات')
                 ->descriptionIcon('heroicon-m-currency-dollar', IconPosition::Before)
                 ->color('info'),

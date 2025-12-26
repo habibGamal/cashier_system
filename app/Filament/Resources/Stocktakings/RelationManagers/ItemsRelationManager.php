@@ -2,16 +2,13 @@
 
 namespace App\Filament\Resources\Stocktakings\RelationManagers;
 
-use Filament\Schemas\Schema;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -67,31 +64,42 @@ class ItemsRelationManager extends RelationManager
                     ->sortable()
                     ->alignEnd()
                     ->color(function ($state) {
-                        if ($state > 0) return 'success';
-                        if ($state < 0) return 'danger';
+                        if ($state > 0) {
+                            return 'success';
+                        }
+                        if ($state < 0) {
+                            return 'danger';
+                        }
+
                         return 'gray';
                     })
                     ->formatStateUsing(function ($state) {
                         if ($state > 0) {
-                            return '+' . number_format($state, 2);
+                            return '+'.number_format($state, 2);
                         }
+
                         return number_format($state, 2);
                     }),
 
                 TextColumn::make('price')
                     ->label('سعر الوحدة')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->alignEnd(),
 
                 TextColumn::make('total')
                     ->label('القيمة الإجمالية')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->alignEnd()
                     ->color(function ($state) {
-                        if ($state > 0) return 'success';
-                        if ($state < 0) return 'danger';
+                        if ($state > 0) {
+                            return 'success';
+                        }
+                        if ($state < 0) {
+                            return 'danger';
+                        }
+
                         return 'gray';
                     }),
 

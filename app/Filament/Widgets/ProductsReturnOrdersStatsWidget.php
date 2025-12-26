@@ -3,13 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Services\ProductsSalesReportService;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class ProductsReturnOrdersStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -44,7 +45,7 @@ class ProductsReturnOrdersStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('danger'),
 
-            Stat::make('قيمة المرتجعات', number_format($returnStats['total_refund_amount'], 2) . ' جنيه')
+            Stat::make('قيمة المرتجعات', format_money($returnStats['total_refund_amount']))
                 ->description('إجمالي المبالغ المردودة')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('danger'),
@@ -54,12 +55,12 @@ class ProductsReturnOrdersStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-squares-2x2')
                 ->color('warning'),
 
-            Stat::make('متوسط قيمة المرتجع', number_format($returnStats['avg_refund_amount'], 2) . ' جنيه')
+            Stat::make('متوسط قيمة المرتجع', format_money($returnStats['avg_refund_amount']))
                 ->description('متوسط قيمة طلب المرتجع')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
 
-            Stat::make('معدل الإرجاع', number_format($returnRate, 2) . '%')
+            Stat::make('معدل الإرجاع', number_format($returnRate, 2).'%')
                 ->description('نسبة المرتجعات من إجمالي المبيعات')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color($returnRate > 5 ? 'danger' : ($returnRate > 2 ? 'warning' : 'success')),

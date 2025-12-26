@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Wastes\Pages;
 
 use App\Filament\Resources\Wastes\WasteResource;
 use App\Services\Resources\WasteCalculatorService;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateWaste extends CreateRecord

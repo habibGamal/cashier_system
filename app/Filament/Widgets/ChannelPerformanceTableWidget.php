@@ -3,22 +3,23 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
+use App\Services\ChannelPerformanceReportService;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Actions\Action;
-use Illuminate\Database\Eloquent\Collection;
-use App\Services\ChannelPerformanceReportService;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Collection;
 
 class ChannelPerformanceTableWidget extends BaseWidget
 {
     protected static ?string $heading = 'أداء القنوات التفصيلي';
+
     protected static ?string $description = 'تحليل شامل لأداء جميع قنوات البيع والمقارنة بينها';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
+
     protected static bool $isLazy = false;
 
     use InteractsWithPageFilters;
@@ -60,13 +61,13 @@ class ChannelPerformanceTableWidget extends BaseWidget
                 TextColumn::make('total_sales')
                     ->label('إجمالي المبيعات')
                     ->sortable()
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->color('success'),
 
                 TextColumn::make('total_profit')
                     ->label('إجمالي الأرباح')
                     ->sortable()
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->color('warning'),
 
                 TextColumn::make('unique_customers')
@@ -78,12 +79,12 @@ class ChannelPerformanceTableWidget extends BaseWidget
                 TextColumn::make('avg_order_value')
                     ->label('متوسط قيمة الطلب')
                     ->sortable()
-                    ->money('EGP'),
+                    ->money(currency_code()),
 
                 TextColumn::make('market_share')
                     ->label('الحصة السوقية')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => number_format($state, 1) . '%')
+                    ->formatStateUsing(fn ($state) => number_format($state, 1).'%')
                     ->badge()
                     ->color(fn ($record) => match (true) {
                         $record->market_share >= 30 => 'success',
@@ -95,7 +96,7 @@ class ChannelPerformanceTableWidget extends BaseWidget
                 TextColumn::make('profit_margin_percentage')
                     ->label('هامش الربح')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => number_format($state, 1) . '%')
+                    ->formatStateUsing(fn ($state) => number_format($state, 1).'%')
                     ->badge()
                     ->color(fn ($record) => match (true) {
                         $record->profit_margin_percentage >= 25 => 'success',
@@ -119,7 +120,7 @@ class ChannelPerformanceTableWidget extends BaseWidget
                 TextColumn::make('avg_revenue_per_customer')
                     ->label('متوسط الإيراد/عميل')
                     ->sortable()
-                    ->money('EGP'),
+                    ->money(currency_code()),
 
                 TextColumn::make('avg_orders_per_customer')
                     ->label('متوسط الطلبات/عميل')
@@ -148,7 +149,7 @@ class ChannelPerformanceTableWidget extends BaseWidget
                     ->action(function ($record) {
                         $this->dispatch('notify', [
                             'type' => 'info',
-                            'message' => "تحليل تفصيلي لقناة: {$record->type_label}"
+                            'message' => "تحليل تفصيلي لقناة: {$record->type_label}",
                         ]);
                     }),
             ]);

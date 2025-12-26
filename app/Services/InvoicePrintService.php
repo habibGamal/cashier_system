@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use InvalidArgumentException;
 use App\Models\PurchaseInvoice;
 use App\Models\ReturnPurchaseInvoice;
 use App\Models\Stocktaking;
 use App\Models\Waste;
+use InvalidArgumentException;
 
 class InvoicePrintService
 {
@@ -100,7 +100,7 @@ class InvoicePrintService
                 ];
             }),
             'additional_info' => [
-                ['label' => 'إجمالي الفرق', 'value' => number_format($stocktaking->total, 2) . ' ج.م'],
+                ['label' => 'إجمالي الفرق', 'value' => format_money($stocktaking->total)],
             ],
         ];
     }
@@ -129,7 +129,7 @@ class InvoicePrintService
                 ];
             }),
             'additional_info' => [
-                ['label' => 'إجمالي قيمة التالف', 'value' => number_format($waste->total, 2) . ' ج.م'],
+                ['label' => 'إجمالي قيمة التالف', 'value' => format_money($waste->total)],
             ],
         ];
     }

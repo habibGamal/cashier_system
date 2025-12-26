@@ -4,13 +4,14 @@ namespace App\Filament\Widgets;
 
 use App\Models\Shift;
 use App\Services\ShiftsReportService;
+use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Carbon\Carbon;
 
 class CurrentShiftInfoStats extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     protected ShiftsReportService $shiftsReportService;
@@ -19,6 +20,7 @@ class CurrentShiftInfoStats extends BaseWidget
     {
         $this->shiftsReportService = app(ShiftsReportService::class);
     }
+
     public function getHeading(): string
     {
         return 'معلومات الشفت الحالي';
@@ -28,7 +30,7 @@ class CurrentShiftInfoStats extends BaseWidget
     {
         $currentShift = $this->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             return [];
         }
 
@@ -48,7 +50,7 @@ class CurrentShiftInfoStats extends BaseWidget
                 ->descriptionIcon('heroicon-m-play')
                 ->color('warning'),
 
-            Stat::make('النقدية البدائية', number_format((float)$currentShift->start_cash, 2) . ' جنيه')
+            Stat::make('النقدية البدائية', format_money((float) $currentShift->start_cash))
                 ->description('النقدية الموجودة في بداية الشفت')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

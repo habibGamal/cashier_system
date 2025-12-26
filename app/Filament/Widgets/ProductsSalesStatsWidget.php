@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Services\ProductsSalesReportService;
+use Filament\Support\Enums\IconPosition;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Filament\Support\Enums\IconPosition;
 
 class ProductsSalesStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -32,17 +33,17 @@ class ProductsSalesStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-cube', IconPosition::Before)
                 ->color('primary'),
 
-            Stat::make('إجمالي قيمة المبيعات', number_format($summary['total_sales'], 2) . ' ج.م')
+            Stat::make('إجمالي قيمة المبيعات', format_money($summary['total_sales']))
                 ->description('إجمالي قيمة المبيعات لجميع المنتجات')
                 ->descriptionIcon('heroicon-m-banknotes', IconPosition::Before)
                 ->color('success'),
 
-            Stat::make('إجمالي الأرباح', number_format($summary['total_profit'], 2) . ' ج.م')
+            Stat::make('إجمالي الأرباح', format_money($summary['total_profit']))
                 ->description('إجمالي الأرباح المحققة من المبيعات')
                 ->descriptionIcon('heroicon-m-chart-bar', IconPosition::Before)
                 ->color('warning'),
 
-            Stat::make('متوسط هامش الربح', number_format($summary['avg_profit_margin'], 1) . '%')
+            Stat::make('متوسط هامش الربح', number_format($summary['avg_profit_margin'], 1).'%')
                 ->description('متوسط هامش الربح لجميع المنتجات')
                 ->descriptionIcon('heroicon-m-calculator', IconPosition::Before)
                 ->color('info'),
@@ -54,15 +55,14 @@ class ProductsSalesStatsWidget extends BaseWidget
 
             Stat::make('أفضل منتج بالمبيعات', $summary['best_selling_product']?->name ?? 'لا يوجد')
                 ->description($summary['best_selling_product'] ?
-                    number_format($summary['best_selling_product']->total_sales, 2) . ' ج.م' :
+                    format_money($summary['best_selling_product']->total_sales) :
                     'لا توجد مبيعات')
                 ->descriptionIcon('heroicon-m-trophy', IconPosition::Before)
                 ->color('success'),
 
             Stat::make('أفضل منتج بالربح', $summary['most_profitable_product']?->name ?? 'لا يوجد')
                 ->description($summary['most_profitable_product'] ?
-                    number_format($summary['most_profitable_product']->total_profit, 2) . '
-                    ج.م' :
+                    format_money($summary['most_profitable_product']->total_profit) :
                     'لا توجد مبيعات')
                 ->descriptionIcon('heroicon-m-trophy', IconPosition::Before)
                 ->color('success'),

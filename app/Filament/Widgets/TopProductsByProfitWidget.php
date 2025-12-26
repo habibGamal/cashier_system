@@ -9,13 +9,14 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class TopProductsByProfitWidget extends ChartWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
 
     protected ?string $heading = 'أفضل 10 منتجات بالربحية';
 
-    protected int | string | array $columnSpan = 2;
+    protected int|string|array $columnSpan = 2;
 
     protected ProductsSalesReportService $productsReportService;
 
@@ -34,7 +35,7 @@ class TopProductsByProfitWidget extends ChartWidget
 
         foreach ($topProducts as $product) {
             $labels[] = mb_strlen($product->name) > 15 ?
-                mb_substr($product->name, 0, 15) . '...' :
+                mb_substr($product->name, 0, 15).'...' :
                 $product->name;
             $salesData[] = $product->total_sales;
             $profitData[] = $product->total_profit;
@@ -43,7 +44,7 @@ class TopProductsByProfitWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'المبيعات (ج.م)',
+                    'label' => 'المبيعات ('.currency_symbol().')',
                     'data' => $salesData,
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
                     'borderColor' => 'rgb(59, 130, 246)',
@@ -51,7 +52,7 @@ class TopProductsByProfitWidget extends ChartWidget
                     'yAxisID' => 'y',
                 ],
                 [
-                    'label' => 'الأرباح (ج.م)',
+                    'label' => 'الأرباح ('.currency_symbol().')',
                     'data' => $profitData,
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
                     'borderColor' => 'rgb(16, 185, 129)',

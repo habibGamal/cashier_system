@@ -2,25 +2,21 @@
 
 namespace App\Filament\Resources\InventoryItems\RelationManagers;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Actions\Action;
+use App\Enums\InventoryMovementOperation;
+use App\Enums\MovementReason;
 use App\Models\Order;
 use App\Models\PurchaseInvoice;
 use App\Models\ReturnPurchaseInvoice;
-use App\Models\Waste;
 use App\Models\Stocktaking;
-use App\Enums\InventoryMovementOperation;
-use App\Enums\MovementReason;
-use Filament\Forms;
+use App\Models\Waste;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MovementsRelationManager extends RelationManager
 {
@@ -87,19 +83,19 @@ class MovementsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->where('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->where('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->where('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->where('created_at', '<=', $date),
                             );
-                    })
+                    }),
             ])
             ->recordActions([
                 Action::make('view_reference')
                     ->label('عرض المرجع')
                     ->icon('heroicon-o-eye')
-                    ->url(fn($record) => match ($record->referenceable_type) {
+                    ->url(fn ($record) => match ($record->referenceable_type) {
                         Order::class => route('filament.admin.resources.orders.view', ['record' => $record->referenceable_id]),
                         PurchaseInvoice::class => route('filament.admin.resources.purchase-invoices.view', ['record' => $record->referenceable_id]),
                         ReturnPurchaseInvoice::class => route('filament.admin.resources.return-purchase-invoices.view', ['record' => $record->referenceable_id]),

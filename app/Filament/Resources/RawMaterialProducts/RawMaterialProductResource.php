@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\RawMaterialProducts;
 
+use App\Enums\ProductType;
+use App\Filament\Resources\RawMaterialProducts\Pages\CreateRawMaterialProduct;
+use App\Filament\Resources\RawMaterialProducts\Pages\EditRawMaterialProduct;
+use App\Filament\Resources\RawMaterialProducts\Pages\ListRawMaterialProducts;
+use App\Filament\Resources\RawMaterialProducts\Pages\ViewRawMaterialProduct;
 use App\Filament\Resources\RawMaterialProducts\Schemas\RawMaterialProductForm;
 use App\Filament\Resources\RawMaterialProducts\Tables\RawMaterialProductsTable;
-use App\Filament\Resources\RawMaterialProducts\Pages\ListRawMaterialProducts;
-use App\Filament\Resources\RawMaterialProducts\Pages\CreateRawMaterialProduct;
-use App\Filament\Resources\RawMaterialProducts\Pages\ViewRawMaterialProduct;
-use App\Filament\Resources\RawMaterialProducts\Pages\EditRawMaterialProduct;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Product;
-use App\Enums\ProductType;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Traits\AdminAccess;
 
 class RawMaterialProductResource extends Resource
 {
@@ -22,9 +22,9 @@ class RawMaterialProductResource extends Resource
 
     protected static ?string $model = Product::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cube';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المنتجات';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المنتجات';
 
     protected static ?int $navigationSort = 3;
 

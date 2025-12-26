@@ -22,7 +22,7 @@ class WasteInfolist
 
                         TextEntry::make('total')
                             ->label('إجمالي قيمة التالف')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('closed_at')
                             ->label('الحالة')
@@ -30,7 +30,7 @@ class WasteInfolist
                                 return $state ? 'مغلق' : 'مفتوح';
                             })
                             ->badge()
-                            ->color(fn($state): string => $state ? 'success' : 'warning'),
+                            ->color(fn ($state): string => $state ? 'success' : 'warning'),
 
                         TextEntry::make('created_at')
                             ->label('تاريخ الإنشاء')

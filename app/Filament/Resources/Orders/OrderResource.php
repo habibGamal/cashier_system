@@ -100,7 +100,7 @@ class OrderResource extends Resource
 
                         TextEntry::make('customer.delivery_cost')
                             ->label('تكلفة التوصيل')
-                            ->money('EGP')
+                            ->money(currency_code())
                             ->placeholder('غير محدد'),
                     ])
                     ->columns(2)
@@ -110,38 +110,38 @@ class OrderResource extends Resource
                     ->schema([
                         TextEntry::make('sub_total')
                             ->label('المجموع الفرعي')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('tax')
                             ->label('الضرائب')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('service')
                             ->label('رسوم الخدمة')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('discount')
                             ->label('الخصم')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('total')
                             ->label('الإجمالي')
-                            ->money('EGP')
+                            ->money(currency_code())
                             ->weight('bold'),
 
                         TextEntry::make('total_paid')
                             ->label('المبلغ المدفوع')
-                            ->money('EGP')
+                            ->money(currency_code())
                             ->color('success'),
 
                         TextEntry::make('remaining_amount')
                             ->label('المبلغ المتبقي')
-                            ->money('EGP')
+                            ->money(currency_code())
                             ->color(fn ($record) => $record->remaining_amount > 0 ? 'danger' : 'success'),
 
                         TextEntry::make('profit')
                             ->label('الربح')
-                            ->money('EGP'),
+                            ->money(currency_code()),
                     ])
                     ->columns(3),
 

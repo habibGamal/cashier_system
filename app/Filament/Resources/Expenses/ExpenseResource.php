@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Expenses;
 
+use App\Filament\Resources\Expenses\Pages\CreateExpense;
+use App\Filament\Resources\Expenses\Pages\EditExpense;
+use App\Filament\Resources\Expenses\Pages\ListExpenses;
+use App\Filament\Resources\Expenses\Pages\ViewExpense;
 use App\Filament\Resources\Expenses\Schemas\ExpenseForm;
 use App\Filament\Resources\Expenses\Tables\ExpensesTable;
-use App\Filament\Resources\Expenses\Pages\ListExpenses;
-use App\Filament\Resources\Expenses\Pages\CreateExpense;
-use App\Filament\Resources\Expenses\Pages\ViewExpense;
-use App\Filament\Resources\Expenses\Pages\EditExpense;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Expense;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use App\Filament\Traits\AdminAccess;
 
 class ExpenseResource extends Resource
 {
@@ -20,9 +20,9 @@ class ExpenseResource extends Resource
 
     protected static ?string $model = Expense::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المصروفات';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المصروفات';
 
     protected static ?int $navigationSort = 2;
 

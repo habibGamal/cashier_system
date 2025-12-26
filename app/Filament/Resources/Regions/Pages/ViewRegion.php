@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\Regions\Pages;
 
-use Filament\Actions\EditAction;
 use App\Filament\Resources\Regions\RegionResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewRegion extends ViewRecord

@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Suppliers\Tables;
 
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 
 class SuppliersTable
 {
@@ -32,6 +32,7 @@ class SuppliersTable
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 TextColumn::make('created_at')

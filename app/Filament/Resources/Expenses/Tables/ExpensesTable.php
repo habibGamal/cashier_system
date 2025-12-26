@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Expenses\Tables;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Tables\Table;
 use App\Models\ExpenceType;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ExpensesTable
@@ -27,7 +27,7 @@ class ExpensesTable
                     ->searchable(),
                 TextColumn::make('amount')
                     ->label('المبلغ')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
                 TextColumn::make('notes')
                     ->label('ملاحظات')
@@ -37,6 +37,7 @@ class ExpensesTable
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 TextColumn::make('created_at')

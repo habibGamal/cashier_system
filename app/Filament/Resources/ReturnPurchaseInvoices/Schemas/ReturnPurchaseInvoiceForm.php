@@ -48,9 +48,9 @@ class ReturnPurchaseInvoiceForm
                             ]),
 
                         TextInput::make('total')
-                            ->label('إجمالي المرتجع (ج.م)')
+                            ->label('إجمالي المرتجع ('.currency_symbol().')')
                             ->numeric()
-                            ->prefix('ج.م')
+                            ->prefix(currency_symbol())
                             ->disabled()
                             ->dehydrated(false)
                             ->default(0),
@@ -78,8 +78,8 @@ class ReturnPurchaseInvoiceForm
                             ->table([
                                 TableColumn::make('المنتج')->width('200px'),
                                 TableColumn::make('الكمية')->width('100px'),
-                                TableColumn::make('سعر الوحدة (ج.م)')->width('120px'),
-                                TableColumn::make('الإجمالي (ج.م)')->width('120px'),
+                                TableColumn::make('سعر الوحدة ('.currency_symbol().')')->width('120px'),
+                                TableColumn::make('الإجمالي ('.currency_symbol().')')->width('120px'),
                             ])
                             ->schema([
                                 Hidden::make('product_id'),
@@ -103,16 +103,16 @@ class ReturnPurchaseInvoiceForm
                                     ->minValue(1),
 
                                 TextInput::make('price')
-                                    ->label('سعر الوحدة (ج.م)')
+                                    ->label('سعر الوحدة ('.currency_symbol().')')
                                     ->numeric()
                                     ->required()
                                     ->minValue(0)
-                                    ->prefix('ج.م'),
+                                    ->prefix(currency_symbol()),
 
                                 TextInput::make('total')
-                                    ->label('الإجمالي (ج.م)')
+                                    ->label('الإجمالي ('.currency_symbol().')')
                                     ->numeric()
-                                    ->prefix('ج.م')
+                                    ->prefix(currency_symbol())
                                     ->disabled()
                                     ->dehydrated(false),
                             ])

@@ -3,14 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Services\ShiftsReportService;
-use App\Enums\OrderType;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class PeriodShiftDoneOrdersStats extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -46,8 +46,8 @@ class PeriodShiftDoneOrdersStats extends BaseWidget
             if (isset($orderTypeStats[$enumValue]) && $orderTypeStats[$enumValue]['count'] > 0) {
                 $data = $orderTypeStats[$enumValue];
                 $average = $data['count'] > 0 ? $data['value'] / $data['count'] : 0;
-                $stats[] = Stat::make($config['label'], $data['count'] . ' اوردر')
-                    ->description('بقيمة ' . number_format($data['value'], 2) . ' جنيه - ربح ' . number_format($data['profit'], 2) . ' جنيه - متوسط ' . number_format($average, 2) . ' جنيه')
+                $stats[] = Stat::make($config['label'], $data['count'].' اوردر')
+                    ->description('بقيمة '.format_money($data['value']).' - ربح '.format_money($data['profit']).' - متوسط '.format_money($average))
                     ->descriptionIcon($config['icon'])
                     ->extraAttributes([
                         'class' => 'transition hover:scale-105 cursor-pointer',
@@ -69,10 +69,12 @@ class PeriodShiftDoneOrdersStats extends BaseWidget
 
         if ($filterType === 'shifts') {
             $shiftIds = $this->pageFilters['shifts'] ?? [];
+
             return $this->shiftsReportService->calculatePeriodOrderTypeStats(null, null, $shiftIds);
         } else {
             $startDate = $this->pageFilters['startDate'] ?? now()->subDays(value: 7)->startOfDay()->toDateString();
             $endDate = $this->pageFilters['endDate'] ?? now()->endOfDay()->toDateString();
+
             return $this->shiftsReportService->calculatePeriodOrderTypeStats($startDate, $endDate, null);
         }
     }

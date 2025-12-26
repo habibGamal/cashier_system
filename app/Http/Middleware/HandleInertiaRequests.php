@@ -39,6 +39,12 @@ class HandleInertiaRequests extends Middleware
             ],
             'receiptFooter' => $settingsService->getReceiptFooter(),
             'scaleBarcodePrefix' => $settingsService->getScaleBarcodePrefix(),
+            'currency' => [
+                'symbol' => currency_symbol(),
+                'code' => currency_code(),
+                'name' => currency_name(),
+                'decimals' => currency_decimals(),
+            ],
         ];
     }
 }

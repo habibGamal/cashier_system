@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources\ReturnPurchaseInvoices\Tables;
 
-use Filament\Tables\Table;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use App\Filament\Actions\CloseReturnPurchaseInvoiceAction;
 use App\Filament\Actions\PrintReturnPurchaseInvoiceAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class ReturnPurchaseInvoicesTable
@@ -44,13 +44,13 @@ class ReturnPurchaseInvoicesTable
 
                 TextColumn::make('total')
                     ->label('إجمالي المرتجع')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('notes')
                     ->label('ملاحظات')
                     ->limit(50)
-                    ->tooltip(fn($state): ?string => $state),
+                    ->tooltip(fn ($state): ?string => $state),
 
                 TextColumn::make('closed_at')
                     ->label('الحالة')
@@ -58,7 +58,7 @@ class ReturnPurchaseInvoicesTable
                         return $state ? 'مغلق' : 'مفتوح';
                     })
                     ->badge()
-                    ->color(fn(string $state): string => $state ? 'success' : 'warning')
+                    ->color(fn (string $state): string => $state ? 'success' : 'warning')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -87,11 +87,11 @@ class ReturnPurchaseInvoicesTable
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])

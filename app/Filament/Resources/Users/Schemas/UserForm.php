@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Utilities\Get;
-use App\Filament\Resources\Users\Pages\CreateUser;
-use App\Filament\Actions\GeneratePasswordAction;
 use App\Enums\UserRole;
+use App\Filament\Actions\GeneratePasswordAction;
+use App\Filament\Resources\Users\Pages\CreateUser;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 

@@ -4,6 +4,7 @@ import { PrinterOutlined } from '@ant-design/icons';
 import { router } from '@inertiajs/react';
 import { Order } from '@/types';
 import useModal from '@/hooks/useModal';
+import { formatCurrency } from '@/utils/currency';
 
 interface WebPaymentModalProps {
     open: boolean;
@@ -37,27 +38,27 @@ export default function WebPaymentModal({ open, onCancel, order }: WebPaymentMod
         {
             key: 'subTotal',
             label: 'المجموع',
-            children: details.subTotal.toFixed(1),
+            children: formatCurrency(details.subTotal),
         },
         {
             key: 'tax',
             label: 'الضريبة',
-            children: details.tax.toFixed(1),
+            children: formatCurrency(details.tax),
         },
         {
             key: 'service',
             label: 'الخدمة',
-            children: details.serviceCharge.toFixed(1),
+            children: formatCurrency(details.serviceCharge),
         },
         {
             key: 'discount',
             label: 'الخصم',
-            children: details.discount.toFixed(1),
+            children: formatCurrency(details.discount),
         },
         {
             key: 'total',
             label: 'الاجمالي',
-            children: details.total.toFixed(1),
+            children: formatCurrency(details.total),
         },
     ];
 

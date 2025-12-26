@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\ConsumableProducts\Tables;
 
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Category;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Models\Category;
 
 class ConsumableProductsTable
 {
@@ -34,11 +34,11 @@ class ConsumableProductsTable
                     ->searchable(),
                 TextColumn::make('price')
                     ->label('السعر')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
                 TextColumn::make('cost')
                     ->label('التكلفة')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
                 TextColumn::make('min_stock')
                     ->label('الحد الأدنى للمخزون')

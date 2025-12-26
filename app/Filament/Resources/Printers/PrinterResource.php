@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Printers;
 
+use App\Filament\Resources\Printers\Pages\CreatePrinter;
+use App\Filament\Resources\Printers\Pages\EditPrinter;
+use App\Filament\Resources\Printers\Pages\ListPrinters;
+use App\Filament\Resources\Printers\Pages\ViewPrinter;
 use App\Filament\Resources\Printers\Schemas\PrinterForm;
 use App\Filament\Resources\Printers\Tables\PrintersTable;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\Printers\Pages\ListPrinters;
-use App\Filament\Resources\Printers\Pages\CreatePrinter;
-use App\Filament\Resources\Printers\Pages\ViewPrinter;
-use App\Filament\Resources\Printers\Pages\EditPrinter;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Printer;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use App\Filament\Traits\AdminAccess;
 
 class PrinterResource extends Resource
 {
@@ -20,9 +20,9 @@ class PrinterResource extends Resource
 
     protected static ?string $model = Printer::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-printer';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-printer';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المطعم';
 
     protected static ?int $navigationSort = 1;
 

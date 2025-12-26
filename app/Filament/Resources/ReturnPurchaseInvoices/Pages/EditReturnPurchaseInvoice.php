@@ -2,13 +2,11 @@
 
 namespace App\Filament\Resources\ReturnPurchaseInvoices\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Actions\CloseReturnPurchaseInvoiceAction;
 use App\Filament\Resources\ReturnPurchaseInvoices\ReturnPurchaseInvoiceResource;
 use App\Services\Resources\PurchaseInvoiceCalculatorService;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 
 class EditReturnPurchaseInvoice extends EditRecord
@@ -27,7 +25,7 @@ class EditReturnPurchaseInvoice extends EditRecord
     {
         $data['total'] = PurchaseInvoiceCalculatorService::calculateInvoiceTotal($data['items'] ?? []);
         $record->update($data);
+
         return $record;
     }
-
 }

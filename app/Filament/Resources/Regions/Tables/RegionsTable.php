@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Regions\Tables;
 
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\ViewAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 
 class RegionsTable
 {
@@ -22,7 +22,7 @@ class RegionsTable
                     ->sortable(),
                 TextColumn::make('delivery_cost')
                     ->label('تكلفة التوصيل')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('تاريخ الإنشاء')

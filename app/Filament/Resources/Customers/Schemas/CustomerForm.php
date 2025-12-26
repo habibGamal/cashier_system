@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\Customers\Schemas;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use App\Models\Customer;
+use App\Models\Region;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use App\Models\Customer;
-use App\Models\Region;
 
 class CustomerForm
 {
@@ -62,7 +62,7 @@ class CustomerForm
                             ->numeric()
                             ->step(0.01)
                             ->placeholder('0.00')
-                            ->prefix('ج.م')
+                            ->prefix(currency_symbol())
                             ->helperText('سيتم تحديثها تلقائياً عند اختيار المنطقة'),
                     ]),
 

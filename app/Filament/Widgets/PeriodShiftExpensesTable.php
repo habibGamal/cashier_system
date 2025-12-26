@@ -2,20 +2,18 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\ExportAction;
-use Filament\Tables\Columns\TextColumn;
-use App\Services\ShiftsReportService;
+use App\Filament\Exports\PeriodShiftExpensesDetailedExporter;
+use App\Filament\Exports\PeriodShiftExpensesExporter;
 use App\Models\ExpenceType;
 use App\Models\Expense;
-use App\Filament\Exports\PeriodShiftExpensesExporter;
-use App\Filament\Exports\PeriodShiftExpensesDetailedExporter;
+use App\Services\ShiftsReportService;
 use Carbon\Carbon;
-use Filament\Tables;
+use Filament\Actions\ExportAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\HtmlString;
 
 class PeriodShiftExpensesTable extends BaseWidget
 {
@@ -41,7 +39,7 @@ class PeriodShiftExpensesTable extends BaseWidget
         if ($filterType === 'shifts') {
             $shiftIds = $this->pageFilters['shifts'] ?? [];
             $totalExpensesOverPeriod = Expense::query()
-                ->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                ->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                     return $query->whereIn('shift_id', $shiftIds);
                 })
                 ->sum('amount');
@@ -49,22 +47,22 @@ class PeriodShiftExpensesTable extends BaseWidget
             $expenseTypeQuery = ExpenceType::query()
                 ->withCount([
                     'expenses' => function ($query) use ($shiftIds) {
-                        $query->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                        $query->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                             return $query->whereIn('shift_id', $shiftIds);
                         });
-                    }
+                    },
                 ])
                 ->withSum([
                     'expenses' => function ($query) use ($shiftIds) {
-                        $query->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                        $query->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                             return $query->whereIn('shift_id', $shiftIds);
                         });
-                    }
+                    },
                 ], 'amount');
 
             $detailedExportQuery = function (Builder $query) use ($shiftIds) {
                 return Expense::query()
-                    ->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                    ->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                         return $query->whereIn('shift_id', $shiftIds);
                     })
                     ->with(['expenceType', 'shift'])
@@ -77,7 +75,7 @@ class PeriodShiftExpensesTable extends BaseWidget
                 ->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                     $query->whereBetween('created_at', [
                         Carbon::parse($startDate)->startOfDay(),
-                        Carbon::parse($endDate)->endOfDay()
+                        Carbon::parse($endDate)->endOfDay(),
                     ]);
                 })->sum('amount');
 
@@ -87,20 +85,20 @@ class PeriodShiftExpensesTable extends BaseWidget
                         $query->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                             $query->whereBetween('created_at', [
                                 Carbon::parse($startDate)->startOfDay(),
-                                Carbon::parse($endDate)->endOfDay()
+                                Carbon::parse($endDate)->endOfDay(),
                             ]);
                         });
-                    }
+                    },
                 ])
                 ->withSum([
                     'expenses' => function ($query) use ($startDate, $endDate) {
                         $query->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                             $query->whereBetween('created_at', [
                                 Carbon::parse($startDate)->startOfDay(),
-                                Carbon::parse($endDate)->endOfDay()
+                                Carbon::parse($endDate)->endOfDay(),
                             ]);
                         });
-                    }
+                    },
                 ], 'amount');
 
             $detailedExportQuery = function (Builder $query) use ($startDate, $endDate) {
@@ -108,7 +106,7 @@ class PeriodShiftExpensesTable extends BaseWidget
                     ->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                         $query->whereBetween('created_at', [
                             Carbon::parse($startDate)->startOfDay(),
-                            Carbon::parse($endDate)->endOfDay()
+                            Carbon::parse($endDate)->endOfDay(),
                         ]);
                     })->with(['expenceType', 'shift'])
                     ->orderBy('created_at', 'desc');
@@ -123,7 +121,7 @@ class PeriodShiftExpensesTable extends BaseWidget
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->exporter(PeriodShiftExpensesExporter::class)
-                    ->fileName(fn() => 'period-shift-expenses-summary-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                    ->fileName(fn () => 'period-shift-expenses-summary-'.now()->format('Y-m-d-H-i-s').'.xlsx'),
 
                 ExportAction::make('detailed_export')
                     ->label('تصدير تفاصيل المصروفات')
@@ -131,7 +129,7 @@ class PeriodShiftExpensesTable extends BaseWidget
                     ->color('info')
                     ->exporter(PeriodShiftExpensesDetailedExporter::class)
                     ->modifyQueryUsing($detailedExportQuery)
-                    ->fileName(fn() => 'period-shift-expenses-detailed-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                    ->fileName(fn () => 'period-shift-expenses-detailed-'.now()->format('Y-m-d-H-i-s').'.xlsx'),
             ])
             ->columns([
                 TextColumn::make('name')
@@ -149,7 +147,7 @@ class PeriodShiftExpensesTable extends BaseWidget
 
                 TextColumn::make('expenses_sum_amount')
                     ->label('الإجمالي')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->alignCenter()
                     ->sortable()
                     ->weight('bold')
@@ -178,12 +176,13 @@ class PeriodShiftExpensesTable extends BaseWidget
                         if ($current > $adjustedBudget) {
                             return 'danger';
                         }
+
                         return 'success';
                     }),
 
                 TextColumn::make('avg_month_rate')
                     ->label('الميزانية الشهرية')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->alignCenter()
                     ->placeholder('غير محدد')
                     ->color('info'),
@@ -210,7 +209,8 @@ class PeriodShiftExpensesTable extends BaseWidget
                         }
 
                         $adjustedBudget = $monthlyRate * $monthsInPeriod;
-                        return number_format($adjustedBudget, 2) . ' جنيه';
+
+                        return format_money($adjustedBudget);
                     })
                     ->alignCenter()
                     ->color('warning')
@@ -225,6 +225,7 @@ class PeriodShiftExpensesTable extends BaseWidget
 
                             return "الميزانية الشهرية × {$monthsInPeriod} شهر";
                         }
+
                         return 'ميزانية الفترة المحددة';
                     }),
 
@@ -254,10 +255,12 @@ class PeriodShiftExpensesTable extends BaseWidget
 
                         if ($current > $adjustedBudget) {
                             $excess = $current - $adjustedBudget;
-                            return 'تجاوز بـ ' . number_format($excess, 2) . ' جنيه';
+
+                            return 'تجاوز بـ '.format_money($excess);
                         } else {
                             $remaining = $adjustedBudget - $current;
-                            return 'متبقي ' . number_format($remaining, 2) . ' جنيه';
+
+                            return 'متبقي '.format_money($remaining);
                         }
                     })
                     ->color(function ($record) use ($filterType) {
@@ -316,7 +319,8 @@ class PeriodShiftExpensesTable extends BaseWidget
                         $count = $record->expenses_count ?? 0;
                         $total = $record->expenses_sum_amount ?? 0;
                         $average = $count > 0 ? $total / $count : 0;
-                        return number_format($average, 2) . ' جنيه';
+
+                        return format_money($average);
                     })
                     ->alignCenter()
                     ->color('warning'),
@@ -327,7 +331,8 @@ class PeriodShiftExpensesTable extends BaseWidget
                         // Calculate total expenses for percentage
                         $currentAmount = $record->expenses_sum_amount ?? 0;
                         $percentage = $totalExpensesOverPeriod > 0 ? ($currentAmount / $totalExpensesOverPeriod) * 100 : 0;
-                        return number_format($percentage, 1) . '%';
+
+                        return number_format($percentage, 1).'%';
                     })
                     ->alignCenter()
                     ->color('primary'),
@@ -339,9 +344,6 @@ class PeriodShiftExpensesTable extends BaseWidget
             ->emptyStateIcon('heroicon-o-banknotes')
             ->recordAction(null)
             ->recordUrl(null)
-            ->toolbarActions([])
-        ;
+            ->toolbarActions([]);
     }
-
-
 }

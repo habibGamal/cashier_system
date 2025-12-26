@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ConsumableProducts\Pages;
 
-use Filament\Actions\CreateAction;
 use App\Filament\Resources\ConsumableProducts\ConsumableProductResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListConsumableProducts extends ListRecords

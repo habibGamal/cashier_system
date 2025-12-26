@@ -57,6 +57,7 @@ class StockReportExporter extends Exporter
                 ->state(function ($record) {
                     $totalQuantity = ($record->start_quantity ?? 0) + ($record->incoming ?? 0) + ($record->return_sales ?? 0);
                     $totalConsumed = ($record->sales ?? 0) + ($record->return_waste ?? 0);
+
                     return $totalQuantity - $totalConsumed;
                 }),
 
@@ -65,7 +66,7 @@ class StockReportExporter extends Exporter
                 ->formatStateUsing(fn ($state) => $state ?? 0),
 
             ExportColumn::make('average_cost')
-                ->label('متوسط التكلفة (جنيه)')
+                ->label('متوسط التكلفة ('.currency_name().')')
                 ->state(function ($record) {
                     return $record->cost ?? 0;
                 })
@@ -78,17 +79,19 @@ class StockReportExporter extends Exporter
                     $totalConsumed = ($record->sales ?? 0) + ($record->return_waste ?? 0);
                     $idealRemaining = $totalQuantity - $totalConsumed;
                     $actualRemaining = $record->actual_remaining_quantity ?? 0;
+
                     return $actualRemaining - $idealRemaining;
                 }),
 
             ExportColumn::make('deviation_value')
-                ->label('قيمة الانحراف (جنيه)')
+                ->label('قيمة الانحراف ('.currency_name().')')
                 ->state(function ($record) {
                     $totalQuantity = ($record->start_quantity ?? 0) + ($record->incoming ?? 0) + ($record->return_sales ?? 0);
                     $totalConsumed = ($record->sales ?? 0) + ($record->return_waste ?? 0);
                     $idealRemaining = $totalQuantity - $totalConsumed;
                     $actualRemaining = $record->actual_remaining_quantity ?? 0;
                     $deviation = $actualRemaining - $idealRemaining;
+
                     return abs($deviation) * ($record->cost ?? 0);
                 })
                 ->formatStateUsing(fn ($state) => number_format($state, 2)),
@@ -102,7 +105,10 @@ class StockReportExporter extends Exporter
                     $actualRemaining = $record->actual_remaining_quantity ?? 0;
                     $deviation = $actualRemaining - $idealRemaining;
 
-                    if ($idealRemaining == 0) return 0;
+                    if ($idealRemaining == 0) {
+                        return 0;
+                    }
+
                     return ($deviation / $idealRemaining) * 100;
                 })
                 ->formatStateUsing(fn ($state) => number_format($state, 1)),
@@ -111,10 +117,10 @@ class StockReportExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'تم إكمال تصدير تقرير المخزون وتم تصدير ' . number_format($export->successful_rows) . ' ' . ($export->successful_rows == 1 ? 'صف' : 'صفوف') . '.';
+        $body = 'تم إكمال تصدير تقرير المخزون وتم تصدير '.number_format($export->successful_rows).' '.($export->successful_rows == 1 ? 'صف' : 'صفوف').'.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' فشل في تصدير ' . number_format($failedRowsCount) . ' ' . ($failedRowsCount == 1 ? 'صف' : 'صفوف') . '.';
+            $body .= ' فشل في تصدير '.number_format($failedRowsCount).' '.($failedRowsCount == 1 ? 'صف' : 'صفوف').'.';
         }
 
         return $body;

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 
+import { usePage } from '@inertiajs/react';
+
 interface InvoiceItem {
     product_name: string;
     quantity?: number;
@@ -34,6 +36,10 @@ interface Props {
 }
 
 export default function InvoicePrint({ invoiceData }: Props) {
+    const { currency } = usePage().props as any;
+    const currencySymbol = currency?.symbol || 'ج.م';
+    const currencyDecimals = currency?.decimals || 2;
+
     const handlePrint = () => {
         window.print();
     };
@@ -77,8 +83,8 @@ export default function InvoicePrint({ invoiceData }: Props) {
                         }`}>
                             {item.difference}
                         </td>
-                        <td className="border border-gray-400 px-4 py-2 text-center">{item.price ? Number(item.price).toFixed(2) : '0.00'} ج.م</td>
-                        <td className="border border-gray-400 px-4 py-2 text-center">{Number(item.total).toFixed(2)} ج.م</td>
+                        <td className="border border-gray-400 px-4 py-2 text-center">{item.price ? Number(item.price).toFixed(currencyDecimals) : '0.00'} {currencySymbol}</td>
+                        <td className="border border-gray-400 px-4 py-2 text-center">{Number(item.total).toFixed(currencyDecimals)} {currencySymbol}</td>
                     </tr>
                 );
             default:
@@ -86,8 +92,8 @@ export default function InvoicePrint({ invoiceData }: Props) {
                     <tr key={index}>
                         <td className="border border-gray-400 px-4 py-2 text-right">{item.product_name}</td>
                         <td className="border border-gray-400 px-4 py-2 text-center">{item.quantity}</td>
-                        <td className="border border-gray-400 px-4 py-2 text-center">{item.price ? Number(item.price).toFixed(2) : '0.00'} ج.م</td>
-                        <td className="border border-gray-400 px-4 py-2 text-center">{Number(item.total).toFixed(2)} ج.م</td>
+                        <td className="border border-gray-400 px-4 py-2 text-center">{item.price ? Number(item.price).toFixed(currencyDecimals) : '0.00'} {currencySymbol}</td>
+                        <td className="border border-gray-400 px-4 py-2 text-center">{Number(item.total).toFixed(currencyDecimals)} {currencySymbol}</td>
                     </tr>
                 );
         }
@@ -129,7 +135,7 @@ export default function InvoicePrint({ invoiceData }: Props) {
                                 {invoiceData.supplier && (
                                     <p><span className="font-medium">المورد:</span> {invoiceData.supplier}</p>
                                 )}
-                                <p><span className="font-medium">الإجمالي:</span> {Number(invoiceData.total).toFixed(2)} ج.م</p>
+                                <p><span className="font-medium">الإجمالي:</span> {Number(invoiceData.total).toFixed(currencyDecimals)} {currencySymbol}</p>
                             </div>
                         </div>
 
@@ -180,7 +186,7 @@ export default function InvoicePrint({ invoiceData }: Props) {
                             </div>
                             <div className="text-right">
                                 <p className="text-2xl font-bold text-gray-800">
-                                    الإجمالي النهائي: {Number(invoiceData.total).toFixed(2)} ج.م
+                                    الإجمالي النهائي: {Number(invoiceData.total).toFixed(currencyDecimals)} {currencySymbol}
                                 </p>
                             </div>
                         </div>

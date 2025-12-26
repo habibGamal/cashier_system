@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\PurchaseInvoices;
 
+use App\Filament\Resources\PurchaseInvoices\Pages\CreatePurchaseInvoice;
+use App\Filament\Resources\PurchaseInvoices\Pages\EditPurchaseInvoice;
+use App\Filament\Resources\PurchaseInvoices\Pages\ListPurchaseInvoices;
+use App\Filament\Resources\PurchaseInvoices\Pages\ViewPurchaseInvoice;
 use App\Filament\Resources\PurchaseInvoices\Schemas\PurchaseInvoiceForm;
 use App\Filament\Resources\PurchaseInvoices\Schemas\PurchaseInvoiceInfolist;
 use App\Filament\Resources\PurchaseInvoices\Tables\PurchaseInvoicesTable;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\PurchaseInvoices\Pages\ListPurchaseInvoices;
-use App\Filament\Resources\PurchaseInvoices\Pages\CreatePurchaseInvoice;
-use App\Filament\Resources\PurchaseInvoices\Pages\ViewPurchaseInvoice;
-use App\Filament\Resources\PurchaseInvoices\Pages\EditPurchaseInvoice;
+use App\Filament\Traits\AdminAccess;
 use App\Models\PurchaseInvoice;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Traits\AdminAccess;
 
 class PurchaseInvoiceResource extends Resource
 {
@@ -22,7 +22,7 @@ class PurchaseInvoiceResource extends Resource
 
     protected static ?string $model = PurchaseInvoice::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?string $navigationLabel = 'فواتير الشراء';
 
@@ -30,7 +30,7 @@ class PurchaseInvoiceResource extends Resource
 
     protected static ?string $pluralModelLabel = 'فواتير الشراء';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'المشتريات';
+    protected static string|\UnitEnum|null $navigationGroup = 'المشتريات';
 
     public static function form(Schema $schema): Schema
     {
@@ -56,8 +56,6 @@ class PurchaseInvoiceResource extends Resource
     {
         return is_null($record->closed_at);
     }
-
-
 
     public static function getPages(): array
     {

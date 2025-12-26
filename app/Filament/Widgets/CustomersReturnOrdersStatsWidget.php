@@ -3,13 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Services\CustomersPerformanceReportService;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class CustomersReturnOrdersStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -41,12 +42,12 @@ class CustomersReturnOrdersStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-users')
                 ->color('danger'),
 
-            Stat::make('المبلغ المسترد', number_format($returnStats['total_refund_amount'], 2) . ' جنيه')
+            Stat::make('المبلغ المسترد', format_money($returnStats['total_refund_amount']))
                 ->description('إجمالي المبالغ المردودة للعملاء')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('danger'),
 
-            Stat::make('متوسط قيمة المرتجع', number_format($returnStats['avg_refund_amount'], 2) . ' جنيه')
+            Stat::make('متوسط قيمة المرتجع', format_money($returnStats['avg_refund_amount']))
                 ->description('متوسط قيمة المرتجع للعميل الواحد')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('info'),
@@ -58,7 +59,7 @@ class CustomersReturnOrdersStatsWidget extends BaseWidget
 
             Stat::make('أكثر العملاء إرجاعاً', $returnStats['top_returning_customer']->name ?? 'لا يوجد')
                 ->description($returnStats['top_returning_customer'] ?
-                    number_format($returnStats['top_returning_customer']->return_orders_count) . ' مرتجع' :
+                    number_format($returnStats['top_returning_customer']->return_orders_count).' مرتجع' :
                     'لم يتم العثور على مرتجعات')
                 ->descriptionIcon('heroicon-m-user')
                 ->color('primary'),

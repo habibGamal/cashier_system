@@ -25,24 +25,25 @@ class PeriodShiftExpensesExporter extends Exporter
                 }),
 
             ExportColumn::make('expenses_sum_amount')
-                ->label('الإجمالي (جنيه)')
+                ->label('الإجمالي ('.currency_name().')')
                 ->state(function ($record) {
                     // This will be populated by the widget's query
                     return number_format($record->expenses_sum_amount ?? 0, 2);
                 }),
 
             ExportColumn::make('avg_month_rate')
-                ->label('الميزانية الشهرية (جنيه)')
+                ->label('الميزانية الشهرية ('.currency_name().')')
                 ->state(function ($record) {
                     return $record->avg_month_rate ? number_format((float) $record->avg_month_rate, 2) : 'غير محدد';
                 }),
 
             ExportColumn::make('average_amount')
-                ->label('متوسط المبلغ (جنيه)')
+                ->label('متوسط المبلغ ('.currency_name().')')
                 ->state(function ($record) {
                     $count = $record->expenses_count ?? 0;
-                        $total = $record->expenses_sum_amount ?? 0;
-                        $average = $count > 0 ? $total / $count : 0;
+                    $total = $record->expenses_sum_amount ?? 0;
+                    $average = $count > 0 ? $total / $count : 0;
+
                     return number_format($average, 2);
                 }),
         ];
@@ -50,10 +51,10 @@ class PeriodShiftExpensesExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'تم إكمال تصدير ملخص مصروفات فترة الشفتات وتم تصدير ' . number_format($export->successful_rows) . ' ' . ($export->successful_rows == 1 ? 'نوع مصروف' : 'نوع مصروف') . '.';
+        $body = 'تم إكمال تصدير ملخص مصروفات فترة الشفتات وتم تصدير '.number_format($export->successful_rows).' '.($export->successful_rows == 1 ? 'نوع مصروف' : 'نوع مصروف').'.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' فشل في تصدير ' . number_format($failedRowsCount) . ' ' . ($failedRowsCount == 1 ? 'نوع مصروف' : 'نوع مصروف') . '.';
+            $body .= ' فشل في تصدير '.number_format($failedRowsCount).' '.($failedRowsCount == 1 ? 'نوع مصروف' : 'نوع مصروف').'.';
         }
 
         return $body;

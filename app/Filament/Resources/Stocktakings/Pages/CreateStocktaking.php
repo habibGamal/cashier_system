@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Stocktakings\Pages;
 
 use App\Filament\Resources\Stocktakings\StocktakingResource;
 use App\Services\Resources\StocktakingCalculatorService;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateStocktaking extends CreateRecord

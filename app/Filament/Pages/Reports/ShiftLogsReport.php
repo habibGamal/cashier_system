@@ -2,31 +2,26 @@
 
 namespace App\Filament\Pages\Reports;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use App\Filament\Traits\AdminAccess;
 use App\Filament\Traits\ViewerAccess;
 use App\Models\Shift;
-use App\Services\ShiftLoggingService;
+use Carbon\Carbon;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Pages\Page;
-use Filament\Forms;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ShiftLogsReport extends Page implements HasForms
 {
     use InteractsWithForms, ViewerAccess;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected string $view = 'filament.pages.reports.shift-logs-report';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'التقارير';
+    protected static string|\UnitEnum|null $navigationGroup = 'التقارير';
 
     protected static ?string $navigationLabel = 'سجل أنشطة الوردية';
 
@@ -35,7 +30,9 @@ class ShiftLogsReport extends Page implements HasForms
     protected static ?int $navigationSort = 4;
 
     public ?array $data = [];
+
     public array $logEntries = [];
+
     public ?string $selectedShiftInfo = null;
 
     public function mount(): void
@@ -63,14 +60,14 @@ class ShiftLogsReport extends Page implements HasForms
                                         $endDate = $shift->end_at ? $shift->end_at->format('d/m/Y H:i') : 'لم تنته';
 
                                         return [
-                                            $shift->id => "وردية #{$shift->id} - {$userLabel} ({$startDate} - {$endDate})"
+                                            $shift->id => "وردية #{$shift->id} - {$userLabel} ({$startDate} - {$endDate})",
                                         ];
                                     });
                             })
                             ->searchable()
                             ->placeholder('اختر الوردية')
                             ->live()
-                            ->afterStateUpdated(fn() => $this->loadLogs()),
+                            ->afterStateUpdated(fn () => $this->loadLogs()),
 
                         Select::make('log_level')
                             ->label('مستوى السجل')
@@ -81,7 +78,7 @@ class ShiftLogsReport extends Page implements HasForms
                             ])
                             ->default('all')
                             ->live()
-                            ->afterStateUpdated(fn() => $this->loadLogs()),
+                            ->afterStateUpdated(fn () => $this->loadLogs()),
 
                         Select::make('action_filter')
                             ->label('نوع النشاط')
@@ -98,14 +95,14 @@ class ShiftLogsReport extends Page implements HasForms
                             ])
                             ->default('all')
                             ->live()
-                            ->afterStateUpdated(fn() => $this->loadLogs()),
+                            ->afterStateUpdated(fn () => $this->loadLogs()),
 
                         TextInput::make('order_id')
                             ->label('رقم الطلب')
                             ->placeholder('اختياري - اتركه فارغ لعرض جميع الطلبات')
                             ->numeric()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn() => $this->loadLogs()),
+                            ->afterStateUpdated(fn () => $this->loadLogs()),
                     ])
                     ->columns(4),
             ])
@@ -119,16 +116,18 @@ class ShiftLogsReport extends Page implements HasForms
         $actionFilter = $this->data['action_filter'] ?? 'all';
         $orderId = $this->data['order_id'] ?? null;
 
-        if (!$shiftId) {
+        if (! $shiftId) {
             $this->logEntries = [];
             $this->selectedShiftInfo = null;
+
             return;
         }
 
         $shift = Shift::with('user')->find($shiftId);
-        if (!$shift) {
+        if (! $shift) {
             $this->logEntries = [];
             $this->selectedShiftInfo = null;
+
             return;
         }
 
@@ -142,8 +141,9 @@ class ShiftLogsReport extends Page implements HasForms
         $shiftDate = $shift->created_at->format('Y-m-d');
         $logPath = storage_path("logs/shifts/shift_{$shift->id}_{$shiftDate}.log");
 
-        if (!file_exists($logPath)) {
+        if (! file_exists($logPath)) {
             $this->logEntries = [];
+
             return;
         }
 
@@ -157,8 +157,9 @@ class ShiftLogsReport extends Page implements HasForms
         $entries = [];
 
         foreach ($lines as $line) {
-            if (empty(trim($line)))
+            if (empty(trim($line))) {
                 continue;
+            }
 
             // Parse Laravel log format: [timestamp] environment.level: message {context}
             if (preg_match('/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s+(\w+)\.(\w+):\s*(.+)$/', $line, $matches)) {
@@ -242,7 +243,7 @@ class ShiftLogsReport extends Page implements HasForms
                             break;
                     }
 
-                    if (!$shouldInclude) {
+                    if (! $shouldInclude) {
                         continue;
                     }
                 }
@@ -264,7 +265,7 @@ class ShiftLogsReport extends Page implements HasForms
                     'formatted_date' => Carbon::parse($timestamp)->format('d/m/Y'),
                     // Temporary debug info
                     'debug_original' => $messageAndContext,
-                    'debug_json_detected' => !empty($context),
+                    'debug_json_detected' => ! empty($context),
                 ];
             }
         }
@@ -347,11 +348,11 @@ class ShiftLogsReport extends Page implements HasForms
      */
     public function formatMoney($value): string
     {
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return (string) $value;
         }
 
-        return number_format((float) $value, 2) . ' جنيه';
+        return format_money((float) $value);
     }
 
     /**
@@ -366,7 +367,7 @@ class ShiftLogsReport extends Page implements HasForms
             'start_cash',
             'end_cash',
             'real_end_cash',
-            'discount_amount'
+            'discount_amount',
         ]);
     }
 
@@ -420,51 +421,53 @@ class ShiftLogsReport extends Page implements HasForms
      */
     public function debugLogParsing(): void
     {
-        if (!isset($this->data['shift_id'])) {
+        if (! isset($this->data['shift_id'])) {
             return;
         }
 
         $shift = Shift::find($this->data['shift_id']);
-        if (!$shift) {
+        if (! $shift) {
             return;
         }
 
         $shiftDate = $shift->created_at->format('Y-m-d');
         $logPath = storage_path("logs/shifts/shift_{$shift->id}_{$shiftDate}.log");
 
-        if (!file_exists($logPath)) {
-            dd('Log file not found: ' . $logPath);
+        if (! file_exists($logPath)) {
+            dd('Log file not found: '.$logPath);
         }
 
         $content = file_get_contents($logPath);
         $lines = explode("\n", $content);
 
         foreach ($lines as $index => $line) {
-            if (empty(trim($line)))
+            if (empty(trim($line))) {
                 continue;
+            }
 
-            echo "Line " . ($index + 1) . ":\n";
-            echo "Raw: " . $line . "\n";
+            echo 'Line '.($index + 1).":\n";
+            echo 'Raw: '.$line."\n";
 
             if (preg_match('/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]\s+(\w+)\.(\w+):\s*(.+?)(\s+\{.+\})?$/', $line, $matches)) {
                 echo "Matches found:\n";
-                echo "1. Timestamp: " . $matches[1] . "\n";
-                echo "2. Environment: " . $matches[2] . "\n";
-                echo "3. Level: " . $matches[3] . "\n";
-                echo "4. Message: " . $matches[4] . "\n";
-                echo "5. Context: " . ($matches[5] ?? 'none') . "\n";
+                echo '1. Timestamp: '.$matches[1]."\n";
+                echo '2. Environment: '.$matches[2]."\n";
+                echo '3. Level: '.$matches[3]."\n";
+                echo '4. Message: '.$matches[4]."\n";
+                echo '5. Context: '.($matches[5] ?? 'none')."\n";
 
-                if (!empty($matches[5])) {
+                if (! empty($matches[5])) {
                     $context = json_decode(trim($matches[5]), true);
-                    echo "Parsed context: " . print_r($context, true) . "\n";
+                    echo 'Parsed context: '.print_r($context, true)."\n";
                 }
             } else {
                 echo "No match found\n";
             }
             echo "---\n";
 
-            if ($index > 2)
-                break; // Just show first few lines for debugging
+            if ($index > 2) {
+                break;
+            } // Just show first few lines for debugging
         }
 
         dd('Debug complete');

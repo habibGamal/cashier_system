@@ -40,13 +40,13 @@ class WastesTable
 
                 TextColumn::make('total')
                     ->label('إجمالي قيمة التالف')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('notes')
                     ->label('ملاحظات')
                     ->limit(50)
-                    ->tooltip(fn($state): ?string => $state),
+                    ->tooltip(fn ($state): ?string => $state),
 
                 TextColumn::make('closed_at')
                     ->label('الحالة')
@@ -54,7 +54,7 @@ class WastesTable
                         return $state ? 'مغلق' : 'مفتوح';
                     })
                     ->badge()
-                    ->color(fn($state): string => $state ? 'success' : 'warning')
+                    ->color(fn ($state): string => $state ? 'success' : 'warning')
                     ->sortable(),
 
                 TextColumn::make('created_at')
@@ -79,11 +79,11 @@ class WastesTable
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
 
@@ -93,9 +93,9 @@ class WastesTable
                     ->trueLabel('مغلق')
                     ->falseLabel('مفتوح')
                     ->queries(
-                        true: fn(Builder $query) => $query->whereNotNull('closed_at'),
-                        false: fn(Builder $query) => $query->whereNull('closed_at'),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->whereNotNull('closed_at'),
+                        false: fn (Builder $query) => $query->whereNull('closed_at'),
+                        blank: fn (Builder $query) => $query,
                     ),
             ])
             ->recordActions([

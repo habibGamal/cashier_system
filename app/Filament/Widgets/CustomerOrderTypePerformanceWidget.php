@@ -9,6 +9,7 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class CustomerOrderTypePerformanceWidget extends ChartWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -65,7 +66,7 @@ class CustomerOrderTypePerformanceWidget extends ChartWidget
                     'yAxisID' => 'y',
                 ],
                 [
-                    'label' => 'إجمالي المبيعات (ج.م)',
+                    'label' => 'إجمالي المبيعات ('.currency_symbol().')',
                     'data' => $totalSales,
                     'backgroundColor' => 'rgba(75, 192, 192, 0.6)',
                     'borderColor' => 'rgba(75, 192, 192, 1)',
@@ -74,7 +75,7 @@ class CustomerOrderTypePerformanceWidget extends ChartWidget
                     'yAxisID' => 'y1',
                 ],
                 [
-                    'label' => 'إجمالي الأرباح (ج.م)',
+                    'label' => 'إجمالي الأرباح ('.currency_symbol().')',
                     'data' => $totalProfit,
                     'backgroundColor' => 'rgba(255, 193, 7, 0.6)',
                     'borderColor' => 'rgba(255, 193, 7, 1)',
@@ -119,7 +120,7 @@ class CustomerOrderTypePerformanceWidget extends ChartWidget
                     'beginAtZero' => true,
                     'title' => [
                         'display' => true,
-                        'text' => 'المبيعات والأرباح (ج.م)',
+                        'text' => 'المبيعات والأرباح ('.currency_symbol().')',
                     ],
                     'grid' => [
                         'drawOnChartArea' => false,

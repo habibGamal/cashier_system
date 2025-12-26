@@ -2,10 +2,9 @@
 
 namespace App\Filament\Pages;
 
-use Exception;
 use App\Filament\Traits\AdminAccess;
 use App\Services\BranchService;
-use App\Models\Category;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -16,26 +15,34 @@ use Illuminate\Support\Facades\Cache;
 
 class BranchManagement extends Page implements HasForms
 {
-    use InteractsWithForms, AdminAccess;
+    use AdminAccess, InteractsWithForms;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
+
     protected string $view = 'filament.pages.branch-management';
+
     protected static ?string $navigationLabel = 'إدارة الفروع';
+
     protected static ?string $title = 'إدارة الفروع';
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة النظام';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة النظام';
+
     protected static ?int $navigationSort = 2;
 
     public $newProducts = [];
+
     public $changedPrices = [];
+
     public $changedRecipes = [];
 
     public function mount(): void
     {
         $branchService = app(BranchService::class);
 
-        if (!$branchService->isSlave()) {
+        if (! $branchService->isSlave()) {
             redirect()->route('filament.admin.pages.settings')
                 ->with('warning', 'هذه الصفحة متاحة فقط للفروع');
+
             return;
         }
 
@@ -114,13 +121,13 @@ class BranchManagement extends Page implements HasForms
     {
         $branchService = app(BranchService::class);
 
-        if (!$branchService->isSlave()) {
+        if (! $branchService->isSlave()) {
             return [];
         }
 
-        $newProductsCount = collect($this->newProducts)->sum(fn($category) => count($category['products']));
-        $changedPricesCount = collect($this->changedPrices)->sum(fn($category) => count($category['products']));
-        $changedRecipesCount = collect($this->changedRecipes)->sum(fn($category) => count($category['products']));
+        $newProductsCount = collect($this->newProducts)->sum(fn ($category) => count($category['products']));
+        $changedPricesCount = collect($this->changedPrices)->sum(fn ($category) => count($category['products']));
+        $changedRecipesCount = collect($this->changedRecipes)->sum(fn ($category) => count($category['products']));
 
         return [
             Action::make('refresh')
@@ -140,7 +147,7 @@ class BranchManagement extends Page implements HasForms
                         ->options($this->getProductOptions($this->newProducts))
                         ->bulkToggleable()
                         ->required()
-                        ->columns(2)
+                        ->columns(2),
                 ])
                 ->action(function (array $data) {
                     $this->importProducts($data['productIds']);
@@ -157,7 +164,7 @@ class BranchManagement extends Page implements HasForms
                         ->options($this->getPriceOptions($this->changedPrices))
                         ->bulkToggleable()
                         ->required()
-                        ->columns(2)
+                        ->columns(2),
                 ])
                 ->action(function (array $data) {
                     $this->updatePrices($data['productIds']);
@@ -174,7 +181,7 @@ class BranchManagement extends Page implements HasForms
                         ->bulkToggleable()
                         ->options($this->getRecipeOptions($this->changedRecipes))
                         ->required()
-                        ->columns(2)
+                        ->columns(2),
                 ])
                 ->action(function (array $data) {
                     $this->updateRecipes($data['productIds']);
@@ -190,6 +197,7 @@ class BranchManagement extends Page implements HasForms
                 $options[$product['id']] = "{$category['name']} - {$product['name']}";
             }
         }
+
         return $options;
     }
 
@@ -200,14 +208,15 @@ class BranchManagement extends Page implements HasForms
             foreach ($category['products'] as $product) {
                 $priceInfo = '';
                 if (isset($product['price'])) {
-                    $priceInfo .= "سعر: {$product['price']} جنيه";
+                    $priceInfo .= "سعر: {$product['price']} ".currency_name();
                 }
                 if (isset($product['cost'])) {
-                    $priceInfo .= $priceInfo ? " | كلفة: {$product['cost']} جنيه" : "كلفة: {$product['cost']} جنيه";
+                    $priceInfo .= $priceInfo ? " | كلفة: {$product['cost']} ".currency_name() : "كلفة: {$product['cost']} ".currency_name();
                 }
-                $options[$product['id']] = "{$category['name']} - {$product['name']}" . ($priceInfo ? " ({$priceInfo})" : '');
+                $options[$product['id']] = "{$category['name']} - {$product['name']}".($priceInfo ? " ({$priceInfo})" : '');
             }
         }
+
         return $options;
     }
 
@@ -220,6 +229,7 @@ class BranchManagement extends Page implements HasForms
                 $options[$product['id']] = "{$category['name']} - {$product['name']} ({$componentsCount} مكون)";
             }
         }
+
         return $options;
     }
 
@@ -233,6 +243,7 @@ class BranchManagement extends Page implements HasForms
                     ->icon('heroicon-o-exclamation-triangle')
                     ->iconColor('warning')
                     ->send();
+
                 return;
             }
 
@@ -241,7 +252,7 @@ class BranchManagement extends Page implements HasForms
 
             Notification::make()
                 ->title('تم استيراد المنتجات بنجاح')
-                ->body('تم استيراد ' . count($productIds) . ' منتج من النقطة الرئيسية')
+                ->body('تم استيراد '.count($productIds).' منتج من النقطة الرئيسية')
                 ->icon('heroicon-o-check-circle')
                 ->iconColor('success')
                 ->send();
@@ -252,7 +263,7 @@ class BranchManagement extends Page implements HasForms
         } catch (Exception $e) {
             Notification::make()
                 ->title('خطأ في استيراد المنتجات')
-                ->body('حدث خطأ أثناء محاولة استيراد المنتجات: ' . $e->getMessage())
+                ->body('حدث خطأ أثناء محاولة استيراد المنتجات: '.$e->getMessage())
                 ->icon('heroicon-o-x-circle')
                 ->iconColor('danger')
                 ->send();
@@ -269,6 +280,7 @@ class BranchManagement extends Page implements HasForms
                     ->icon('heroicon-o-exclamation-triangle')
                     ->iconColor('warning')
                     ->send();
+
                 return;
             }
 
@@ -277,7 +289,7 @@ class BranchManagement extends Page implements HasForms
 
             Notification::make()
                 ->title('تم تحديث الأسعار بنجاح')
-                ->body('تم تحديث أسعار ' . count($productIds) . ' منتج من النقطة الرئيسية')
+                ->body('تم تحديث أسعار '.count($productIds).' منتج من النقطة الرئيسية')
                 ->icon('heroicon-o-check-circle')
                 ->iconColor('success')
                 ->send();
@@ -288,7 +300,7 @@ class BranchManagement extends Page implements HasForms
         } catch (Exception $e) {
             Notification::make()
                 ->title('خطأ في تحديث الأسعار')
-                ->body('حدث خطأ أثناء محاولة تحديث الأسعار: ' . $e->getMessage())
+                ->body('حدث خطأ أثناء محاولة تحديث الأسعار: '.$e->getMessage())
                 ->icon('heroicon-o-x-circle')
                 ->iconColor('danger')
                 ->send();
@@ -305,6 +317,7 @@ class BranchManagement extends Page implements HasForms
                     ->icon('heroicon-o-exclamation-triangle')
                     ->iconColor('warning')
                     ->send();
+
                 return;
             }
 
@@ -313,7 +326,7 @@ class BranchManagement extends Page implements HasForms
 
             Notification::make()
                 ->title('تم تحديث الوصفات بنجاح')
-                ->body('تم تحديث وصفات ' . count($productIds) . ' منتج من النقطة الرئيسية')
+                ->body('تم تحديث وصفات '.count($productIds).' منتج من النقطة الرئيسية')
                 ->icon('heroicon-o-check-circle')
                 ->iconColor('success')
                 ->send();
@@ -324,7 +337,7 @@ class BranchManagement extends Page implements HasForms
         } catch (Exception $e) {
             Notification::make()
                 ->title('خطأ في تحديث الوصفات')
-                ->body('حدث خطأ أثناء محاولة تحديث الوصفات: ' . $e->getMessage())
+                ->body('حدث خطأ أثناء محاولة تحديث الوصفات: '.$e->getMessage())
                 ->icon('heroicon-o-x-circle')
                 ->iconColor('danger')
                 ->send();
@@ -334,6 +347,7 @@ class BranchManagement extends Page implements HasForms
     public static function shouldRegisterNavigation(): bool
     {
         $branchService = app(BranchService::class);
+
         return $branchService->isSlave();
     }
 }

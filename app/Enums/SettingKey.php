@@ -140,12 +140,12 @@ enum SettingKey: string
             self::RESTAURANT_PRINT_LOGO => true, // Always valid for file path
             self::RESTAURANT_OFFICIAL_LOGO => true, // Always valid for file path
             self::NODE_TYPE => in_array($value, ['master', 'slave', 'independent']),
-            self::MASTER_NODE_LINK => !$value || filter_var($value, FILTER_VALIDATE_URL) !== false,
+            self::MASTER_NODE_LINK => ! $value || filter_var($value, FILTER_VALIDATE_URL) !== false,
             self::SCALE_BARCODE_PREFIX => is_string($value) && preg_match('/^\d{1,4}$/', $value),
             self::CURRENCY_SYMBOL => is_string($value) && strlen($value) > 0 && strlen($value) <= 10,
             self::CURRENCY_CODE => is_string($value) && strlen($value) === 3,
             self::CURRENCY_NAME => is_string($value) && strlen($value) > 0 && strlen($value) <= 50,
-            self::CURRENCY_DECIMALS => is_numeric($value) && (int)$value >= 0 && (int)$value <= 4,
+            self::CURRENCY_DECIMALS => is_numeric($value) && (int) $value >= 0 && (int) $value <= 4,
         };
     }
 }

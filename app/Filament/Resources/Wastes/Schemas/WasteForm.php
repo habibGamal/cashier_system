@@ -33,9 +33,9 @@ class WasteForm
                             ->default(auth()->id()),
 
                         TextInput::make('total')
-                            ->label('إجمالي قيمة التالف (ج.م)')
+                            ->label('إجمالي قيمة التالف ('.currency_symbol().')')
                             ->numeric()
-                            ->prefix('ج.م')
+                            ->prefix(currency_symbol())
                             ->disabled()
                             ->dehydrated(false)
                             ->default(0),
@@ -71,8 +71,8 @@ class WasteForm
                                 TableColumn::make('المنتج')->width('200px'),
                                 TableColumn::make('الكمية الحالية')->width('100px'),
                                 TableColumn::make('الكمية')->width('100px'),
-                                TableColumn::make('سعر الوحدة (ج.م)')->width('120px'),
-                                TableColumn::make('الإجمالي (ج.م)')->width('120px'),
+                                TableColumn::make('سعر الوحدة ('.currency_symbol().')')->width('120px'),
+                                TableColumn::make('الإجمالي ('.currency_symbol().')')->width('120px'),
                             ])
                             ->schema([
                                 Hidden::make('product_id'),
@@ -100,16 +100,16 @@ class WasteForm
                                     ->minValue(1),
 
                                 TextInput::make('price')
-                                    ->label('سعر الوحدة (ج.م)')
+                                    ->label('سعر الوحدة ('.currency_symbol().')')
                                     ->numeric()
-                                    ->prefix('ج.م')
+                                    ->prefix(currency_symbol())
                                     ->disabled()
                                     ->dehydrated(condition: true),
 
                                 TextInput::make('total')
-                                    ->label('الإجمالي (ج.م)')
+                                    ->label('الإجمالي ('.currency_symbol().')')
                                     ->numeric()
-                                    ->prefix('ج.م')
+                                    ->prefix(currency_symbol())
                                     ->disabled()
                                     ->dehydrated(false),
                             ])

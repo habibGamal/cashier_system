@@ -2,20 +2,17 @@
 
 namespace App\Filament\Resources\Regions;
 
-use Filament\Schemas\Schema;
+use App\Filament\Resources\Regions\Pages\CreateRegion;
+use App\Filament\Resources\Regions\Pages\EditRegion;
+use App\Filament\Resources\Regions\Pages\ListRegions;
+use App\Filament\Resources\Regions\Pages\ViewRegion;
 use App\Filament\Resources\Regions\Schemas\RegionForm;
 use App\Filament\Resources\Regions\Tables\RegionsTable;
-use App\Filament\Resources\Regions\Pages\ListRegions;
-use App\Filament\Resources\Regions\Pages\CreateRegion;
-use App\Filament\Resources\Regions\Pages\ViewRegion;
-use App\Filament\Resources\Regions\Pages\EditRegion;
-use App\Filament\Resources\RegionResource\Pages;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Region;
-use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use \App\Filament\Traits\AdminAccess;
 
 class RegionResource extends Resource
 {
@@ -23,9 +20,9 @@ class RegionResource extends Resource
 
     protected static ?string $model = Region::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-map';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المطعم';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المطعم';
 
     protected static ?int $navigationSort = 4;
 

@@ -3,14 +3,15 @@
 namespace App\Filament\Widgets;
 
 use App\Services\ChannelPerformanceReportService;
+use Filament\Support\Enums\IconPosition;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Filament\Support\Enums\IconPosition;
 
 class ChannelPerformanceStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -27,7 +28,7 @@ class ChannelPerformanceStatsWidget extends BaseWidget
         $metrics = $this->getChannelMetrics();
 
         return [
-            Stat::make('إجمالي الإيرادات', number_format($metrics['total_revenue'], 2) . ' ج.م')
+            Stat::make('إجمالي الإيرادات', format_money($metrics['total_revenue']))
                 ->description('إجمالي إيرادات جميع القنوات')
                 ->descriptionIcon('heroicon-m-banknotes', IconPosition::Before)
                 ->color('success'),
@@ -42,7 +43,7 @@ class ChannelPerformanceStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-users', IconPosition::Before)
                 ->color('info'),
 
-            Stat::make('متوسط قيمة الطلب', number_format($metrics['avg_order_value'], 2) . ' ج.م')
+            Stat::make('متوسط قيمة الطلب', format_money($metrics['avg_order_value']))
                 ->description('متوسط قيمة الطلب عبر جميع القنوات')
                 ->descriptionIcon('heroicon-m-calculator', IconPosition::Before)
                 ->color('warning'),
@@ -50,21 +51,21 @@ class ChannelPerformanceStatsWidget extends BaseWidget
             Stat::make('أفضل قناة (إيرادات)',
                 $metrics['top_channel_by_revenue'] ? $metrics['top_channel_by_revenue']->type_label : 'لا توجد')
                 ->description($metrics['top_channel_by_revenue'] ?
-                    number_format($metrics['top_channel_by_revenue']->total_sales, 2) . ' ج.م' : 'لا توجد مبيعات')
+                    format_money($metrics['top_channel_by_revenue']->total_sales) : 'لا توجد مبيعات')
                 ->descriptionIcon('heroicon-m-trophy', IconPosition::Before)
                 ->color('success'),
 
             Stat::make('أفضل قناة (طلبات)',
                 $metrics['top_channel_by_orders'] ? $metrics['top_channel_by_orders']->type_label : 'لا توجد')
                 ->description($metrics['top_channel_by_orders'] ?
-                    number_format($metrics['top_channel_by_orders']->total_orders) . ' طلب' : 'لا توجد طلبات')
+                    number_format($metrics['top_channel_by_orders']->total_orders).' طلب' : 'لا توجد طلبات')
                 ->descriptionIcon('heroicon-m-chart-bar', IconPosition::Before)
                 ->color('primary'),
 
             Stat::make('أكثر القنوات كفاءة',
                 $metrics['most_efficient_channel'] ? $metrics['most_efficient_channel']->type_label : 'لا توجد')
                 ->description($metrics['most_efficient_channel'] ?
-                    number_format($metrics['most_efficient_channel']->efficiency_score, 1) . '%' : 'لا توجد بيانات')
+                    number_format($metrics['most_efficient_channel']->efficiency_score, 1).'%' : 'لا توجد بيانات')
                 ->descriptionIcon('heroicon-m-rocket-launch', IconPosition::Before)
                 ->color('warning'),
 

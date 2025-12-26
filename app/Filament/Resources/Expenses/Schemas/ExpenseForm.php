@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources\Expenses\Schemas;
 
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Schema;
 use App\Models\ExpenceType;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 
 class ExpenseForm
 {
@@ -23,7 +23,7 @@ class ExpenseForm
                     ->label('المبلغ')
                     ->required()
                     ->numeric()
-                    ->prefix('ج.م'),
+                    ->prefix(currency_symbol()),
                 Textarea::make('notes')
                     ->label('ملاحظات')
                     ->rows(3)

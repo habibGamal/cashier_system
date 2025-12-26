@@ -56,7 +56,7 @@ class ProductSelector extends Select
                     $price = $product->cost ?? $product->price;
                     $categoryName = $product->category ? $product->category->name : 'بدون فئة';
 
-                    $label = $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')';
+                    $label = $product->name.' - '.format_money($price).' ('.$categoryName.')';
 
                     return [$product->id => $label];
                 });

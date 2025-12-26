@@ -17,6 +17,7 @@ import {
     ConfigProvider,
 } from "antd";
 import { ReactNode, useLayoutEffect, useEffect } from "react";
+import { formatCurrency } from '@/utils/currency';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -118,7 +119,7 @@ export default function CashierLayout({ children, title }: CashierLayoutProps) {
                                 العميل: {order.customer_name}
                             </Typography.Text>
                             <Typography.Text>
-                                الإجمالي: {order.total} جنيه
+                                الإجمالي: {formatCurrency(order.total)}
                             </Typography.Text>
                             <Button
                                 type="primary"

@@ -1,7 +1,7 @@
 <?php
 
-use App\Services\InventoryDailyAggregationService;
 use App\Enums\SettingKey;
+use App\Services\InventoryDailyAggregationService;
 use App\Services\SettingsService;
 
 /*
@@ -32,8 +32,10 @@ if (! function_exists('shouldDayBeOpen')) {
      */
     function shouldDayBeOpen(): bool
     {
-        if (app(InventoryDailyAggregationService::class)->dayStatus() === null)
+        if (app(InventoryDailyAggregationService::class)->dayStatus() === null) {
             throw new Exception('يجب فتح اليوم قبل إجراء أي عمليات على المخزون');
+        }
+
         return true;
     }
 }
@@ -81,20 +83,21 @@ if (! function_exists('currency_decimals')) {
 if (! function_exists('format_money')) {
     /**
      * Format a monetary amount with currency symbol
-     * @param float $amount The amount to format
-     * @param int|null $decimals Number of decimal places (null = use system default)
-     * @param bool $showSymbol Whether to show currency symbol
+     *
+     * @param  float  $amount  The amount to format
+     * @param  int|null  $decimals  Number of decimal places (null = use system default)
+     * @param  bool  $showSymbol  Whether to show currency symbol
      * @return string Formatted amount with currency
      */
     function format_money(float $amount, ?int $decimals = null, bool $showSymbol = true): string
     {
         $decimals = $decimals ?? currency_decimals();
         $formatted = number_format($amount, $decimals);
-        
+
         if ($showSymbol) {
-            return $formatted . ' ' . currency_symbol();
+            return $formatted.' '.currency_symbol();
         }
-        
+
         return $formatted;
     }
 }

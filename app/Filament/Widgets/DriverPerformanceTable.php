@@ -2,30 +2,26 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\Action;
-use App\Filament\Resources\Drivers\Pages\ViewDriver;
 use App\Models\Driver;
-use App\Models\Order;
 use App\Services\ShiftsReportService;
-use App\Enums\OrderStatus;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Filament\Actions\Action;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class DriverPerformanceTable extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected static ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
 
     protected ShiftsReportService $shiftsReportService;
-
 
     protected int|string|array $columnSpan = 'full';
 
@@ -85,13 +81,13 @@ class DriverPerformanceTable extends BaseWidget
                     ->label('إجمالي القيمة')
                     ->sortable()
                     ->default(0)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . ' ج.م'),
+                    ->formatStateUsing(fn ($state) => format_money($state)),
 
                 TextColumn::make('avg_order_value')
                     ->label('متوسط قيمة الطلب')
                     ->sortable()
                     ->default(0)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . ' ج.م'),
+                    ->formatStateUsing(fn ($state) => format_money($state)),
             ])
             ->recordActions([
                 Action::make('view_orders')
@@ -129,7 +125,7 @@ class DriverPerformanceTable extends BaseWidget
             ])
             ->leftJoin('orders', function ($join) use ($shiftIds) {
                 $join->on('drivers.id', '=', 'orders.driver_id')
-                     ->whereIn('orders.shift_id', $shiftIds);
+                    ->whereIn('orders.shift_id', $shiftIds);
             })
             ->groupBy('drivers.id', 'drivers.name', 'drivers.phone', 'drivers.created_at', 'drivers.updated_at')
             ->havingRaw('COUNT(orders.id) > 0');
