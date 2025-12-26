@@ -37,3 +37,64 @@ if (! function_exists('shouldDayBeOpen')) {
         return true;
     }
 }
+
+if (! function_exists('currency_symbol')) {
+    /**
+     * Get the currency symbol (e.g., 'ج.م', '$', '€')
+     */
+    function currency_symbol(): string
+    {
+        return setting(SettingKey::CURRENCY_SYMBOL);
+    }
+}
+
+if (! function_exists('currency_code')) {
+    /**
+     * Get the currency code (e.g., 'EGP', 'USD', 'EUR')
+     */
+    function currency_code(): string
+    {
+        return setting(SettingKey::CURRENCY_CODE);
+    }
+}
+
+if (! function_exists('currency_name')) {
+    /**
+     * Get the currency name in Arabic (e.g., 'جنيه', 'دولار', 'يورو')
+     */
+    function currency_name(): string
+    {
+        return setting(SettingKey::CURRENCY_NAME);
+    }
+}
+
+if (! function_exists('currency_decimals')) {
+    /**
+     * Get the number of decimal places for currency display
+     */
+    function currency_decimals(): int
+    {
+        return (int) setting(SettingKey::CURRENCY_DECIMALS);
+    }
+}
+
+if (! function_exists('format_money')) {
+    /**
+     * Format a monetary amount with currency symbol
+     * @param float $amount The amount to format
+     * @param int|null $decimals Number of decimal places (null = use system default)
+     * @param bool $showSymbol Whether to show currency symbol
+     * @return string Formatted amount with currency
+     */
+    function format_money(float $amount, ?int $decimals = null, bool $showSymbol = true): string
+    {
+        $decimals = $decimals ?? currency_decimals();
+        $formatted = number_format($amount, $decimals);
+        
+        if ($showSymbol) {
+            return $formatted . ' ' . currency_symbol();
+        }
+        
+        return $formatted;
+    }
+}

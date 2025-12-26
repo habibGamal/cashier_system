@@ -183,6 +183,44 @@ class Settings extends Page implements HasForms
                                     ->required(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
                             ]),
                     ]),
+
+                Section::make('إعدادات العملة')
+                    ->description('تخصيص العملة المستخدمة في النظام')
+                    ->icon('heroicon-m-currency-dollar')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make(SettingKey::CURRENCY_SYMBOL->value)
+                                    ->label(SettingKey::CURRENCY_SYMBOL->label())
+                                    ->helperText(SettingKey::CURRENCY_SYMBOL->helperText())
+                                    ->required()
+                                    ->maxLength(10)
+                                    ->placeholder(SettingKey::CURRENCY_SYMBOL->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_CODE->value)
+                                    ->label(SettingKey::CURRENCY_CODE->label())
+                                    ->helperText(SettingKey::CURRENCY_CODE->helperText())
+                                    ->required()
+                                    ->maxLength(3)
+                                    ->placeholder(SettingKey::CURRENCY_CODE->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_NAME->value)
+                                    ->label(SettingKey::CURRENCY_NAME->label())
+                                    ->helperText(SettingKey::CURRENCY_NAME->helperText())
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->placeholder(SettingKey::CURRENCY_NAME->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_DECIMALS->value)
+                                    ->label(SettingKey::CURRENCY_DECIMALS->label())
+                                    ->helperText(SettingKey::CURRENCY_DECIMALS->helperText())
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(4)
+                                    ->placeholder(SettingKey::CURRENCY_DECIMALS->placeholder()),
+                            ]),
+                    ]),
             ])
             ->statePath('data');
     }

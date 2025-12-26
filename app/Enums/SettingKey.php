@@ -13,6 +13,10 @@ enum SettingKey: string
     case NODE_TYPE = 'node_type';
     case MASTER_NODE_LINK = 'master_node_link';
     case SCALE_BARCODE_PREFIX = 'scale_barcode_prefix';
+    case CURRENCY_SYMBOL = 'currency_symbol';
+    case CURRENCY_CODE = 'currency_code';
+    case CURRENCY_NAME = 'currency_name';
+    case CURRENCY_DECIMALS = 'currency_decimals';
 
     /**
      * Get default value for this setting
@@ -29,6 +33,10 @@ enum SettingKey: string
             self::NODE_TYPE => 'independent',
             self::MASTER_NODE_LINK => 'http://127.0.0.1:38794',
             self::SCALE_BARCODE_PREFIX => '23',
+            self::CURRENCY_SYMBOL => 'ج.م',
+            self::CURRENCY_CODE => 'EGP',
+            self::CURRENCY_NAME => 'جنيه',
+            self::CURRENCY_DECIMALS => '2',
         };
     }
 
@@ -47,6 +55,10 @@ enum SettingKey: string
             self::NODE_TYPE => ['required', 'in:master,slave,independent'],
             self::MASTER_NODE_LINK => ['nullable', 'url', 'max:255'],
             self::SCALE_BARCODE_PREFIX => ['required', 'string', 'regex:/^\d{1,4}$/', 'max:4'],
+            self::CURRENCY_SYMBOL => ['required', 'string', 'max:10'],
+            self::CURRENCY_CODE => ['required', 'string', 'max:3'],
+            self::CURRENCY_NAME => ['required', 'string', 'max:50'],
+            self::CURRENCY_DECIMALS => ['required', 'integer', 'min:0', 'max:4'],
         };
     }
 
@@ -65,6 +77,10 @@ enum SettingKey: string
             self::NODE_TYPE => 'نوع النقطة الحالية',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية',
             self::SCALE_BARCODE_PREFIX => 'بادئة باركود الميزان',
+            self::CURRENCY_SYMBOL => 'رمز العملة',
+            self::CURRENCY_CODE => 'كود العملة',
+            self::CURRENCY_NAME => 'اسم العملة',
+            self::CURRENCY_DECIMALS => 'عدد الخانات العشرية',
         };
     }
 
@@ -83,6 +99,10 @@ enum SettingKey: string
             self::NODE_TYPE => 'تحديد نوع النقطة الحالية في شبكة الفروع',
             self::MASTER_NODE_LINK => 'رابط النقطة الرئيسية (مطلوب فقط إذا كان النوع عبارة عن فرع)',
             self::SCALE_BARCODE_PREFIX => 'البادئة المستخدمة لتحديد باركود المنتجات الموزونة (مثال: 23)',
+            self::CURRENCY_SYMBOL => 'الرمز الذي يظهر بجانب المبالغ (مثال: ج.م، $، €)',
+            self::CURRENCY_CODE => 'الكود الدولي للعملة المكون من 3 أحرف (مثال: EGP، USD، EUR)',
+            self::CURRENCY_NAME => 'اسم العملة بالعربية (مثال: جنيه، دولار، يورو)',
+            self::CURRENCY_DECIMALS => 'عدد الأرقام بعد الفاصلة العشرية (عادة 2)',
         };
     }
 
@@ -100,6 +120,10 @@ enum SettingKey: string
             self::NODE_TYPE => 'اختر نوع النقطة',
             self::MASTER_NODE_LINK => 'http://127.0.0.1:38794',
             self::SCALE_BARCODE_PREFIX => '23',
+            self::CURRENCY_SYMBOL => 'ج.م',
+            self::CURRENCY_CODE => 'EGP',
+            self::CURRENCY_NAME => 'جنيه',
+            self::CURRENCY_DECIMALS => '2',
         };
     }
 
@@ -118,6 +142,10 @@ enum SettingKey: string
             self::NODE_TYPE => in_array($value, ['master', 'slave', 'independent']),
             self::MASTER_NODE_LINK => !$value || filter_var($value, FILTER_VALIDATE_URL) !== false,
             self::SCALE_BARCODE_PREFIX => is_string($value) && preg_match('/^\d{1,4}$/', $value),
+            self::CURRENCY_SYMBOL => is_string($value) && strlen($value) > 0 && strlen($value) <= 10,
+            self::CURRENCY_CODE => is_string($value) && strlen($value) === 3,
+            self::CURRENCY_NAME => is_string($value) && strlen($value) > 0 && strlen($value) <= 50,
+            self::CURRENCY_DECIMALS => is_numeric($value) && (int)$value >= 0 && (int)$value <= 4,
         };
     }
 }
