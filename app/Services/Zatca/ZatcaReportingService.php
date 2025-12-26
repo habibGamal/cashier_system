@@ -39,11 +39,11 @@ class ZatcaReportingService
             // Using onboarding service to get the correct path
             $basePath = $this->onboardingService->getFullStoragePath();
 
-            $productionCertPath = $basePath.'/production_certificate.pem';
-            $productionSecretPath = $basePath.'/production_secret.txt';
-            $keyPath = $basePath.'/private.pem';
+            $productionCertPath = $basePath . '/production_certificate.pem';
+            $productionSecretPath = $basePath . '/production_secret.txt';
+            $keyPath = $basePath . '/private.pem';
 
-            if (! file_exists($productionCertPath) || ! file_exists($productionSecretPath) || ! file_exists($keyPath)) {
+            if (!file_exists($productionCertPath) || !file_exists($productionSecretPath) || !file_exists($keyPath)) {
                 return [
                     'status' => 'error',
                     'message' => 'Zatca Production Certificate or Private Key not found. Please onboard first.',
@@ -74,7 +74,7 @@ class ZatcaReportingService
             // Simplified -> Report (reportInvoice)
             // Standard -> Clear (clearInvoice)
             // Determine based on customer data
-            $isStandard = ! empty($order->customer?->vat_number);
+            $isStandard = !empty($order->customer?->vat_number);
 
             $responseData = null;
 
@@ -101,7 +101,10 @@ class ZatcaReportingService
             // Zatca API response structure verification needed.
             // Simplified Report returns: { validationResults: { status: 'PASSED' | 'WARNING' | 'FAILED' }, ... }
             // Clearance returns: { clearanceStatus: 'CLEARED' | 'NOT_CLEARED', ... }
-
+            logger()->debug(
+                'Response Data: ',
+                $responseData
+            );
             $status = 'FAILED';
             $isSuccess = false;
 
@@ -151,7 +154,7 @@ class ZatcaReportingService
 
             return [
                 'status' => 'error',
-                'message' => 'Exception during Zatca reporting: '.$e->getMessage(),
+                'message' => 'Exception during Zatca reporting: ' . $e->getMessage(),
             ];
         }
     }
@@ -175,7 +178,7 @@ class ZatcaReportingService
 
     private function saveXml(string $uuid, string $xmlContent): string
     {
-        $path = 'zatca/invoices/'.date('Y/m/d').'/'.$uuid.'.xml';
+        $path = 'zatca/invoices/' . date('Y/m/d') . '/' . $uuid . '.xml';
         \Illuminate\Support\Facades\Storage::disk('local')->put($path, $xmlContent);
 
         return $path;

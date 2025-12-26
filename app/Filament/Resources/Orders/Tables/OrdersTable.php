@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
@@ -100,16 +101,38 @@ class OrdersTable
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['created_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     }),
             ])
             ->recordActions([
                 ViewAction::make()->label('عرض'),
+                Action::make('reportOrder')
+                    ->label('إرسال للزكاة')
+                    ->icon('heroicon-o-document-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (\App\Models\Order $record, \App\Services\Zatca\ZatcaReportingService $service) {
+                        $result = $service->reportOrder($record);
+
+                        if ($result['status'] === 'success') {
+                            \Filament\Notifications\Notification::make()
+                                ->title('تم الإرسال بنجاح')
+                                ->success()
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('فشل الإرسال')
+                                ->body($result['message'])
+                                ->danger()
+                                ->send();
+                        }
+                    })
+                    ->visible(fn(\App\Models\Order $record) => !in_array($record->zatca_status, ['REPORTED', 'CLEARED'])),
             ])
             ->toolbarActions([
                 // No bulk actions for view-only resource

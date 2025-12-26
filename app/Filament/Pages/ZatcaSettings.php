@@ -243,10 +243,7 @@ class ZatcaSettings extends Page implements HasForms
         }
     }
 
-    public function startOnboarding(): void
-    {
-        $this->redirect(route('filament.admin.pages.zatca-onboarding'));
-    }
+
 
     public function deleteCertificates(): void
     {
@@ -274,40 +271,92 @@ class ZatcaSettings extends Page implements HasForms
     protected function getFormActions(): array
     {
         return [
-            Action::make('save')
-                ->label('حفظ الإعدادات')
-                ->icon('heroicon-m-check')
-                ->color('primary')
-                ->action('saveSettings'),
-
-            Action::make('generateCSR')
-                ->label('إنشاء CSR')
-                ->icon('heroicon-m-key')
-                ->color('success')
-                ->visible(fn () => ! $this->certificateStatus['csr_exists'])
-                ->requiresConfirmation()
-                ->modalHeading('إنشاء شهادة طلب CSR')
-                ->modalDescription('سيتم إنشاء شهادة طلب CSR ومفتاح خاص. تأكد من صحة البيانات قبل المتابعة.')
-                ->modalSubmitActionLabel('نعم، إنشاء')
-                ->action('generateCSR'),
-
-            Action::make('startOnboarding')
-                ->label('بدء عملية التفعيل')
-                ->icon('heroicon-m-rocket-launch')
-                ->color('warning')
-                ->visible(fn () => $this->certificateStatus['csr_exists'] && ! $this->certificateStatus['production_certificate_exists'])
-                ->action('startOnboarding'),
-
-            Action::make('deleteCertificates')
-                ->label('حذف الشهادات')
-                ->icon('heroicon-m-trash')
-                ->color('danger')
-                ->visible(fn () => $this->certificateStatus['csr_exists'])
-                ->requiresConfirmation()
-                ->modalHeading('حذف جميع الشهادات')
-                ->modalDescription('سيتم حذف جميع الشهادات والملفات. لن يمكنك التراجع عن هذا الإجراء.')
-                ->modalSubmitActionLabel('نعم، حذف')
-                ->action('deleteCertificates'),
+            $this->saveAction(),
+            $this->generateCSRAction(),
+            $this->startOnboardingAction(),
+            $this->deleteCertificatesAction(),
         ];
+    }
+
+    public function saveAction(): Action
+    {
+        return Action::make('save')
+            ->label('حفظ الإعدادات')
+            ->icon('heroicon-m-check')
+            ->color('primary')
+            ->action('saveSettings');
+    }
+
+    public function generateCSRAction(): Action
+    {
+        return Action::make('generateCSR')
+            ->label('إنشاء CSR')
+            ->icon('heroicon-m-key')
+            ->color('success')
+            ->visible(fn() => !$this->certificateStatus['csr_exists'])
+            ->requiresConfirmation()
+            ->modalHeading('إنشاء شهادة طلب CSR')
+            ->modalDescription('سيتم إنشاء شهادة طلب CSR ومفتاح خاص. تأكد من صحة البيانات قبل المتابعة.')
+            ->modalSubmitActionLabel('نعم، إنشاء')
+            ->action('generateCSR');
+    }
+
+    public function startOnboardingAction(): Action
+    {
+        return Action::make('startOnboarding')
+            ->label('بدء عملية التفعيل')
+            ->icon('heroicon-m-rocket-launch')
+            ->color('warning')
+            ->visible(fn() => $this->certificateStatus['csr_exists'] && !$this->certificateStatus['production_certificate_exists'])
+            ->form([
+                TextInput::make('otp')
+                    ->label('رمز التفعيل (OTP)')
+                    ->required()
+                    ->maxLength(6)
+                    ->placeholder('123456')
+                    ->helperText('احصل على رمز OTP من بوابة فاتورة (fatoora.zatca.gov.sa)'),
+            ])
+            ->modalHeading('تفعيل الفاتورة الإلكترونية')
+            ->modalDescription('أدخل رمز OTP للحصول على شهادة الإنتاج وبدء إصدار الفواتير.')
+            ->modalSubmitActionLabel('بدء التفعيل')
+            ->action(function (array $data) {
+                try {
+                    $onboardingService = app(ZatcaOnboardingService::class);
+                    $onboardingService->onboard($data['otp']);
+
+                    Notification::make()
+                        ->title('تم التفعيل بنجاح')
+                        ->body('تم الحصول على شهادة الإنتاج. يمكنك الآن إصدار الفواتير الإلكترونية.')
+                        ->success()
+                        ->duration(10000)
+                        ->send();
+
+                    $this->mount(); // Refresh data
+    
+                } catch (Exception $e) {
+                    Notification::make()
+                        ->title('فشل التفعيل')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->duration(10000)
+                        ->send();
+
+                    throw $e;
+                }
+            });
+    }
+
+    public function deleteCertificatesAction(): Action
+    {
+        return Action::make('deleteCertificates')
+            ->label('حذف الشهادات')
+            ->icon('heroicon-m-trash')
+            ->color('danger')
+            ->visible(fn() => $this->certificateStatus['csr_exists'])
+            ->requiresConfirmation()
+            ->modalHeading('حذف جميع الشهادات')
+            ->modalDescription('سيتم حذف جميع الشهادات والملفات. لن يمكنك التراجع عن هذا الإجراء.')
+            ->modalSubmitActionLabel('نعم، حذف')
+            ->action('deleteCertificates');
     }
 }

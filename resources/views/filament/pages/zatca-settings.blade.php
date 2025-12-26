@@ -1,12 +1,9 @@
 <x-filament-panels::page>
-    <x-filament-panels::form wire:submit="save">
+    <form wire:submit="saveSettings" class="space-y-6">
         {{ $this->form }}
 
-        <x-filament-panels::form.actions
-            :actions="$this->getFormActions()"
-            :full-width="$this->hasFullWidthFormActions()"
-        />
-    </x-filament-panels::form>
+        <x-filament::actions :actions="$this->getFormActions()" />
+    </form>
 
     @if($certificateStatus['csr_exists'] || $certificateStatus['compliance_certificate_exists'] || $certificateStatus['production_certificate_exists'])
         <x-filament::section>
