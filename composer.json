@@ -13,12 +13,19 @@
         "boilerplate"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/habibGamal/zatca-php"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "bezhansalleh/filament-language-switch": "^4.0",
         "filament/filament": "~4.0",
         "inertiajs/inertia-laravel": "^2.0",
         "khaled.alshamaa/ar-php": "^7.0",
+        "khaledhajsalem/zatca-php": "dev-main",
         "laravel/framework": "^11.9",
         "laravel/pail": "^1.2",
         "laravel/pulse": "^1.4",

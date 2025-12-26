@@ -169,6 +169,39 @@ class OrderResource extends Resource
                     ])
                     ->columns(3)
                     ->collapsible(),
+
+                Section::make('معلومات الفوترة الإلكترونية (ZATCA)')
+                    ->schema([
+                        TextEntry::make('zatca_status')
+                            ->label('حالة الإرسال')
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'REPORTED', 'CLEARED' => 'success',
+                                'FAILED' => 'danger',
+                                default => 'gray',
+                            }),
+
+                        TextEntry::make('zatca_uuid')
+                            ->label('UUID')
+                            ->copyable()
+                            ->columnSpanFull(),
+
+                        TextEntry::make('zatca_submitted_at')
+                            ->label('تاريخ الإرسال')
+                            ->dateTime('Y-m-d H:i:s'),
+
+                        TextEntry::make('zatca_xml_path')
+                            ->label('مسار XML'),
+
+                        TextEntry::make('zatca_qr_base64')
+                            ->label('رمز الاستجابة السريعة (QR)')
+                            ->formatStateUsing(fn($state) => $state ? '<img src="data:image/png;base64,' . $state . '" style="width: 150px; height: 150px; border-radius: 8px; border: 1px solid #ddd; padding: 5px;" />' : 'لا يوجد QR')
+                            ->html()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->collapsible()
+                    ->collapsed(),
             ]);
     }
 

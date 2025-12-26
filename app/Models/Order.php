@@ -35,6 +35,13 @@ class Order extends Model
         'payment_status',
         'order_notes',
         'order_number',
+        'zatca_status',
+        'zatca_uuid',
+        'zatca_hash',
+        'zatca_qr_base64',
+        'zatca_xml_path',
+        'zatca_last_response',
+        'zatca_submitted_at',
     ];
 
     protected $appends = [
