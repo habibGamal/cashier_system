@@ -2,19 +2,18 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\ExportAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use App\Services\ShiftsReportService;
-use App\Models\Expense;
 use App\Filament\Exports\PeriodShiftExpensesDetailedExporter;
+use App\Models\Expense;
+use App\Services\ShiftsReportService;
 use Carbon\Carbon;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Actions\ExportAction;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 class PeriodShiftExpensesDetailsTable extends BaseWidget
@@ -41,7 +40,7 @@ class PeriodShiftExpensesDetailsTable extends BaseWidget
         if ($filterType === 'shifts') {
             $shiftIds = $this->pageFilters['shifts'] ?? [];
             $expenseQuery = Expense::query()
-                ->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                ->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                     return $query->whereIn('shift_id', $shiftIds);
                 })
                 ->with(['expenceType', 'shift.user'])
@@ -53,7 +52,7 @@ class PeriodShiftExpensesDetailsTable extends BaseWidget
                 ->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                     $query->whereBetween('created_at', [
                         Carbon::parse($startDate)->startOfDay(),
-                        Carbon::parse($endDate)->endOfDay()
+                        Carbon::parse($endDate)->endOfDay(),
                     ]);
                 })
                 ->with(['expenceType', 'shift.user'])
@@ -71,7 +70,7 @@ class PeriodShiftExpensesDetailsTable extends BaseWidget
                         'id' => 'expenses_table',
                     ])
                     ->exporter(PeriodShiftExpensesDetailedExporter::class)
-                    ->fileName(fn() => 'period-shift-expenses-detailed-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                    ->fileName(fn () => 'period-shift-expenses-detailed-'.now()->format('Y-m-d-H-i-s').'.xlsx'),
             ])
             ->columns([
                 TextColumn::make('id')
@@ -90,7 +89,7 @@ class PeriodShiftExpensesDetailsTable extends BaseWidget
 
                 TextColumn::make('amount')
                     ->label('المبلغ')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->alignCenter()
                     ->sortable()
                     ->weight('bold'),
@@ -165,7 +164,6 @@ class PeriodShiftExpensesDetailsTable extends BaseWidget
                                 fn (Builder $query, $maxAmount): Builder => $query->where('amount', '<=', $maxAmount),
                             );
                     }),
-            ])
-        ;
+            ]);
     }
 }

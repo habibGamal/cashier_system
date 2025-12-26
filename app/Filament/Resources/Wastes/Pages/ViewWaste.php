@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Wastes\Pages;
 
-use Filament\Actions\EditAction;
 use App\Filament\Actions\CloseWasteAction;
-use App\Filament\Resources\Wastes\WasteResource;
 use App\Filament\Resources\Wastes\RelationManagers\ItemsRelationManager;
-use Filament\Actions;
+use App\Filament\Resources\Wastes\WasteResource;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewWaste extends ViewRecord
@@ -20,7 +19,6 @@ class ViewWaste extends ViewRecord
             EditAction::make(),
         ];
     }
-
 
     public function getRelationManagers(): array
     {

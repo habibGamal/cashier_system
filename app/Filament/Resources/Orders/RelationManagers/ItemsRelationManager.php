@@ -2,15 +2,11 @@
 
 namespace App\Filament\Resources\Orders\RelationManagers;
 
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -52,12 +48,12 @@ class ItemsRelationManager extends RelationManager
 
                 TextColumn::make('price')
                     ->label('سعر الوحدة')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('total')
                     ->label('الإجمالي')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->getStateUsing(function ($record) {
                         return $record->quantity * $record->price;
@@ -65,7 +61,7 @@ class ItemsRelationManager extends RelationManager
 
                 TextColumn::make('cost')
                     ->label('التكلفة')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('notes')

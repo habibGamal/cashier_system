@@ -2,38 +2,40 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Utilities\Get;
-use Exception;
-use App\Filament\Traits\AdminAccess;
-use App\Services\SettingsService;
-use App\Services\PrintService;
-use App\Services\BranchService;
-use App\Models\Category;
 use App\Enums\SettingKey;
+use App\Filament\Traits\AdminAccess;
+use App\Services\PrintService;
+use App\Services\SettingsService;
+use Exception;
 use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class Settings extends Page implements HasForms
 {
-    use InteractsWithForms, AdminAccess;
+    use AdminAccess, InteractsWithForms;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected string $view = 'filament.pages.settings';
+
     protected static ?string $navigationLabel = 'الإعدادات';
+
     protected static ?string $title = 'إعدادات النظام';
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة النظام';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة النظام';
+
     protected static ?int $navigationSort = 100;
 
     public ?array $data = [];
@@ -179,8 +181,46 @@ class Settings extends Page implements HasForms
                                     ->helperText(SettingKey::MASTER_NODE_LINK->helperText())
                                     ->url()
                                     ->placeholder(SettingKey::MASTER_NODE_LINK->placeholder())
-                                    ->visible(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave')
-                                    ->required(fn(Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
+                                    ->visible(fn (Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave')
+                                    ->required(fn (Get $get): bool => $get(SettingKey::NODE_TYPE->value) === 'slave'),
+                            ]),
+                    ]),
+
+                Section::make('إعدادات العملة')
+                    ->description('تخصيص العملة المستخدمة في النظام')
+                    ->icon('heroicon-m-currency-dollar')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make(SettingKey::CURRENCY_SYMBOL->value)
+                                    ->label(SettingKey::CURRENCY_SYMBOL->label())
+                                    ->helperText(SettingKey::CURRENCY_SYMBOL->helperText())
+                                    ->required()
+                                    ->maxLength(10)
+                                    ->placeholder(SettingKey::CURRENCY_SYMBOL->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_CODE->value)
+                                    ->label(SettingKey::CURRENCY_CODE->label())
+                                    ->helperText(SettingKey::CURRENCY_CODE->helperText())
+                                    ->required()
+                                    ->maxLength(3)
+                                    ->placeholder(SettingKey::CURRENCY_CODE->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_NAME->value)
+                                    ->label(SettingKey::CURRENCY_NAME->label())
+                                    ->helperText(SettingKey::CURRENCY_NAME->helperText())
+                                    ->required()
+                                    ->maxLength(50)
+                                    ->placeholder(SettingKey::CURRENCY_NAME->placeholder()),
+
+                                TextInput::make(SettingKey::CURRENCY_DECIMALS->value)
+                                    ->label(SettingKey::CURRENCY_DECIMALS->label())
+                                    ->helperText(SettingKey::CURRENCY_DECIMALS->helperText())
+                                    ->required()
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(4)
+                                    ->placeholder(SettingKey::CURRENCY_DECIMALS->placeholder()),
                             ]),
                     ]),
             ])
@@ -209,7 +249,7 @@ class Settings extends Page implements HasForms
                 ->send();
 
         } catch (Exception $e) {
-            logger()->error('Error saving settings: ' . $e->getMessage());
+            logger()->error('Error saving settings: '.$e->getMessage());
             Notification::make()
                 ->title('خطأ في حفظ الإعدادات')
                 ->body('حدث خطأ أثناء محاولة حفظ الإعدادات. يرجى المحاولة مرة أخرى.')
@@ -262,12 +302,13 @@ class Settings extends Page implements HasForms
         } catch (Exception $e) {
             Notification::make()
                 ->title('فشل في اختبار الطابعة')
-                ->body('حدث خطأ أثناء محاولة اختبار الطابعة: ' . $e->getMessage())
+                ->body('حدث خطأ أثناء محاولة اختبار الطابعة: '.$e->getMessage())
                 ->icon('heroicon-o-x-circle')
                 ->iconColor('danger')
                 ->send();
         }
     }
+
     protected function getFormActions(): array
     {
         $actions = [
@@ -297,5 +338,4 @@ class Settings extends Page implements HasForms
 
         return $actions;
     }
-
 }

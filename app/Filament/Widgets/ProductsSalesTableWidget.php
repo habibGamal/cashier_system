@@ -2,17 +2,15 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\ProductType;
+use App\Filament\Exports\ProductsSalesTableExporter;
+use App\Services\ProductsSalesReportService;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ViewAction;
-use App\Enums\ProductType;
-use App\Services\ProductsSalesReportService;
-use App\Filament\Exports\ProductsSalesTableExporter;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Widgets\TableWidget as BaseWidget;
 
 class ProductsSalesTableWidget extends BaseWidget
 {
@@ -22,18 +20,14 @@ class ProductsSalesTableWidget extends BaseWidget
 
     protected static bool $isLazy = false;
 
-
     protected static ?string $heading = 'تفاصيل أداء المنتجات';
 
     protected ProductsSalesReportService $productsReportService;
-
 
     public function boot(): void
     {
         $this->productsReportService = app(ProductsSalesReportService::class);
     }
-
-
 
     public function table(Table $table): Table
     {
@@ -53,7 +47,7 @@ class ProductsSalesTableWidget extends BaseWidget
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->exporter(ProductsSalesTableExporter::class)
-                    ->fileName(fn () => 'products-sales-performance-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                    ->fileName(fn () => 'products-sales-performance-'.now()->format('Y-m-d-H-i-s').'.xlsx'),
             ])
             ->columns([
                 TextColumn::make('name')
@@ -73,46 +67,46 @@ class ProductsSalesTableWidget extends BaseWidget
 
                 TextColumn::make('total_sales')
                     ->label('إجمالي المبيعات')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('total_profit')
                     ->label('إجمالي الربح')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('profit_margin')
                     ->label('هامش الربح %')
                     ->state(
-                        fn($record) => $record->total_sales > 0
-                            ? number_format(($record->total_profit / $record->total_sales) * 100, 1) . '%'
+                        fn ($record) => $record->total_sales > 0
+                            ? number_format(($record->total_profit / $record->total_sales) * 100, 1).'%'
                             : '0%'
                     ),
 
                 // Order Type Performance
                 TextColumn::make('takeaway_sales')
                     ->label('تيك أواي')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('delivery_sales')
                     ->label('دليفري')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('web_delivery_sales')
                     ->label('اونلاين دليفري')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('web_takeaway_sales')
                     ->label('اونلاين تيك أواي')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('direct_sale_sales')
                     ->label('بيع مباشر')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
             ])
             ->defaultSort('total_sales', 'desc')

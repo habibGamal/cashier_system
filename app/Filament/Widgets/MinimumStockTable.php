@@ -37,7 +37,7 @@ class MinimumStockTable extends BaseWidget
                     ->label('تصدير التقرير')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
-                    ->fileName(fn() => 'minimum-stock-report-' . now()->format('Y-m-d-H-i-s') . '.xlsx')
+                    ->fileName(fn () => 'minimum-stock-report-'.now()->format('Y-m-d-H-i-s').'.xlsx')
                 // ->modifyQueryUsing(function (Builder $query) {
                 //     return $query->with(['category', 'inventoryItem'])
                 //         ->whereHas('inventoryItem', function ($query) {
@@ -60,7 +60,6 @@ class MinimumStockTable extends BaseWidget
                     ->weight('medium')
                     ->color('primary'),
 
-
                 TextColumn::make('category.name')
                     ->label('الفئة')
                     ->searchable()
@@ -76,9 +75,9 @@ class MinimumStockTable extends BaseWidget
                 TextColumn::make('inventoryItem.quantity')
                     ->label('المخزون الحالي')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(fn($record) => ' ' . $record->unit)
+                    ->suffix(fn ($record) => ' '.$record->unit)
                     ->alignCenter()
-                    ->color(fn($record) => match (true) {
+                    ->color(fn ($record) => match (true) {
                         ($record->inventoryItem->quantity ?? 0) <= 0 => 'danger',
                         ($record->inventoryItem->quantity ?? 0) < ($record->min_stock / 2) => 'danger',
                         ($record->inventoryItem->quantity ?? 0) < $record->min_stock => 'warning',
@@ -89,7 +88,7 @@ class MinimumStockTable extends BaseWidget
                 TextColumn::make('min_stock')
                     ->label('الحد الأدنى')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(fn($record) => ' ' . $record->unit)
+                    ->suffix(fn ($record) => ' '.$record->unit)
                     ->alignCenter()
                     ->badge()
                     ->color('info'),
@@ -102,7 +101,7 @@ class MinimumStockTable extends BaseWidget
 
                         return number_format($shortage, 2);
                     })
-                    ->suffix(fn($record) => ' ' . $record->unit)
+                    ->suffix(fn ($record) => ' '.$record->unit)
                     ->alignCenter()
                     ->color('danger')
                     ->weight('bold'),
@@ -110,7 +109,7 @@ class MinimumStockTable extends BaseWidget
                 TextColumn::make('cost')
                     ->label('سعر التكلفة')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->toggleable(),
 
@@ -121,16 +120,16 @@ class MinimumStockTable extends BaseWidget
                         $shortage = max(0, $record->min_stock - $currentStock);
                         $cost = $shortage * $record->cost;
 
-                        return number_format($cost, 2);
+                        return format_money($cost, 2, false);
                     })
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->color('warning'),
 
                 TextColumn::make('avg_purchase_quantity')
                     ->label('كمية الشراء المعتادة')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(fn($record) => ' ' . $record->unit)
+                    ->suffix(fn ($record) => ' '.$record->unit)
                     ->alignCenter()
                     ->toggleable(),
 
@@ -142,9 +141,9 @@ class MinimumStockTable extends BaseWidget
                         $recommendedQty = max($shortage, $record->avg_purchase_quantity ?? 1);
                         $cost = $recommendedQty * $record->cost;
 
-                        return number_format($cost, 2);
+                        return format_money($cost, 2, false);
                     })
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->color('success')
                     ->weight('bold'),
@@ -166,25 +165,25 @@ class MinimumStockTable extends BaseWidget
                 TernaryFilter::make('zero_stock')
                     ->label('مخزون صفر')
                     ->queries(
-                        true: fn(Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
+                        true: fn (Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
                             $subQuery->where('quantity', '<=', 0);
                         }),
-                        false: fn(Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
+                        false: fn (Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
                             $subQuery->where('quantity', '>', 0);
                         }),
-                        blank: fn(Builder $query) => $query,
+                        blank: fn (Builder $query) => $query,
                     ),
 
                 TernaryFilter::make('critical_stock')
                     ->label('مخزون حرج')
                     ->queries(
-                        true: fn(Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
+                        true: fn (Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
                             $subQuery->whereRaw('quantity < (SELECT min_stock / 2 FROM products WHERE products.id = inventory_items.product_id)');
                         }),
-                        false: fn(Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
+                        false: fn (Builder $query) => $query->whereHas('inventoryItem', function ($subQuery) {
                             $subQuery->whereRaw('quantity >= (SELECT min_stock / 2 FROM products WHERE products.id = inventory_items.product_id)');
                         }),
-                        blank: fn(Builder $query) => $query,
+                        blank: fn (Builder $query) => $query,
                     ),
             ])
             ->striped()
@@ -192,8 +191,7 @@ class MinimumStockTable extends BaseWidget
             ->poll('30s')
             ->emptyStateHeading('لا توجد منتجات تحت الحد الأدنى')
             ->emptyStateDescription('جميع المنتجات لديها مخزون كافي.')
-            ->emptyStateIcon('heroicon-o-check-circle')
-            // ->recordUrl(fn (Product $record): string => route('filament.admin.resources.products.view', $record))
-        ;
+            ->emptyStateIcon('heroicon-o-check-circle');
+        // ->recordUrl(fn (Product $record): string => route('filament.admin.resources.products.view', $record))
     }
 }

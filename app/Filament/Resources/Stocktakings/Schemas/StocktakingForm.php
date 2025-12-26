@@ -32,9 +32,9 @@ class StocktakingForm
                             ->default(auth()->id()),
 
                         TextInput::make('total')
-                            ->label('إجمالي الفرق (ج.م)')
+                            ->label('إجمالي الفرق ('.currency_symbol().')')
                             ->numeric()
-                            ->prefix('ج.م')
+                            ->prefix(currency_symbol())
                             ->disabled()
                             ->dehydrated(false)
                             ->default(0),
@@ -63,8 +63,8 @@ class StocktakingForm
                             ->table([
                                 TableColumn::make('المنتج')->width('150px'),
                                 TableColumn::make('الكمية الفعلية')->width('120px'),
-                                TableColumn::make('سعر الوحدة (ج.م)')->width('120px'),
-                                TableColumn::make('الفرق (ج.م)')->width('120px'),
+                                TableColumn::make('سعر الوحدة ('.currency_symbol().')')->width('120px'),
+                                TableColumn::make('الفرق ('.currency_symbol().')')->width('120px'),
                             ])
                             ->schema([
                                 Hidden::make('product_id'),
@@ -91,18 +91,18 @@ class StocktakingForm
                                     ->minValue(0),
 
                                 TextInput::make('price')
-                                    ->label('سعر الوحدة (ج.م)')
+                                    ->label('سعر الوحدة ('.currency_symbol().')')
                                     ->numeric()
                                     ->required()
                                     ->minValue(0)
-                                    ->prefix('ج.م')
+                                    ->prefix(currency_symbol())
                                     ->disabled()
                                     ->dehydrated(true),
 
                                 TextInput::make('total')
-                                    ->label('الفرق (ج.م)')
+                                    ->label('الفرق ('.currency_symbol().')')
                                     ->numeric()
-                                    ->prefix('ج.م')
+                                    ->prefix(currency_symbol())
                                     ->disabled()
                                     ->dehydrated(false),
                             ])

@@ -32,7 +32,7 @@ class StocktakingProductSelector extends Select
                     $categoryName = $product->category ? $product->category->name : 'بدون فئة';
                     $currentStock = $product->inventoryItem ? $product->inventoryItem->quantity : 0;
 
-                    $label = $product->name.' - '.$price.' ج.م'.' ('.$categoryName.')';
+                    $label = $product->name.' - '.format_money($price).' ('.$categoryName.')';
 
                     return [$product->id => $label];
                 });

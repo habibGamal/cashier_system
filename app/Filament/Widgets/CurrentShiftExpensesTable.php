@@ -2,27 +2,27 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\ExportAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
-use Illuminate\Database\Eloquent\Collection;
-use App\Models\Shift;
-use App\Models\Expense;
-use App\Models\ExpenceType;
-use App\Services\ShiftsReportService;
-use App\Filament\Exports\CurrentShiftExpensesExporter;
 use App\Filament\Exports\CurrentShiftExpensesDetailedExporter;
-use Filament\Tables;
+use App\Filament\Exports\CurrentShiftExpensesExporter;
+use App\Models\ExpenceType;
+use App\Models\Expense;
+use App\Models\Shift;
+use App\Services\ShiftsReportService;
+use Filament\Actions\Action;
+use Filament\Actions\ExportAction;
+use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
 class CurrentShiftExpensesTable extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected static ?string $pollingInterval = null;
 
     protected int|string|array $columnSpan = 'full';
@@ -40,7 +40,7 @@ class CurrentShiftExpensesTable extends BaseWidget
     {
         $currentShift = $this->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             $query = ExpenceType::query()->where('id', 0); // Empty query
         } else {
             // Use ExpenceType as base and join with expenses
@@ -52,9 +52,9 @@ class CurrentShiftExpensesTable extends BaseWidget
                     DB::raw('COUNT(expenses.id) as expense_count'),
                     DB::raw('COALESCE(SUM(expenses.amount), 0) as total_amount'),
                 ])
-                ->leftJoin('expenses', function($join) use ($currentShift) {
+                ->leftJoin('expenses', function ($join) use ($currentShift) {
                     $join->on('expence_types.id', '=', 'expenses.expence_type_id')
-                         ->where('expenses.shift_id', '=', $currentShift->id);
+                        ->where('expenses.shift_id', '=', $currentShift->id);
                 })
                 ->groupBy('expence_types.id', 'expence_types.name', 'expence_types.avg_month_rate')
                 ->havingRaw('COUNT(expenses.id) > 0'); // Only show types that have expenses
@@ -79,16 +79,17 @@ class CurrentShiftExpensesTable extends BaseWidget
                                     DB::raw('COUNT(expenses.id) as expense_count'),
                                     DB::raw('COALESCE(SUM(expenses.amount), 0) as total_amount'),
                                 ])
-                                ->leftJoin('expenses', function($join) use ($currentShift) {
+                                ->leftJoin('expenses', function ($join) use ($currentShift) {
                                     $join->on('expence_types.id', '=', 'expenses.expence_type_id')
-                                         ->where('expenses.shift_id', '=', $currentShift->id);
+                                        ->where('expenses.shift_id', '=', $currentShift->id);
                                 })
                                 ->groupBy('expence_types.id', 'expence_types.name', 'expence_types.avg_month_rate')
                                 ->havingRaw('COUNT(expenses.id) > 0');
                         }
+
                         return ExpenceType::query()->where('id', 0);
                     })
-                    ->fileName(fn () => 'current-shift-expenses-summary-' . now()->format('Y-m-d-H-i-s') . '.xlsx')
+                    ->fileName(fn () => 'current-shift-expenses-summary-'.now()->format('Y-m-d-H-i-s').'.xlsx')
                     ->visible(fn () => $this->getCurrentShift() !== null),
 
                 ExportAction::make('detailed_export')
@@ -104,9 +105,10 @@ class CurrentShiftExpensesTable extends BaseWidget
                                 ->with(['expenceType', 'shift'])
                                 ->orderBy('created_at', 'desc');
                         }
+
                         return Expense::query()->where('id', 0);
                     })
-                    ->fileName(fn () => 'current-shift-expenses-detailed-' . now()->format('Y-m-d-H-i-s') . '.xlsx')
+                    ->fileName(fn () => 'current-shift-expenses-detailed-'.now()->format('Y-m-d-H-i-s').'.xlsx')
                     ->visible(fn () => $this->getCurrentShift() !== null),
             ])
             ->columns([
@@ -125,7 +127,7 @@ class CurrentShiftExpensesTable extends BaseWidget
                 TextColumn::make('total_amount')
                     ->label('الإجمالي')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->weight('bold')
                     ->alignCenter()
                     ->color(function ($record) {
@@ -137,13 +139,14 @@ class CurrentShiftExpensesTable extends BaseWidget
                         if ($dailyRate > 0 && $current > $dailyRate) {
                             return 'danger';
                         }
+
                         return 'success';
                     }),
 
                 TextColumn::make('avg_month_rate')
                     ->label('الميزانية الشهرية')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->placeholder('غير محدد')
                     ->state(fn ($record) => $record->avg_month_rate)
@@ -164,10 +167,12 @@ class CurrentShiftExpensesTable extends BaseWidget
                         // Compare current shift total against daily budget (monthly budget spread over current month's days)
                         if ($current > $dailyRate) {
                             $excess = $current - $dailyRate;
-                            return 'تجاوز بـ ' . number_format($excess, 2) . ' ج';
+
+                            return 'تجاوز بـ '.number_format($excess, 2).' ج';
                         } else {
                             $remaining = $dailyRate - $current;
-                            return 'متبقي ' . number_format($remaining, 2) . ' ج';
+
+                            return 'متبقي '.number_format($remaining, 2).' ج';
                         }
                     })
                     ->color(function ($record) {
@@ -207,13 +212,12 @@ class CurrentShiftExpensesTable extends BaseWidget
                     ->label('عرض التفاصيل')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->modalHeading(fn ($record) => 'مصروفات نوع: ' . $record->name)
+                    ->modalHeading(fn ($record) => 'مصروفات نوع: '.$record->name)
                     ->modalWidth(Width::FourExtraLarge)
-                    ->modalContent(fn ($record) =>
-                        view('filament.modals.shift-details', [
-                            'shiftId' => $currentShift->id,
-                            'expenceTypeId' => $record->id,
-                        ])
+                    ->modalContent(fn ($record) => view('filament.modals.shift-details', [
+                        'shiftId' => $currentShift->id,
+                        'expenceTypeId' => $record->id,
+                    ])
                     )
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('إغلاق'),
@@ -232,7 +236,7 @@ class CurrentShiftExpensesTable extends BaseWidget
     {
         $currentShift = $this->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             return collect();
         }
 
@@ -271,11 +275,11 @@ class CurrentShiftExpensesTable extends BaseWidget
                 <div class="grid grid-cols-2 gap-4 text-center">
                     <div>
                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">عدد المصروفات</h3>
-                        <p class="text-xl font-bold text-primary-600 dark:text-primary-400">' . $expenseCount . '</p>
+                        <p class="text-xl font-bold text-primary-600 dark:text-primary-400">'.$expenseCount.'</p>
                     </div>
                     <div>
                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">إجمالي المبلغ</h3>
-                        <p class="text-xl font-bold text-danger-600 dark:text-danger-400">' . number_format($totalAmount, 2) . ' جنيه</p>
+                        <p class="text-xl font-bold text-danger-600 dark:text-danger-400">'.format_money($totalAmount).'</p>
                     </div>
                 </div>
             </div>
@@ -295,19 +299,19 @@ class CurrentShiftExpensesTable extends BaseWidget
         foreach ($expenses as $index => $expense) {
             $bgClass = $index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700';
             $html .= '
-                        <tr class="' . $bgClass . '">
+                        <tr class="'.$bgClass.'">
                             <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="text-sm font-semibold text-danger-600 dark:text-danger-400">' . number_format($expense->amount, 2) . ' جنيه</span>
+                                <span class="text-sm font-semibold text-danger-600 dark:text-danger-400">'.format_money($expense->amount).'</span>
                             </td>
                             <td class="px-4 py-3">
                                 <div class="text-sm text-gray-900 dark:text-white max-w-xs">
-                                    ' . ($expense->notes ? htmlspecialchars($expense->notes) : '<span class="text-gray-400 italic">لا توجد ملاحظات</span>') . '
+                                    '.($expense->notes ? htmlspecialchars($expense->notes) : '<span class="text-gray-400 italic">لا توجد ملاحظات</span>').'
                                 </div>
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">
                                 <div class="text-sm text-gray-500 dark:text-gray-300">
-                                    <div>' . $expense->created_at->format('Y-m-d') . '</div>
-                                    <div class="text-xs">' . $expense->created_at->format('H:i:s') . '</div>
+                                    <div>'.$expense->created_at->format('Y-m-d').'</div>
+                                    <div class="text-xs">'.$expense->created_at->format('H:i:s').'</div>
                                 </div>
                             </td>
                         </tr>';

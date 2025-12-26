@@ -2,19 +2,19 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\OrderStatus;
+use App\Models\Order;
 use App\Services\ShiftsReportService;
+use Carbon\Carbon;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Carbon\Carbon;
-use App\Models\Driver;
-use App\Models\Order;
-use App\Enums\OrderStatus;
 use Illuminate\Support\Facades\DB;
 
 class DriverPerformanceStatsWidget extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -46,7 +46,7 @@ class DriverPerformanceStatsWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-truck')
                 ->color('info'),
 
-            Stat::make('إجمالي قيمة الطلبات', number_format($driverStats['total_value'], 2) . ' ج.م')
+            Stat::make('إجمالي قيمة الطلبات', format_money($driverStats['total_value']))
                 ->description('القيمة الإجمالية لطلبات التوصيل')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Button,
     Card,
@@ -32,6 +32,10 @@ interface ShowReturnOrderProps {
 }
 
 export default function ShowReturnOrder({ returnOrder }: ShowReturnOrderProps) {
+    const { currency } = usePage().props as any;
+    const currencySymbol = currency?.symbol || 'ج.م';
+    const currencyDecimals = currency?.decimals || 2;
+
     const handlePrint = () => {
         // TODO: Implement print functionality for return orders
         message.info('وظيفة الطباعة قيد التطوير');
@@ -95,31 +99,46 @@ export default function ShowReturnOrder({ returnOrder }: ShowReturnOrderProps) {
             dataIndex: 'original_price',
             key: 'original_price',
             align: 'center' as const,
-            render: (price: number) => (
-                <Typography.Text>{Number(price).toFixed(2)} ج.م</Typography.Text>
-            ),
+            render: (price: number) => {
+                const { currency } = usePage().props as any;
+                const symbol = currency?.symbol || 'ج.م';
+                const decimals = currency?.decimals || 2;
+                return (
+                    <Typography.Text>{Number(price).toFixed(decimals)} {symbol}</Typography.Text>
+                );
+            },
         },
         {
             title: 'سعر الإرجاع',
             dataIndex: 'return_price',
             key: 'return_price',
             align: 'center' as const,
-            render: (price: number) => (
-                <Typography.Text style={{ color: '#52c41a' }}>
-                    {Number(price).toFixed(2)} ج.م
-                </Typography.Text>
-            ),
+            render: (price: number) => {
+                const { currency } = usePage().props as any;
+                const symbol = currency?.symbol || 'ج.م';
+                const decimals = currency?.decimals || 2;
+                return (
+                    <Typography.Text style={{ color: '#52c41a' }}>
+                        {Number(price).toFixed(decimals)} {symbol}
+                    </Typography.Text>
+                );
+            },
         },
         {
             title: 'الإجمالي',
             dataIndex: 'total',
             key: 'total',
             align: 'center' as const,
-            render: (total: number) => (
-                <Typography.Text strong style={{ color: '#52c41a' }}>
-                    {Number(total).toFixed(2)} ج.م
-                </Typography.Text>
-            ),
+            render: (total: number) => {
+                const { currency } = usePage().props as any;
+                const symbol = currency?.symbol || 'ج.م';
+                const decimals = currency?.decimals || 2;
+                return (
+                    <Typography.Text strong style={{ color: '#52c41a' }}>
+                        {Number(total).toFixed(decimals)} {symbol}
+                    </Typography.Text>
+                );
+            },
         },
         {
             title: 'السبب',
@@ -230,7 +249,7 @@ export default function ShowReturnOrder({ returnOrder }: ShowReturnOrderProps) {
                                         strong
                                         style={{ fontSize: '16px', color: '#52c41a' }}
                                     >
-                                        {Number(returnOrder.refund_amount).toFixed(2)} ج.م
+                                        {Number(returnOrder.refund_amount).toFixed(currencyDecimals)} {currencySymbol}
                                     </Typography.Text>
                                 </Descriptions.Item>
                                 <Descriptions.Item label="الحالة">
@@ -329,7 +348,7 @@ export default function ShowReturnOrder({ returnOrder }: ShowReturnOrderProps) {
                                             strong
                                             style={{ color: '#52c41a', fontSize: '16px' }}
                                         >
-                                            {Number(totalAmount).toFixed(2)} ج.م
+                                            {Number(totalAmount).toFixed(currencyDecimals)} {currencySymbol}
                                         </Typography.Text>
                                     </Table.Summary.Cell>
                                     <Table.Summary.Cell index={5}>-</Table.Summary.Cell>

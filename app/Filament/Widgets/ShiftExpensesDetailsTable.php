@@ -2,21 +2,20 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Tables\Columns\TextColumn;
 use App\Models\Expense;
-use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class ShiftExpensesDetailsTable extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected static ?string $pollingInterval = null;
 
     public $shiftId;
 
     public $expenceTypeId;
-
 
     protected static ?string $heading = 'المصاريف';
 
@@ -33,7 +32,7 @@ class ShiftExpensesDetailsTable extends BaseWidget
                     ->searchable(),
                 TextColumn::make('amount')
                     ->label('المبلغ')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
                 TextColumn::make('notes')
                     ->label('ملاحظات')
@@ -43,6 +42,7 @@ class ShiftExpensesDetailsTable extends BaseWidget
                         if (strlen($state) <= 50) {
                             return null;
                         }
+
                         return $state;
                     }),
                 TextColumn::make('created_at')

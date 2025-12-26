@@ -2,15 +2,10 @@
 
 namespace App\Filament\Resources\PurchaseInvoices\RelationManagers;
 
-use Filament\Schemas\Schema;
-use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class ItemsRelationManager extends RelationManager
 {
@@ -44,18 +39,18 @@ class ItemsRelationManager extends RelationManager
 
                 TextColumn::make('price')
                     ->label('سعر الوحدة')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
 
                 TextColumn::make('total')
                     ->label('الإجمالي')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable(),
             ]);
     }
 
     public function isReadOnly(): bool
     {
-        return !is_null($this->ownerRecord->closed_at);
+        return ! is_null($this->ownerRecord->closed_at);
     }
 }

@@ -9,6 +9,7 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class TopCustomersByProfitWidget extends ChartWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -39,7 +40,7 @@ class TopCustomersByProfitWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'الأرباح (ج.م)',
+                    'label' => 'الأرباح ('.currency_symbol().')',
                     'data' => $topCustomers->pluck('total_profit')->toArray(),
                     'backgroundColor' => [
                         'rgba(255, 193, 7, 0.2)',
@@ -70,7 +71,7 @@ class TopCustomersByProfitWidget extends ChartWidget
             ],
             'labels' => $topCustomers->map(function ($customer) {
                 return mb_strlen($customer->name, 'UTF-8') > 15
-                    ? mb_substr($customer->name, 0, 15, 'UTF-8') . '...'
+                    ? mb_substr($customer->name, 0, 15, 'UTF-8').'...'
                     : $customer->name;
             })->toArray(),
         ];

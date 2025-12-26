@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\PurchaseInvoices\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Actions\ClosePurchaseInvoiceAction;
 use App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource;
 use App\Services\Resources\PurchaseInvoiceCalculatorService;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +25,7 @@ class EditPurchaseInvoice extends EditRecord
     {
         $data['total'] = PurchaseInvoiceCalculatorService::calculateInvoiceTotal($record->items);
         $record->update($data);
+
         return $record;
     }
 

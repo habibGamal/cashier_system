@@ -2,19 +2,16 @@
 
 namespace App\Filament\Resources\Categories;
 
-use App\Filament\Traits\AdminAccess;
-use Filament\Schemas\Schema;
+use App\Filament\Resources\Categories\Pages\CreateCategory;
+use App\Filament\Resources\Categories\Pages\EditCategory;
+use App\Filament\Resources\Categories\Pages\ListCategories;
+use App\Filament\Resources\Categories\Pages\ViewCategory;
 use App\Filament\Resources\Categories\Schemas\CategoryForm;
 use App\Filament\Resources\Categories\Tables\CategoriesTable;
-use App\Filament\Resources\Categories\Pages\ListCategories;
-use App\Filament\Resources\Categories\Pages\CreateCategory;
-use App\Filament\Resources\Categories\Pages\ViewCategory;
-use App\Filament\Resources\Categories\Pages\EditCategory;
-use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Category;
-use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class CategoryResource extends Resource
@@ -23,9 +20,9 @@ class CategoryResource extends Resource
 
     protected static ?string $model = Category::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المنتجات';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المنتجات';
 
     protected static ?int $navigationSort = 1;
 

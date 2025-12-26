@@ -28,6 +28,7 @@ import { orderStatus } from "@/helpers/orderState";
 import { orderHeader } from "@/helpers/orderHeader";
 import CashierLayout from "@/Layouts/CashierLayout";
 import useModal from "@/hooks/useModal";
+import { formatCurrency } from '@/utils/currency';
 
 // Components
 import DriverModal from "@/Components/Orders/DriverModal";
@@ -232,32 +233,32 @@ export default function ManageWebOrder({
         {
             key: "subTotal",
             label: "المجموع",
-            children: `${(Number(order.sub_total) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.sub_total) || 0),
         },
         {
             key: "tax",
             label: "الضريبة",
-            children: `${(Number(order.tax) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.tax) || 0),
         },
         {
             key: "service",
             label: "الخدمة",
-            children: `${(Number(order.service) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.service) || 0),
         },
         {
             key: "discount",
             label: "الخصم",
-            children: `${(Number(order.discount) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.discount) || 0),
         },
         {
             key: "webPosDiff",
             label: "فرق تسعير",
-            children: `${(Number(order.web_pos_diff) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.web_pos_diff) || 0),
         },
         {
             key: "total",
             label: "الإجمالي",
-            children: `${(Number(order.total) || 0).toFixed(1)} جنيه`,
+            children: formatCurrency(Number(order.total) || 0),
         },
     ];
 

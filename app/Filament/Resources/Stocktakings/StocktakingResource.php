@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\Stocktakings;
 
+use App\Filament\Resources\Stocktakings\Pages\CreateStocktaking;
+use App\Filament\Resources\Stocktakings\Pages\EditStocktaking;
+use App\Filament\Resources\Stocktakings\Pages\ListStocktakings;
+use App\Filament\Resources\Stocktakings\Pages\ViewStocktaking;
 use App\Filament\Resources\Stocktakings\Schemas\StocktakingForm;
 use App\Filament\Resources\Stocktakings\Schemas\StocktakingInfolist;
 use App\Filament\Resources\Stocktakings\Tables\StocktakingsTable;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\Stocktakings\Pages\ListStocktakings;
-use App\Filament\Resources\Stocktakings\Pages\CreateStocktaking;
-use App\Filament\Resources\Stocktakings\Pages\ViewStocktaking;
-use App\Filament\Resources\Stocktakings\Pages\EditStocktaking;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Stocktaking;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Traits\AdminAccess;
 
 class StocktakingResource extends Resource
 {
@@ -22,7 +22,7 @@ class StocktakingResource extends Resource
 
     protected static ?string $model = Stocktaking::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?string $navigationLabel = 'الجرد';
 
@@ -30,7 +30,7 @@ class StocktakingResource extends Resource
 
     protected static ?string $pluralModelLabel = 'الجرد';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المخزون';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المخزون';
 
     public static function form(Schema $schema): Schema
     {

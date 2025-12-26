@@ -2,19 +2,16 @@
 
 namespace App\Filament\Resources\Orders\RelationManagers;
 
+use App\Enums\PaymentMethod;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
-use App\Enums\PaymentMethod;
-use Filament\Forms;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PaymentsRelationManager extends RelationManager
 {
@@ -41,7 +38,7 @@ class PaymentsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('amount')
                     ->label('المبلغ')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->weight('semibold'),
 
@@ -77,11 +74,11 @@ class PaymentsRelationManager extends RelationManager
                         TextInput::make('amount_from')
                             ->label('من')
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                         TextInput::make('amount_to')
                             ->label('إلى')
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

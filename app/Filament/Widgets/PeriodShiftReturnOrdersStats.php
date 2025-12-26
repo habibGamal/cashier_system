@@ -3,13 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Services\ShiftsReportService;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class PeriodShiftReturnOrdersStats extends BaseWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
@@ -38,13 +39,12 @@ class PeriodShiftReturnOrdersStats extends BaseWidget
                 ->descriptionIcon('heroicon-m-arrow-uturn-left')
                 ->color('warning'),
 
-            Stat::make('قيمة المرتجعات', number_format($periodStats['totalRefundAmount'], 2) . ' جنيه')
+            Stat::make('قيمة المرتجعات', format_money($periodStats['totalRefundAmount']))
                 ->description('إجمالي المبالغ المردودة')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('danger'),
 
-
-            Stat::make('معدل المرتجعات', number_format($returnRate, 2) . '%')
+            Stat::make('معدل المرتجعات', number_format($returnRate, 2).'%')
                 ->description('نسبة المرتجعات من إجمالي الطلبات')
                 ->descriptionIcon('heroicon-m-chart-bar')
                 ->color($returnRate > 5 ? 'danger' : ($returnRate > 2 ? 'warning' : 'success')),
@@ -57,10 +57,12 @@ class PeriodShiftReturnOrdersStats extends BaseWidget
 
         if ($filterType === 'shifts') {
             $shiftIds = $this->pageFilters['shifts'] ?? [];
+
             return $this->shiftsReportService->calculatePeriodStats(null, null, $shiftIds);
         } else {
             $startDate = $this->pageFilters['startDate'] ?? now()->subDays(7)->startOfDay()->toDateString();
             $endDate = $this->pageFilters['endDate'] ?? now()->endOfDay()->toDateString();
+
             return $this->shiftsReportService->calculatePeriodStats($startDate, $endDate, null);
         }
     }

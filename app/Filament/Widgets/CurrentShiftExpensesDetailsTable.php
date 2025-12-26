@@ -2,17 +2,16 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\ExportAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use App\Services\ShiftsReportService;
-use App\Models\Expense;
 use App\Filament\Exports\CurrentShiftExpensesDetailedExporter;
-use Filament\Tables;
+use App\Models\Expense;
+use App\Services\ShiftsReportService;
+use Filament\Actions\ExportAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 
 class CurrentShiftExpensesDetailsTable extends BaseWidget
@@ -34,7 +33,7 @@ class CurrentShiftExpensesDetailsTable extends BaseWidget
     {
         $currentShift = $this->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             $expenseQuery = Expense::query()->where('id', 0); // Empty query
         } else {
             $expenseQuery = Expense::query()
@@ -54,8 +53,8 @@ class CurrentShiftExpensesDetailsTable extends BaseWidget
                         'id' => 'expenses_table',
                     ])
                     ->exporter(CurrentShiftExpensesDetailedExporter::class)
-                    ->fileName(fn() => 'current-shift-expenses-detailed-' . now()->format('Y-m-d-H-i-s') . '.xlsx')
-                    ->visible(fn() => $this->getCurrentShift() !== null),
+                    ->fileName(fn () => 'current-shift-expenses-detailed-'.now()->format('Y-m-d-H-i-s').'.xlsx')
+                    ->visible(fn () => $this->getCurrentShift() !== null),
             ])
             ->columns([
                 TextColumn::make('id')
@@ -74,7 +73,7 @@ class CurrentShiftExpensesDetailsTable extends BaseWidget
 
                 TextColumn::make('amount')
                     ->label('المبلغ')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->alignCenter()
                     ->sortable()
                     ->weight('bold')

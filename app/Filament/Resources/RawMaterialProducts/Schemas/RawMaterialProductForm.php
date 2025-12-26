@@ -32,7 +32,7 @@ class RawMaterialProductForm
                     ->label('التكلفة')
                     ->required()
                     ->numeric()
-                    ->prefix('ج.م'),
+                    ->prefix(currency_symbol()),
                 TextInput::make('min_stock')
                     ->label('الحد الأدنى للمخزون')
                     ->required()

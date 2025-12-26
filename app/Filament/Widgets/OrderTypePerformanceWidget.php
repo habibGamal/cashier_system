@@ -9,13 +9,14 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class OrderTypePerformanceWidget extends ChartWidget
 {
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     use InteractsWithPageFilters;
 
     protected ?string $heading = 'أداء المبيعات حسب نوع الطلب';
 
-    protected int | string | array $columnSpan = 2;
+    protected int|string|array $columnSpan = 2;
 
     protected ProductsSalesReportService $productsReportService;
 
@@ -42,7 +43,7 @@ class OrderTypePerformanceWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'المبيعات (ج.م)',
+                    'label' => 'المبيعات ('.currency_symbol().')',
                     'data' => $salesData,
                     'backgroundColor' => [
                         'rgba(59, 130, 246, 0.1)',
@@ -90,11 +91,11 @@ class OrderTypePerformanceWidget extends ChartWidget
                         'label' => 'function(context) {
                             return context.dataset.label + ": " + new Intl.NumberFormat("ar-EG", {
                                 style: "currency",
-                                currency: "EGP"
+                                currency: "'.currency_code().'"
                             }).format(context.parsed.y);
-                        }'
-                    ]
-                ]
+                        }',
+                    ],
+                ],
             ],
             'scales' => [
                 'x' => [
@@ -113,12 +114,12 @@ class OrderTypePerformanceWidget extends ChartWidget
                         'callback' => 'function(value) {
                             return new Intl.NumberFormat("ar-EG", {
                                 style: "currency",
-                                currency: "EGP",
+                                currency: "'.currency_code().'",
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 0
                             }).format(value);
-                        }'
-                    ]
+                        }',
+                    ],
                 ],
             ],
         ];

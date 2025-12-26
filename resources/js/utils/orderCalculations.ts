@@ -1,4 +1,5 @@
 import { Order, OrderItemData } from '@/types';
+import { usePage } from '@inertiajs/react';
 
 export interface OrderTotals {
   subTotal: number;
@@ -49,10 +50,13 @@ export const calculateOrderTotals = (
 
 export const formatCurrency = (amount: number): string => {
     try {
-        return `${Number(amount).toFixed(1)} ج.م`;
+        const { currency } = usePage().props as any;
+        const decimals = currency?.decimals || 1;
+        const symbol = currency?.symbol || 'ج.م';
+        return `${Number(amount).toFixed(decimals)} ${symbol}`;
     } catch (error) {
         console.error('Error formatting currency:', error);
-        return '0.0 ج.م';
+        return `0.0 ج.م`;
     }
 };
 

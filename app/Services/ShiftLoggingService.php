@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Shift;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ShiftLoggingService
 {
@@ -22,9 +22,10 @@ class ShiftLoggingService
     {
         $currentShift = $this->shiftService->getCurrentShift();
 
-        if (!$currentShift) {
+        if (! $currentShift) {
             // Log to default channel if no shift is active
             Log::channel('daily')->log($level, $action, $details);
+
             return;
         }
 
@@ -38,7 +39,7 @@ class ShiftLoggingService
         ];
 
         // Create shift-specific log channel
-        $channelName = 'shift_' . $currentShift->id;
+        $channelName = 'shift_'.$currentShift->id;
         $this->createShiftLogChannel($channelName, $currentShift);
 
         Log::channel($channelName)->log($level, $action, $logData);
@@ -92,7 +93,7 @@ class ShiftLoggingService
         $paymentDetails = [];
         foreach ($paymentData as $method => $amount) {
             if ($amount > 0) {
-                $paymentDetails[] = $this->translatePaymentMethod($method) . ": {$amount} جنيه";
+                $paymentDetails[] = $this->translatePaymentMethod($method).": {$amount} ".currency_name();
             }
         }
 
@@ -110,7 +111,7 @@ class ShiftLoggingService
     /**
      * Log order cancellation
      */
-    public function logOrderCancellation(int $orderId, string $reason = null): void
+    public function logOrderCancellation(int $orderId, ?string $reason = null): void
     {
         $action = "إلغاء الطلب رقم #{$orderId}";
         $details = [
@@ -124,7 +125,7 @@ class ShiftLoggingService
     /**
      * Log customer creation/update
      */
-    public function logCustomerAction(string $actionType, array $customerData, int $orderId = null): void
+    public function logCustomerAction(string $actionType, array $customerData, ?int $orderId = null): void
     {
         $actionMap = [
             'create' => 'إنشاء عميل جديد',
@@ -151,7 +152,7 @@ class ShiftLoggingService
     /**
      * Log driver actions
      */
-    public function logDriverAction(string $actionType, array $driverData, int $orderId = null): void
+    public function logDriverAction(string $actionType, array $driverData, ?int $orderId = null): void
     {
         $actionMap = [
             'create' => 'إنشاء سائق جديد',
@@ -180,7 +181,7 @@ class ShiftLoggingService
     {
         $discountText = $type === 'percent'
             ? "{$discount}%"
-            : "{$discount} جنيه";
+            : "{$discount} ".currency_name();
 
         $action = "تطبيق خصم على الطلب رقم #{$orderId}";
         $details = [
@@ -230,7 +231,7 @@ class ShiftLoggingService
             'save' => 'حفظ طلب ويب',
         ];
 
-        $action = ($actionMap[$actionType] ?? $actionType) . " رقم #{$orderId}";
+        $action = ($actionMap[$actionType] ?? $actionType)." رقم #{$orderId}";
         $details = array_merge([
             'order_id' => $orderId,
             'action_type' => $actionType,
@@ -284,7 +285,7 @@ class ShiftLoggingService
             $productId = $newItem['product_id'];
             $productName = $newItem['product_name'] ?? "المنتج رقم {$productId}";
 
-            if (!isset($oldItemsLookup[$productId])) {
+            if (! isset($oldItemsLookup[$productId])) {
                 // New item added
                 $differences[] = [
                     'type' => 'added',
@@ -327,7 +328,7 @@ class ShiftLoggingService
         // Check for removed items
         foreach ($oldItems as $oldItem) {
             $productId = $oldItem['product_id'];
-            if (!isset($newItemsLookup[$productId])) {
+            if (! isset($newItemsLookup[$productId])) {
                 $productName = $oldItem['product_name'] ?? "المنتج رقم {$productId}";
                 $differences[] = [
                     'type' => 'removed',
@@ -364,7 +365,7 @@ class ShiftLoggingService
 
         // Ensure directory exists
         $logDir = dirname($logPath);
-        if (!is_dir($logDir)) {
+        if (! is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
 
@@ -374,7 +375,7 @@ class ShiftLoggingService
                 'path' => $logPath,
                 'level' => 'info',
                 'replace_placeholders' => true,
-            ]
+            ],
         ]);
     }
 }

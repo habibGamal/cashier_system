@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\PurchaseInvoices\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class PurchaseInvoiceInfolist
 {
@@ -25,7 +25,7 @@ class PurchaseInvoiceInfolist
 
                         TextEntry::make('total')
                             ->label('إجمالي الفاتورة')
-                            ->money('EGP'),
+                            ->money(currency_code()),
 
                         TextEntry::make('closed_at')
                             ->label('الحالة')
@@ -33,7 +33,7 @@ class PurchaseInvoiceInfolist
                                 return $state ? 'مغلقة' : 'مفتوحة';
                             })
                             ->badge()
-                            ->color(fn(?string $state): string => $state ? 'success' : 'warning'),
+                            ->color(fn (?string $state): string => $state ? 'success' : 'warning'),
 
                         TextEntry::make('created_at')
                             ->label('تاريخ الإنشاء')

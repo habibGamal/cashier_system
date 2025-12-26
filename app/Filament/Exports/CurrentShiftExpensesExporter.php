@@ -2,9 +2,9 @@
 
 namespace App\Filament\Exports;
 
-use App\Models\Shift;
-use App\Models\Expense;
 use App\Models\ExpenceType;
+use App\Models\Expense;
+use App\Models\Shift;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -27,18 +27,17 @@ class CurrentShiftExpensesExporter extends Exporter
                 }),
 
             ExportColumn::make('total_amount')
-                ->label('الإجمالي (جنيه)')
+                ->label('الإجمالي ('.currency_name().')')
                 ->state(function ($record) {
                     // This will be populated by the widget's query
                     return number_format($record->total_amount ?? 0, 2);
                 }),
 
             ExportColumn::make('avg_month_rate')
-                ->label('الميزانية الشهرية (جنيه)')
+                ->label('الميزانية الشهرية ('.currency_name().')')
                 ->state(function ($record) {
                     return $record->avg_month_rate ? number_format((float) $record->avg_month_rate, 2) : 'غير محدد';
                 }),
-
 
             ExportColumn::make('individual_expenses')
                 ->label('تفاصيل المصروفات')
@@ -48,7 +47,7 @@ class CurrentShiftExpensesExporter extends Exporter
                         ->where('end_at', null)
                         ->first();
 
-                    if (!$currentShift) {
+                    if (! $currentShift) {
                         return 'لا توجد شفت مفتوحة';
                     }
 
@@ -64,7 +63,8 @@ class CurrentShiftExpensesExporter extends Exporter
                         $notes = $expense->notes ? " ({$expense->notes})" : '';
                         $date = $expense->created_at->format('d/m/Y H:i');
                         $amount = number_format((float) $expense->amount, 2);
-                        return "{$amount} جنيه - {$date}{$notes}";
+
+                        return "{$amount} ".currency_name()." - {$date}{$notes}";
                     })->implode(' | ');
                 }),
         ];
@@ -72,10 +72,10 @@ class CurrentShiftExpensesExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'تم إكمال تصدير مصروفات الشفت الحالي وتم تصدير ' . number_format($export->successful_rows) . ' ' . ($export->successful_rows == 1 ? 'نوع مصروف' : 'نوع مصروف') . '.';
+        $body = 'تم إكمال تصدير مصروفات الشفت الحالي وتم تصدير '.number_format($export->successful_rows).' '.($export->successful_rows == 1 ? 'نوع مصروف' : 'نوع مصروف').'.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' فشل في تصدير ' . number_format($failedRowsCount) . ' ' . ($failedRowsCount == 1 ? 'نوع مصروف' : 'نوع مصروف') . '.';
+            $body .= ' فشل في تصدير '.number_format($failedRowsCount).' '.($failedRowsCount == 1 ? 'نوع مصروف' : 'نوع مصروف').'.';
         }
 
         return $body;

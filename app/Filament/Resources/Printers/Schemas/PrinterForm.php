@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources\Printers\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Actions;
-use Filament\Actions\Action;
-use Filament\Schemas\Components\Wizard\Step;
-use Exception;
-use Filament\Forms\Components\Hidden;
-use App\Models\Category;
 use App\Enums\ProductType;
+use App\Models\Category;
 use App\Models\Product;
 use App\Services\PrinterScanService;
+use Exception;
+use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Schema;
 
 class PrinterForm
 {
@@ -66,12 +66,13 @@ class PrinterForm
                                                     ->action(function (array $data, $livewire, $set, $get) {
                                                         $scanService = app(PrinterScanService::class);
 
-                                                        if (!$scanService->isNmapAvailable()) {
+                                                        if (! $scanService->isNmapAvailable()) {
                                                             Notification::make()
                                                                 ->title('خطأ')
                                                                 ->body('برنامج nmap غير متوفر على النظام')
                                                                 ->danger()
                                                                 ->send();
+
                                                             return;
                                                         }
 
@@ -82,18 +83,18 @@ class PrinterForm
 
                                                             Notification::make()
                                                                 ->title('تم البحث بنجاح')
-                                                                ->body('تم العثور على ' . count($printers) . ' طابعة محتملة')
+                                                                ->body('تم العثور على '.count($printers).' طابعة محتملة')
                                                                 ->success()
                                                                 ->send();
                                                         } catch (Exception $e) {
                                                             Notification::make()
                                                                 ->title('خطأ في البحث')
-                                                                ->body('حدث خطأ أثناء البحث: ' . $e->getMessage())
+                                                                ->body('حدث خطأ أثناء البحث: '.$e->getMessage())
                                                                 ->danger()
                                                                 ->send();
                                                         }
-                                                    })
-                                            ])
+                                                    }),
+                                            ]),
                                         ]),
 
                                     Step::make('printer_selection')
@@ -119,14 +120,14 @@ class PrinterForm
                                                                         $set('status', 'متصل');
                                                                         Notification::make()
                                                                             ->title('نجاح')
-                                                                            ->body('تم الاتصال بالطابعة بنجاح: ' . $state)
+                                                                            ->body('تم الاتصال بالطابعة بنجاح: '.$state)
                                                                             ->success()
                                                                             ->send();
                                                                     } catch (Exception $e) {
                                                                         $set('status', 'غير متصل');
                                                                         Notification::make()
                                                                             ->title('فشل الاتصال')
-                                                                            ->body('تعذر الاتصال بالطابعة: ' . $e->getMessage())
+                                                                            ->body('تعذر الاتصال بالطابعة: '.$e->getMessage())
                                                                             ->danger()
                                                                             ->send();
                                                                     }
@@ -146,14 +147,14 @@ class PrinterForm
                                                                     $set('status', 'متصل');
                                                                     Notification::make()
                                                                         ->title('نجاح')
-                                                                        ->body('تم الاتصال بالطابعة بنجاح: ' . $state['ip'])
+                                                                        ->body('تم الاتصال بالطابعة بنجاح: '.$state['ip'])
                                                                         ->success()
                                                                         ->send();
                                                                 } catch (Exception $e) {
                                                                     $set('status', 'غير متصل');
                                                                     Notification::make()
                                                                         ->title('فشل الاتصال')
-                                                                        ->body('تعذر الاتصال بالطابعة: ' . $e->getMessage())
+                                                                        ->body('تعذر الاتصال بالطابعة: '.$e->getMessage())
                                                                         ->danger()
                                                                         ->send();
                                                                 }
@@ -161,12 +162,12 @@ class PrinterForm
                                                         Action::make('select')
                                                             ->label('تحديد هذه الطابعة')
                                                             ->icon('heroicon-o-check')
-                                                            ->action(function (array $state, $data,$get, $set) {
-                                                                if (!empty($state['ip'])) {
+                                                            ->action(function (array $state, $data, $get, $set) {
+                                                                if (! empty($state['ip'])) {
                                                                     $set('../../selected_ip', $state['ip']);
                                                                     Notification::make()
                                                                         ->title('تم التحديد')
-                                                                        ->body('تم تحديد الطابعة: ' . $state['ip'])
+                                                                        ->body('تم تحديد الطابعة: '.$state['ip'])
                                                                         ->success()
                                                                         ->send();
                                                                 } else {
@@ -176,8 +177,8 @@ class PrinterForm
                                                                         ->warning()
                                                                         ->send();
                                                                 }
-                                                            })
-                                                    ])
+                                                            }),
+                                                    ]),
                                                 ])
                                                 ->columnSpanFull()
                                                 ->columns(4)
@@ -186,17 +187,17 @@ class PrinterForm
                                                 ->disableItemCreation(),
 
                                             Hidden::make('selected_ip')
-                                                ->reactive()
-                                        ])
+                                                ->reactive(),
+                                        ]),
                                 ])
                                 ->action(function (array $data, $livewire, $set) {
                                     // Set the selected IP to the main form's ip_address field
-                                    if (!empty($data['selected_ip'])) {
+                                    if (! empty($data['selected_ip'])) {
                                         $set('ip_address', $data['selected_ip']);
 
                                         Notification::make()
                                             ->title('تم التحديد')
-                                            ->body('تم تحديد الطابعة: ' . $data['selected_ip'])
+                                            ->body('تم تحديد الطابعة: '.$data['selected_ip'])
                                             ->success()
                                             ->send();
                                     } else {
@@ -206,9 +207,9 @@ class PrinterForm
                                             ->warning()
                                             ->send();
                                     }
-                                })
+                                }),
                         ])
-                            ->alignEnd()
+                            ->alignEnd(),
                     ]),
 
                 CheckboxList::make('categories')
@@ -243,9 +244,9 @@ class PrinterForm
                                 ->orderBy('category_id');
                         }
                     )
-                    ->getOptionLabelFromRecordUsing(fn(Product $product) => "$product->name ({$product->category?->name})")
+                    ->getOptionLabelFromRecordUsing(fn (Product $product) => "$product->name ({$product->category?->name})")
                     ->bulkToggleable()
-                    ->columns(3)
+                    ->columns(3),
             ]);
     }
 }

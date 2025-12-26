@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\ManufacturedProducts;
 
+use App\Enums\ProductType;
+use App\Filament\Resources\ManufacturedProducts\Pages\CreateManufacturedProduct;
+use App\Filament\Resources\ManufacturedProducts\Pages\EditManufacturedProduct;
+use App\Filament\Resources\ManufacturedProducts\Pages\ListManufacturedProducts;
+use App\Filament\Resources\ManufacturedProducts\Pages\ViewManufacturedProduct;
 use App\Filament\Resources\ManufacturedProducts\Schemas\ManufacturedProductForm;
 use App\Filament\Resources\ManufacturedProducts\Tables\ManufacturedProductsTable;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\ManufacturedProducts\Pages\ListManufacturedProducts;
-use App\Filament\Resources\ManufacturedProducts\Pages\CreateManufacturedProduct;
-use App\Filament\Resources\ManufacturedProducts\Pages\ViewManufacturedProduct;
-use App\Filament\Resources\ManufacturedProducts\Pages\EditManufacturedProduct;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Product;
-use App\Enums\ProductType;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Traits\AdminAccess;
 
 class ManufacturedProductResource extends Resource
 {
@@ -22,9 +22,9 @@ class ManufacturedProductResource extends Resource
 
     protected static ?string $model = Product::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المنتجات';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المنتجات';
 
     protected static ?int $navigationSort = 2;
 

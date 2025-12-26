@@ -9,9 +9,11 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class HourlyPerformanceChartWidget extends ChartWidget
 {
     protected ?string $heading = 'أداء المبيعات حسب الساعة';
+
     protected ?string $description = 'تحليل المبيعات والطلبات على مدار 24 ساعة';
 
     protected ?string $maxHeight = '400px';
+
     protected static bool $isLazy = false;
 
     use InteractsWithPageFilters;
@@ -33,6 +35,7 @@ class HourlyPerformanceChartWidget extends ChartWidget
         // Ensure we have data for all 24 hours
         $allHours = collect(range(0, 23))->map(function ($hour) use ($hourlyData) {
             $existing = $hourlyData->firstWhere('hour', $hour);
+
             return $existing ?: (object) [
                 'hour' => $hour,
                 'hour_label' => sprintf('%02d:00', $hour),
@@ -51,7 +54,7 @@ class HourlyPerformanceChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'المبيعات (ج.م)',
+                    'label' => 'المبيعات ('.currency_symbol().')',
                     'data' => $salesData,
                     'backgroundColor' => 'rgba(16, 185, 129, 0.2)',
                     'borderColor' => 'rgb(16, 185, 129)',
@@ -102,7 +105,7 @@ class HourlyPerformanceChartWidget extends ChartWidget
                     'position' => 'left',
                     'title' => [
                         'display' => true,
-                        'text' => 'المبيعات (ج.م)',
+                        'text' => 'المبيعات ('.currency_symbol().')',
                     ],
                 ],
                 'y1' => [

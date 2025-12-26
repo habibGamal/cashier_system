@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { router, Link } from '@inertiajs/react';
+import { router, Link, usePage } from '@inertiajs/react';
 import {
     Button,
     Input,
@@ -27,6 +27,7 @@ import {
 } from '@ant-design/icons';
 import type { ReturnOrder, Order } from '@/types';
 import axios from 'axios';
+import { formatCurrency } from '@/utils/currency';
 
 const { confirm } = Modal;
 
@@ -169,7 +170,7 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
             key: 'price',
             align: 'center' as const,
             render: (price: number) => (
-                <Typography.Text>{Number(price).toFixed(2)} ج.م</Typography.Text>
+                <Typography.Text>{formatCurrency(price)}</Typography.Text>
             ),
         },
         {
@@ -332,7 +333,7 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
                                                         strong
                                                         style={{ color: '#52c41a' }}
                                                     >
-                                                        {Number(returnOrder.refund_amount).toFixed(2)} ج.م
+                                                        {formatCurrency(returnOrder.refund_amount)}
                                                     </Typography.Text>
                                                 </Descriptions.Item>
                                                 <Descriptions.Item label="التاريخ">
@@ -408,7 +409,7 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
                                 </Descriptions.Item>
                                 <Descriptions.Item label="الإجمالي">
                                     <Typography.Text strong style={{ color: '#52c41a' }}>
-                                        {Number(selectedOrder.total)?.toFixed(2)} ج.م
+                                        {formatCurrency(selectedOrder.total)}
                                     </Typography.Text>
                                 </Descriptions.Item>
                             </Descriptions>

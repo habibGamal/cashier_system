@@ -28,13 +28,11 @@ class MinimumStockFinancialStats extends BaseWidget
     {
         $recommendations = $this->minimumStockReportService->getPurchaseRecommendations();
 
-
         return [
-            Stat::make('التكلفة المقدرة للتجديد', number_format($recommendations['totalValueBelowMinStock'], 2).' جنيه')
+            Stat::make('التكلفة المقدرة للتجديد', format_money($recommendations['totalValueBelowMinStock']))
                 ->description('تكلفة شراء المنتجات المطلوبة')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
-
 
             Stat::make('أولوية التجديد', $recommendations['zeroStockCount'] > 0 ? 'عاجل' : 'متوسط')
                 ->description($recommendations['zeroStockCount'].' منتج نفد تماماً')

@@ -9,9 +9,11 @@ use Filament\Widgets\Concerns\InteractsWithPageFilters;
 class ChannelMarketShareWidget extends ChartWidget
 {
     protected ?string $heading = 'الحصة السوقية للقنوات';
+
     protected ?string $description = 'توزيع الإيرادات والطلبات حسب قنوات البيع';
 
     protected ?string $maxHeight = '350px';
+
     protected static bool $isLazy = false;
 
     use InteractsWithPageFilters;
@@ -50,7 +52,7 @@ class ChannelMarketShareWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'الإيرادات (ج.م)',
+                    'label' => 'الإيرادات ('.currency_symbol().')',
                     'data' => $revenueData,
                     'backgroundColor' => array_slice($colors, 0, count($labels)),
                     'borderColor' => array_slice($colors, 0, count($labels)),
@@ -84,7 +86,7 @@ class ChannelMarketShareWidget extends ChartWidget
                         'label' => "function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return context.label + ': ' + context.parsed.toLocaleString() + ' ج.م (' + percentage + '%)';
+                            return context.label + ': ' + context.parsed.toLocaleString() + ' ".currency_symbol()." (' + percentage + '%)';
                         }",
                     ],
                 ],

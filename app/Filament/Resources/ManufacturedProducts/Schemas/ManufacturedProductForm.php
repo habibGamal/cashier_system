@@ -2,18 +2,17 @@
 
 namespace App\Filament\Resources\ManufacturedProducts\Schemas;
 
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Repeater\TableColumn;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Actions;
 use App\Filament\Actions\Forms\ProductComponentsImporterAction;
 use App\Models\Category;
-use App\Models\Printer;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ManufacturedProductForm
 {
@@ -41,12 +40,12 @@ class ManufacturedProductForm
                             ->label('السعر')
                             ->required()
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                         TextInput::make('cost')
                             ->label('التكلفة')
                             ->required()
                             ->numeric()
-                            ->prefix('ج.م'),
+                            ->prefix(currency_symbol()),
                         TextInput::make('min_stock')
                             ->label('الحد الأدنى للمخزون')
                             ->required()
@@ -94,18 +93,18 @@ class ManufacturedProductForm
                 Section::make('مكونات المنتج')
                     ->columnSpan('full')
                     ->extraAttributes([
-                        'x-init' => <<<JS
+                        'x-init' => <<<'JS'
                                 const updateTotal = () => {
-                                    let items = \$wire.data.productComponents;
+                                    let items = $wire.data.productComponents;
                                     if (!Array.isArray(items)) {
                                         items = Object.values(items);
                                     }
-                                    \$wire.data.cost = items.reduce((total, item) => total + (item.quantity * item.cost || 0), 0);
+                                    $wire.data.cost = items.reduce((total, item) => total + (item.quantity * item.cost || 0), 0);
                                     items.forEach(item => {
                                         item.total = item.quantity * item.cost || 0;
                                     });
                                 };
-                                \$watch('\$wire.data', value => {
+                                $watch('$wire.data', value => {
                                     updateTotal();
                                 })
                                 updateTotal();
@@ -113,13 +112,13 @@ class ManufacturedProductForm
                     ])
                     ->schema([
                         Actions::make([
-                            ProductComponentsImporterAction::make('importComponents')
+                            ProductComponentsImporterAction::make('importComponents'),
                         ])
                             ->alignStart(),
 
                         Repeater::make('productComponents')
                             ->label('المكونات')
-                            ->relationship('productComponents', fn($query) => $query->with('component.category'))
+                            ->relationship('productComponents', fn ($query) => $query->with('component.category'))
                             ->table([
                                 TableColumn::make('المكون')->width('300px'),
                                 TableColumn::make('الكمية')->width('120px'),
@@ -134,7 +133,7 @@ class ManufacturedProductForm
                                 TextInput::make('component_name')
                                     ->label('اسم المكون')
                                     ->formatStateUsing(
-                                        fn($record, $state) => $state ?? $record->component->name
+                                        fn ($record, $state) => $state ?? $record->component->name
                                     )
                                     ->disabled()
                                     ->dehydrated(false),
@@ -149,7 +148,7 @@ class ManufacturedProductForm
                                 TextInput::make('cost')
                                     ->label('التكلفة')
                                     ->formatStateUsing(
-                                        fn($record, $state) => $state ?? $record->component->cost
+                                        fn ($record, $state) => $state ?? $record->component->cost
                                     )
                                     ->disabled()
                                     ->dehydrated(false),
@@ -157,7 +156,7 @@ class ManufacturedProductForm
                                 TextInput::make('unit')
                                     ->label('الوحدة')
                                     ->formatStateUsing(
-                                        fn($record, $state) => $state ?? $record->component->unit
+                                        fn ($record, $state) => $state ?? $record->component->unit
                                     )
                                     ->disabled()
                                     ->dehydrated(false),
@@ -170,7 +169,7 @@ class ManufacturedProductForm
                                 TextInput::make('category_name')
                                     ->label('التكلفة')
                                     ->formatStateUsing(
-                                        fn($record, $state) => $state ?? $record->component->category->name
+                                        fn ($record, $state) => $state ?? $record->component->category->name
                                     )
                                     ->disabled()
                                     ->dehydrated(false),

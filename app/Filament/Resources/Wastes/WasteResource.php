@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources\Wastes;
 
+use App\Filament\Resources\Wastes\Pages\CreateWaste;
+use App\Filament\Resources\Wastes\Pages\EditWaste;
+use App\Filament\Resources\Wastes\Pages\ListWastes;
+use App\Filament\Resources\Wastes\Pages\ViewWaste;
 use App\Filament\Resources\Wastes\Schemas\WasteForm;
 use App\Filament\Resources\Wastes\Schemas\WasteInfolist;
 use App\Filament\Resources\Wastes\Tables\WastesTable;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\Wastes\Pages\ListWastes;
-use App\Filament\Resources\Wastes\Pages\CreateWaste;
-use App\Filament\Resources\Wastes\Pages\ViewWaste;
-use App\Filament\Resources\Wastes\Pages\EditWaste;
+use App\Filament\Traits\AdminAccess;
 use App\Models\Waste;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Traits\AdminAccess;
 
 class WasteResource extends Resource
 {
@@ -22,7 +22,7 @@ class WasteResource extends Resource
 
     protected static ?string $model = Waste::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-trash';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-trash';
 
     protected static ?string $navigationLabel = 'التالف';
 
@@ -30,7 +30,7 @@ class WasteResource extends Resource
 
     protected static ?string $pluralModelLabel = 'سجلات التالف';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'إدارة المخزون';
+    protected static string|\UnitEnum|null $navigationGroup = 'إدارة المخزون';
 
     public static function form(Schema $schema): Schema
     {

@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Stocktakings\Pages;
 
-use Filament\Actions\EditAction;
 use App\Filament\Actions\CloseStocktakingAction;
-use App\Filament\Resources\Stocktakings\StocktakingResource;
 use App\Filament\Resources\Stocktakings\RelationManagers\ItemsRelationManager;
-use Filament\Actions;
+use App\Filament\Resources\Stocktakings\StocktakingResource;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewStocktaking extends ViewRecord

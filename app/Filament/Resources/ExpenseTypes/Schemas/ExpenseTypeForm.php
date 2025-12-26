@@ -16,10 +16,10 @@ class ExpenseTypeForm
                     ->required()
                     ->maxLength(255),
                 TextInput::make('avg_month_rate')
-                    ->label('متوسط الميزانية الشهرية (جنيه)')
+                    ->label('متوسط الميزانية الشهرية ('.currency_name().')')
                     ->numeric()
                     ->step(0.01)
-                    ->suffix('جنيه')
+                    ->suffix(currency_name())
                     ->helperText('متوسط المبلغ المتوقع شهرياً لهذا النوع من المصروفات')
                     ->nullable(),
             ]);

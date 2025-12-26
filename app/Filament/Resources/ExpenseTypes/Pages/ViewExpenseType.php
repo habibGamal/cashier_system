@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ExpenseTypes\Pages;
 
-use Filament\Actions\EditAction;
 use App\Filament\Resources\ExpenseTypes\ExpenseTypeResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewExpenseType extends ViewRecord

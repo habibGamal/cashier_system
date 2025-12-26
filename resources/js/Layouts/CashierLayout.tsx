@@ -17,6 +17,7 @@ import {
     ConfigProvider,
 } from "antd";
 import { ReactNode, useLayoutEffect, useEffect } from "react";
+import { useCurrency, formatMoneyStatic } from '@/utils/currency';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
@@ -29,6 +30,7 @@ interface CashierLayoutProps {
 export default function CashierLayout({ children, title }: CashierLayoutProps) {
     const { auth } = usePage().props;
     const user = auth.user as User;
+    const currency = useCurrency();
 
     const logout = () => {
         router.post("/logout", undefined, {
@@ -118,7 +120,7 @@ export default function CashierLayout({ children, title }: CashierLayoutProps) {
                                 العميل: {order.customer_name}
                             </Typography.Text>
                             <Typography.Text>
-                                الإجمالي: {order.total} جنيه
+                                الإجمالي: {formatMoneyStatic(order.total, currency)}
                             </Typography.Text>
                             <Button
                                 type="primary"

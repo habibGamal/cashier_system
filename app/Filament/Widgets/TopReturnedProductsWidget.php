@@ -5,8 +5,8 @@ namespace App\Filament\Widgets;
 use App\Services\ProductsSalesReportService;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 class TopReturnedProductsWidget extends BaseWidget
@@ -14,6 +14,7 @@ class TopReturnedProductsWidget extends BaseWidget
     use InteractsWithPageFilters;
 
     protected static bool $isLazy = false;
+
     protected ?string $pollingInterval = null;
 
     protected ProductsSalesReportService $productsReportService;
@@ -56,13 +57,13 @@ class TopReturnedProductsWidget extends BaseWidget
 
                 Tables\Columns\TextColumn::make('total_returned_value')
                     ->label('قيمة المرتجعات')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->color('danger'),
 
                 Tables\Columns\TextColumn::make('total_refund_amount')
                     ->label('المبلغ المسترد')
-                    ->money('EGP')
+                    ->money(currency_code())
                     ->sortable()
                     ->color('warning'),
             ])

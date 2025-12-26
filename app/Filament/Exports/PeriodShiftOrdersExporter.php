@@ -2,10 +2,10 @@
 
 namespace App\Filament\Exports;
 
-use App\Models\Order;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
+use App\Models\Order;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -24,7 +24,7 @@ class PeriodShiftOrdersExporter extends Exporter
                 ->label('الشفت')
                 ->state(function ($record) {
                     return $record->shift ?
-                        'شفت ' . $record->shift->start_at->format('d/m/Y H:i') :
+                        'شفت '.$record->shift->start_at->format('d/m/Y H:i') :
                         'غير محدد';
                 }),
 
@@ -43,27 +43,27 @@ class PeriodShiftOrdersExporter extends Exporter
                 }),
 
             ExportColumn::make('sub_total')
-                ->label('المجموع الفرعي (جنيه)')
+                ->label('المجموع الفرعي ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('tax')
-                ->label('الضريبة (جنيه)')
+                ->label('الضريبة ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('service')
-                ->label('الخدمة (جنيه)')
+                ->label('الخدمة ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('discount')
-                ->label('الخصم (جنيه)')
+                ->label('الخصم ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('total')
-                ->label('الإجمالي (جنيه)')
+                ->label('الإجمالي ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('profit')
-                ->label('الربح (جنيه)')
+                ->label('الربح ('.currency_name().')')
                 ->formatStateUsing(fn ($state) => number_format($state ?? 0, 2)),
 
             ExportColumn::make('payment_methods')
@@ -71,36 +71,40 @@ class PeriodShiftOrdersExporter extends Exporter
                 ->state(function ($record) {
                     $methods = $record->payments
                         ->pluck('method')
-                        ->map(fn($method) => $method instanceof PaymentMethod ? $method->label() : $method)
+                        ->map(fn ($method) => $method instanceof PaymentMethod ? $method->label() : $method)
                         ->unique()
                         ->implode(', ');
+
                     return $methods ?: 'غير محدد';
                 }),
 
             ExportColumn::make('cash_amount')
-                ->label('مدفوع كاش (جنيه)')
+                ->label('مدفوع كاش ('.currency_name().')')
                 ->state(function ($record) {
                     $amount = $record->payments
                         ->where('method', PaymentMethod::CASH)
                         ->sum('amount');
+
                     return number_format($amount, 2);
                 }),
 
             ExportColumn::make('card_amount')
-                ->label('مدفوع فيزا (جنيه)')
+                ->label('مدفوع فيزا ('.currency_name().')')
                 ->state(function ($record) {
                     $amount = $record->payments
                         ->where('method', PaymentMethod::CARD)
                         ->sum('amount');
+
                     return number_format($amount, 2);
                 }),
 
             ExportColumn::make('talabat_card_amount')
-                ->label('مدفوع بطاقة طلبات (جنيه)')
+                ->label('مدفوع بطاقة طلبات ('.currency_name().')')
                 ->state(function ($record) {
                     $amount = $record->payments
                         ->where('method', PaymentMethod::TALABAT_CARD)
                         ->sum('amount');
+
                     return number_format($amount, 2);
                 }),
 
@@ -118,10 +122,10 @@ class PeriodShiftOrdersExporter extends Exporter
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'تم إكمال تصدير طلبات فترة الشفتات وتم تصدير ' . number_format($export->successful_rows) . ' ' . ($export->successful_rows == 1 ? 'طلب' : 'طلب') . '.';
+        $body = 'تم إكمال تصدير طلبات فترة الشفتات وتم تصدير '.number_format($export->successful_rows).' '.($export->successful_rows == 1 ? 'طلب' : 'طلب').'.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' فشل في تصدير ' . number_format($failedRowsCount) . ' ' . ($failedRowsCount == 1 ? 'طلب' : 'طلب') . '.';
+            $body .= ' فشل في تصدير '.number_format($failedRowsCount).' '.($failedRowsCount == 1 ? 'طلب' : 'طلب').'.';
         }
 
         return $body;

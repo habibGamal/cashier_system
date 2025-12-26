@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\Drivers\Pages;
 
-use Filament\Actions\EditAction;
-use App\Filament\Resources\Drivers\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\Drivers\DriverResource;
-use Filament\Actions;
+use App\Filament\Resources\Drivers\RelationManagers\OrdersRelationManager;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewDriver extends ViewRecord

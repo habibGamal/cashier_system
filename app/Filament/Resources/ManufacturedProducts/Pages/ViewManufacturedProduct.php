@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ManufacturedProducts\Pages;
 
-use Filament\Actions\EditAction;
 use App\Filament\Resources\ManufacturedProducts\ManufacturedProductResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewManufacturedProduct extends ViewRecord

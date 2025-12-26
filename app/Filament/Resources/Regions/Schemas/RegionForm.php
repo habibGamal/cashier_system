@@ -19,7 +19,7 @@ class RegionForm
                     ->label('تكلفة التوصيل')
                     ->numeric()
                     ->default(0)
-                    ->prefix('ج.م'),
+                    ->prefix(currency_symbol()),
             ]);
     }
 }

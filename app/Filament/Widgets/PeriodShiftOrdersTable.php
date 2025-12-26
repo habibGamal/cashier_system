@@ -2,30 +2,28 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Actions\ExportAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\ViewAction;
-use Filament\Actions\Action;
-use App\Services\PrintService;
-use App\Services\ShiftsReportService;
-use App\Models\Order;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
 use App\Filament\Exports\PeriodShiftOrdersExporter;
+use App\Models\Order;
+use App\Services\PrintService;
+use App\Services\ShiftsReportService;
 use Carbon\Carbon;
-use Filament\Tables;
+use Filament\Actions\Action;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Widgets\TableWidget as BaseWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 
 class PeriodShiftOrdersTable extends BaseWidget
 {
     use InteractsWithPageFilters;
-
 
     protected static bool $isLazy = false;
 
@@ -43,8 +41,7 @@ class PeriodShiftOrdersTable extends BaseWidget
     }
 
     /**
-     * @param array $filter like ['status' => 'completed']
-     * @return void
+     * @param  array  $filter  like ['status' => 'completed']
      */
     public function updateTableFilters(array $filter): void
     {
@@ -62,7 +59,7 @@ class PeriodShiftOrdersTable extends BaseWidget
             $shiftIds = $this->pageFilters['shifts'] ?? [];
             $query = Order::query()
                 ->with(['customer', 'user', 'payments', 'shift'])
-                ->when(!empty($shiftIds), function (Builder $query) use ($shiftIds) {
+                ->when(! empty($shiftIds), function (Builder $query) use ($shiftIds) {
                     return $query->whereIn('shift_id', $shiftIds);
                 });
         } else {
@@ -73,7 +70,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                 ->whereHas('shift', function (Builder $query) use ($startDate, $endDate) {
                     $query->whereBetween('created_at', [
                         Carbon::parse($startDate)->startOfDay(),
-                        Carbon::parse($endDate)->endOfDay()
+                        Carbon::parse($endDate)->endOfDay(),
                     ]);
                 });
         }
@@ -89,7 +86,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                     ->extraAttributes([
                         'id' => 'orders_table',
                     ])
-                    ->fileName(fn() => 'period-shift-orders-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                    ->fileName(fn () => 'period-shift-orders-'.now()->format('Y-m-d-H-i-s').'.xlsx'),
             ])
             ->columns([
                 TextColumn::make('id')
@@ -127,27 +124,27 @@ class PeriodShiftOrdersTable extends BaseWidget
                 TextColumn::make('sub_total')
                     ->label('المجموع الفرعي')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter(),
 
                 TextColumn::make('tax')
                     ->label('الضريبة')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->toggleable(),
 
                 TextColumn::make('service')
                     ->label('الخدمة')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->alignCenter()
                     ->toggleable(),
 
                 TextColumn::make('discount')
                     ->label('الخصم')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->color('danger')
                     ->alignCenter()
                     ->toggleable(),
@@ -155,7 +152,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                 TextColumn::make('total')
                     ->label('الإجمالي')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->color('success')
                     ->weight('bold')
                     ->alignCenter(),
@@ -163,7 +160,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                 TextColumn::make('profit')
                     ->label('الربح')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' جنيه')
+                    ->suffix(' '.currency_name())
                     ->color('success')
                     ->alignCenter()
                     ->toggleable(),
@@ -173,9 +170,10 @@ class PeriodShiftOrdersTable extends BaseWidget
                     ->state(function ($record) {
                         $methods = $record->payments
                             ->pluck('method')
-                            ->map(fn($method) => $method->label())
+                            ->map(fn ($method) => $method->label())
                             ->unique()
                             ->implode(', ');
+
                         return $methods ?: 'غير محدد';
                     })
                     ->color('primary')
@@ -187,6 +185,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                         $amount = $record->payments
                             ->where('method', PaymentMethod::CASH)
                             ->sum('amount');
+
                         return $amount > 0 ? number_format($amount, 2) : 'غير محدد';
                     })
                     ->color('primary')
@@ -198,6 +197,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                         $amount = $record->payments
                             ->where('method', PaymentMethod::CARD)
                             ->sum('amount');
+
                         return $amount > 0 ? number_format($amount, 2) : 'غير محدد';
                     })
                     ->color('primary')
@@ -209,6 +209,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                         $amount = $record->payments
                             ->where('method', PaymentMethod::TALABAT_CARD)
                             ->sum('amount');
+
                         return $amount > 0 ? number_format($amount, 2) : 'غير محدد';
                     })
                     ->color('primary')
@@ -242,7 +243,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                     ->query(function (Builder $query, array $data): Builder {
                         return $query->when(
                             $data['value'],
-                            fn(Builder $query, $value): Builder => $query->whereHas('payments', function (Builder $subQuery) use ($value) {
+                            fn (Builder $query, $value): Builder => $query->whereHas('payments', function (Builder $subQuery) use ($value) {
                                 $subQuery->where('method', $value);
                             })
                         );
@@ -251,9 +252,9 @@ class PeriodShiftOrdersTable extends BaseWidget
                 TernaryFilter::make('has_discount')
                     ->label('يحتوي على خصم')
                     ->queries(
-                        true: fn(Builder $query) => $query->where('discount', '>', 0),
-                        false: fn(Builder $query) => $query->where('discount', '<=', 0),
-                        blank: fn(Builder $query) => $query,
+                        true: fn (Builder $query) => $query->where('discount', '>', 0),
+                        false: fn (Builder $query) => $query->where('discount', '<=', 0),
+                        blank: fn (Builder $query) => $query,
                     ),
             ])
             ->defaultSort('created_at', 'desc')
@@ -266,7 +267,7 @@ class PeriodShiftOrdersTable extends BaseWidget
                 ViewAction::make()
                     ->label('عرض')
                     ->icon('heroicon-o-eye')
-                    ->url(fn(Order $record): string => route('filament.admin.resources.orders.view', $record))
+                    ->url(fn (Order $record): string => route('filament.admin.resources.orders.view', $record))
                     ->openUrlInNewTab(),
                 Action::make('print')
                     ->label('طباعة')
@@ -274,10 +275,10 @@ class PeriodShiftOrdersTable extends BaseWidget
                     ->color('primary')
                     ->action(function ($record) {
                         app(PrintService::class)->printOrderReceipt($record, []);
-                    })
+                    }),
             ])
             ->recordAction(ViewAction::class)
-            ->recordUrl(fn(Order $record): string => route('filament.admin.resources.orders.view', $record))
+            ->recordUrl(fn (Order $record): string => route('filament.admin.resources.orders.view', $record))
             ->toolbarActions([]);
     }
 }
