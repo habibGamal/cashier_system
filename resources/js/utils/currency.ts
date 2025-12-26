@@ -94,3 +94,9 @@ export const formatMoneyStatic = (
 
     return formatted;
 };
+
+/**
+ * Format currency (alias for formatMoney)
+ * Required for compatibility with files expecting formatCurrency export
+ */
+export const formatCurrency = formatMoney;
