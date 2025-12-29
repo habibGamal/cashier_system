@@ -19,6 +19,13 @@ if ! apk info -e font-dejavu > /dev/null 2>&1; then
 else
   echo "✔ font-dejavu is already installed."
 fi
+if ! apk info -e font-freefont-ttf > /dev/null 2>&1; then
+  echo "🖋 Installing font-freefont-ttf..."
+  apk update && apk add font-freefont-ttf
+  echo "✅ font-freefont-ttf installed successfully."
+else
+  echo "✔ font-freefont-ttf is already installed."
+fi
 cd /var/www/turbo_restaurant/larament
 composer install
 npm install

@@ -64,8 +64,8 @@
         }
 
         body {
-            /* font-family: sans-serif; */
-            font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif;
+            font-family: "FreeSans",sans-serif;
+            /* font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif; */
             direction: rtl;
             font-size: 22px;
             font-weight: bold;
