@@ -19,9 +19,9 @@ if ! apk info -e font-dejavu > /dev/null 2>&1; then
 else
   echo "✔ font-dejavu is already installed."
 fi
-if ! apk info -e font-freefont-ttf > /dev/null 2>&1; then
-  echo "🖋 Installing font-freefont-ttf..."
-  apk update && apk add font-freefont-ttf
+if ! apk info -e font-freefont > /dev/null 2>&1; then
+  echo "🖋 Installing font-freefont..."
+  apk update && apk add font-freefont
   echo "✅ font-freefont-ttf installed successfully."
 else
   echo "✔ font-freefont-ttf is already installed."

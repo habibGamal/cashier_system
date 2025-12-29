@@ -44,6 +44,11 @@
         return "data:{$mimeType};base64,{$base64}";
     };
     $footerLogo = $imgToDataUri(public_path('images/turbo.png'));
+
+    // Format number: hide .00 decimals
+    $formatNumber = function($number) {
+        return fmod($number, 1) == 0 ? number_format($number, 0) : number_format($number, 2);
+    };
 @endphp
 
 <!DOCTYPE html>
@@ -64,11 +69,11 @@
         }
 
         body {
-            font-family: "FreeSans",sans-serif;
-            /* font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif; */
+            /* font-family: sans-serif; */
+            font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif;
             direction: rtl;
             font-size: 22px;
-            font-weight: bold;
+            /* font-weight: bold; */
             line-height: 1.4;
             color: black;
             background: white;
@@ -116,7 +121,11 @@
             padding: 8px;
             text-align: center;
             word-break: break-word;
-            font-size: 20px;
+            font-size: 18px;
+        }
+
+        td {
+            font-size: 16px;
         }
 
         th {
@@ -126,7 +135,7 @@
 
         .product-cell {
             text-align: right;
-            max-width: 200px;
+            max-width: 150px;
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
@@ -224,17 +233,17 @@
                     <tr>
                         <td class="product-cell">{{ $item->product->name }}</td>
                         <td class="number-cell">{{ $item->quantity }}</td>
-                        <td class="number-cell">{{ number_format($item->price, 2) }}</td>
-                        <td class="number-cell">{{ number_format($itemSubtotal, 2) }}</td>
+                        <td class="number-cell">{{ $formatNumber($item->price) }}</td>
+                        <td class="number-cell">{{ $formatNumber($itemSubtotal) }}</td>
                         <td class="number-cell" style="text-align: left; padding-right: 20px;">
                             @if ($item->item_discount_type === 'percent' && $item->item_discount_percent)
                                 ({{ number_format($item->item_discount_percent, 0) }}%)
                             @endif
-                            {{ number_format($itemDiscount, 2) }}
+                            {{ $formatNumber($itemDiscount) }}
                         </td>
 
                         <td class="number-cell" style="background-color: #f9f9f9;">
-                            {{ number_format($itemTotal, 2) }}
+                            {{ $formatNumber($itemTotal) }}
                         </td>
                     </tr>
                 @endforeach
@@ -248,7 +257,15 @@
                     <td class="number-cell">{{ number_format($order->sub_total, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>الخصم</td>
+                    <td>
+                        الخصم
+                        @if ($order->discount > 0 && $order->sub_total > 0)
+                            @php
+                                $discountPercent = ($order->discount / $order->sub_total) * 100;
+                            @endphp
+                            ({{ number_format($discountPercent, 2) }}%)
+                        @endif
+                    </td>
                     <td class="number-cell">{{ number_format($order->discount, 2) }}</td>
                 </tr>
                 <tr>

@@ -2,33 +2,32 @@
 
 namespace App\Filament\Pages\Reports;
 
-use Filament\Schemas\Schema;
+use App\Filament\Components\PeriodWithShiftFilterFormComponent;
+use App\Filament\Traits\ViewerAccess;
 use App\Filament\Widgets\NoShiftsInPeriodWidget;
+use App\Filament\Widgets\PeriodShiftDoneOrdersStats;
+use App\Filament\Widgets\PeriodShiftExpensesDetailsTable;
+use App\Filament\Widgets\PeriodShiftExpensesTable;
 use App\Filament\Widgets\PeriodShiftInfoStats;
 use App\Filament\Widgets\PeriodShiftMoneyInfoStats;
 use App\Filament\Widgets\PeriodShiftOrdersStats;
-use App\Filament\Widgets\PeriodShiftDoneOrdersStats;
-use App\Filament\Widgets\PeriodShiftReturnOrdersStats;
 use App\Filament\Widgets\PeriodShiftOrdersTable;
-use App\Filament\Widgets\PeriodShiftExpensesDetailsTable;
-use App\Filament\Widgets\PeriodShiftExpensesTable;
-use App\Filament\Traits\AdminAccess;
-use App\Filament\Traits\ViewerAccess;
-use App\Models\Shift;
+use App\Filament\Widgets\PeriodShiftReturnOrdersStats;
+use App\Filament\Widgets\PeriodShiftReturnOrdersTable;
 use App\Services\ShiftsReportService;
-use App\Filament\Components\PeriodWithShiftFilterFormComponent;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Filament\Schemas\Schema;
 
 class PeriodShiftReport extends BaseDashboard
 {
     use HasFiltersForm,ViewerAccess;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static string $routePath = 'period-shift-report';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'التقارير';
+    protected static string|\UnitEnum|null $navigationGroup = 'التقارير';
 
     protected static ?string $navigationLabel = 'تقرير فترة الشفتات';
 
@@ -83,7 +82,8 @@ class PeriodShiftReport extends BaseDashboard
             PeriodShiftOrdersStats::class,
             PeriodShiftDoneOrdersStats::class,
             PeriodShiftOrdersTable::class,
-             PeriodShiftExpensesDetailsTable::class,
+            PeriodShiftReturnOrdersTable::class,
+            PeriodShiftExpensesDetailsTable::class,
             PeriodShiftExpensesTable::class,
         ];
     }

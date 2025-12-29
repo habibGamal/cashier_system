@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ReturnOrderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,9 +24,13 @@ class ReturnOrder extends Model
         'notes',
     ];
 
-    protected $casts = [
-        'refund_amount' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'refund_amount' => 'decimal:2',
+            'status' => ReturnOrderStatus::class,
+        ];
+    }
 
     public function order(): BelongsTo
     {

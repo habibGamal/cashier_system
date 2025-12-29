@@ -37,6 +37,11 @@
         $mimeType = mime_content_type($imagePath);
         return "data:{$mimeType};base64,{$base64}";
     };
+
+    // Format number: hide .00 decimals
+    $formatNumber = function($number) {
+        return fmod($number, 1) == 0 ? number_format($number, 0) : number_format($number, 2);
+    };
 @endphp
 
 <!DOCTYPE html>
@@ -55,11 +60,10 @@
         }
 
         body {
-            font-family: "FreeSans",sans-serif;
-            /* font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif; */
+            font-family: "DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", sans-serif;
             direction: rtl;
             font-size: 22px;
-            font-weight: bold;
+            /* font-weight: bold; */
             line-height: 1.4;
             color: black;
             background: white;
@@ -105,7 +109,11 @@
             padding: 8px;
             text-align: center;
             word-break: break-word;
-            font-size: 20px;
+            font-size: 18px;
+        }
+
+        td {
+            font-size: 16px;
         }
 
         th {
@@ -176,17 +184,17 @@
                     <tr>
                         <td class="product-cell">{{ $item->product->name }}</td>
                         <td class="number-cell">{{ $item->quantity }}</td>
-                        <td class="number-cell">{{ number_format($item->price, 2) }}</td>
-                        <td class="number-cell">{{ number_format($itemSubtotal, 2) }}</td>
+                        <td class="number-cell">{{ $formatNumber($item->price) }}</td>
+                        <td class="number-cell">{{ $formatNumber($itemSubtotal) }}</td>
                         <td class="number-cell" style="text-align: left; padding-right: 20px;">
                             @if ($item->item_discount_type === 'percent' && $item->item_discount_percent)
                                 ({{ number_format($item->item_discount_percent, 0) }}%)
                             @endif
-                            {{ number_format($itemDiscount, 2) }}
+                            {{ $formatNumber($itemDiscount) }}
                         </td>
 
                         <td class="number-cell" style="background-color: #f9f9f9;">
-                            {{ number_format($itemTotal, 2) }}
+                            {{ $formatNumber($itemTotal) }}
                         </td>
                     </tr>
                 @endforeach

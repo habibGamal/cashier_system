@@ -132,7 +132,15 @@
                     <td class="number-cell">{{ number_format($order->sub_total, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>الخصم</td>
+                    <td>
+                        الخصم
+                        @if ($order->discount > 0 && $order->sub_total > 0)
+                            @php
+                                $discountPercent = ($order->discount / $order->sub_total) * 100;
+                            @endphp
+                            ({{ number_format($discountPercent, 2) }}%)
+                        @endif
+                    </td>
                     <td class="number-cell">{{ number_format($order->discount, 2) }}</td>
                 </tr>
                 <tr>

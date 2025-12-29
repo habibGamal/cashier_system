@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Models\Order;
-use App\Models\Product;
-use App\Models\ReturnOrder;
 use App\Models\ReturnItem;
+use App\Models\ReturnOrder;
 use App\Services\Orders\OrderStockConversionService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Services\ShiftService;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ReturnOrderController extends Controller
 {
     public function __construct(
-        private readonly OrderStockConversionService $stockConversionService
-    ) {
-    }
+        private readonly OrderStockConversionService $stockConversionService,
+        private readonly ShiftService $shiftService
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -54,12 +54,13 @@ class ReturnOrderController extends Controller
         try {
             DB::beginTransaction();
 
+            $currentShift = $this->shiftService->getCurrentShift();
             // Validate that the order exists and is completed
             $order = Order::with(['shift'])->findOrFail($request->order_id);
 
             if ($order->status !== \App\Enums\OrderStatus::COMPLETED) {
                 return response()->json([
-                    'message' => 'Cannot return items from an incomplete order.'
+                    'message' => 'Cannot return items from an incomplete order.',
                 ], 400);
             }
 
@@ -71,14 +72,14 @@ class ReturnOrderController extends Controller
 
             // Calculate total refund amount
             $items = $request->items;
-            $refundAmount = collect($items)->sum(fn($item) => $item['quantity'] * $item['return_price']);
+            $refundAmount = collect($items)->sum(fn ($item) => $item['quantity'] * $item['return_price']);
 
             // Create return order
             $returnOrder = ReturnOrder::create([
                 'order_id' => $request->order_id,
                 'customer_id' => $order->customer_id,
                 'user_id' => Auth::id(),
-                'shift_id' => $order->shift_id,
+                'shift_id' => $currentShift->id,
                 'return_number' => $returnNumber,
                 'status' => 'completed',
                 'refund_amount' => $refundAmount,
@@ -119,11 +120,11 @@ class ReturnOrderController extends Controller
             DB::rollBack();
             Log::error('Failed to create return order', [
                 'error' => $e->getMessage(),
-                'request' => $request->all()
+                'request' => $request->all(),
             ]);
 
             return back()
-                ->withErrors(['error' => 'حدث خطأ أثناء معالجة طلب الإرجاع: ' . $e->getMessage()])
+                ->withErrors(['error' => 'حدث خطأ أثناء معالجة طلب الإرجاع: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -138,11 +139,11 @@ class ReturnOrderController extends Controller
             'customer:id,name,phone,address',
             'user:id,name,email',
             'items.product:id,name',
-            'items.orderItem:id,product_id,quantity,price'
+            'items.orderItem:id,product_id,quantity,price',
         ]);
 
         return Inertia::render('ReturnOrders/Show', [
-            'returnOrder' => $returnOrder
+            'returnOrder' => $returnOrder,
         ]);
     }
 
@@ -157,7 +158,7 @@ class ReturnOrderController extends Controller
 
             if ($order->status !== \App\Enums\OrderStatus::COMPLETED) {
                 return response()->json([
-                    'message' => 'Order must be completed to process returns.'
+                    'message' => 'Order must be completed to process returns.',
                 ], 400);
             }
 
@@ -169,6 +170,7 @@ class ReturnOrderController extends Controller
                 $alreadyReturned = $returnedQuantities[$item->id] ?? 0;
                 $item->available_for_return = max(0, $item->quantity - $alreadyReturned);
                 $item->already_returned = $alreadyReturned;
+
                 return $item;
             });
 
@@ -176,7 +178,7 @@ class ReturnOrderController extends Controller
 
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Order not found or cannot be returned.'
+                'message' => 'Order not found or cannot be returned.',
             ], 404);
         }
     }
@@ -194,7 +196,7 @@ class ReturnOrderController extends Controller
             $returnQuantity = $returnItem['quantity'];
 
             // Check if order item exists in original order
-            if (!$orderItems->has($orderItemId)) {
+            if (! $orderItems->has($orderItemId)) {
                 throw new Exception("Order item ID {$orderItemId} was not found in the original order.");
             }
 
