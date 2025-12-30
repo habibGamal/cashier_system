@@ -121,7 +121,7 @@
             padding: 8px;
             text-align: center;
             word-break: break-word;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         td {

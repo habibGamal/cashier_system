@@ -41,6 +41,19 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
     const [loadingOrderSearch, setLoadingOrderSearch] = useState(false);
     const [form] = Form.useForm();
 
+    // Update form values when selectedOrder changes to fix stale hidden field values
+    React.useEffect(() => {
+        if (selectedOrder?.items) {
+            const returnItems = selectedOrder.items.map((item) => ({
+                order_item_id: item.id,
+                product_id: item.product_id,
+                quantity: 0,
+                reason: '',
+            }));
+            form.setFieldsValue({ return_items: returnItems });
+        }
+    }, [selectedOrder, form]);
+
     // Helper function for return order status
     const getReturnOrderStatusConfig = (status: string) => {
         switch (status) {
@@ -164,13 +177,55 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
             ),
         },
         {
-            title: 'السعر',
+            title: 'السعر الأصلي',
             dataIndex: 'price',
             key: 'price',
             align: 'center' as const,
-            render: (price: number) => (
-                <Typography.Text>{Number(price).toFixed(2)} ج.م</Typography.Text>
-            ),
+            render: (price: number, record: any) => {
+                const hasDiscount = record.effective_return_price && record.effective_return_price < Number(price);
+                return (
+                    <Typography.Text style={hasDiscount ? { textDecoration: 'line-through', color: '#999' } : {}}>
+                        {Number(price).toFixed(2)} ج.م
+                    </Typography.Text>
+                );
+            },
+        },
+        {
+            title: 'سعر الإرجاع',
+            key: 'effective_return_price',
+            align: 'center' as const,
+            render: (_: any, record: any) => {
+                const effectivePrice = record.effective_return_price ?? record.price;
+                const hasDiscount = record.effective_return_price && record.effective_return_price < Number(record.price);
+                return (
+                    <div>
+                        <Typography.Text strong style={{ color: hasDiscount ? '#52c41a' : undefined }}>
+                            {Number(effectivePrice).toFixed(2)} ج.م
+                        </Typography.Text>
+                        {hasDiscount && record.item_discount_type === 'percent' && record.item_discount_percent && (
+                            <div>
+                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                                    (خصم {record.item_discount_percent}%)
+                                </Typography.Text>
+                            </div>
+                        )}
+                        {hasDiscount && record.item_discount_type === 'value' && record.item_discount && (
+                            <div>
+                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                                    (خصم {Number(record.item_discount).toFixed(2)} ج.م)
+                                </Typography.Text>
+                            </div>
+                        )}
+                        {hasDiscount && !record.item_discount_type && (
+                            <div>
+                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                                    (خصم على الطلب)
+                                </Typography.Text>
+                            </div>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             title: 'كمية الإرجاع',
@@ -236,9 +291,6 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
                 </Form.Item>
                 <Form.Item name={['return_items', index, 'product_id']} hidden initialValue={item.product_id}>
                     <Input value={item.product_id} />
-                </Form.Item>
-                <Form.Item name={['return_items', index, 'return_price']} hidden initialValue={item.price}>
-                    <Input value={item.price} />
                 </Form.Item>
             </div>
         ));
@@ -412,6 +464,22 @@ export const ReturnOrdersTab: React.FC<ReturnOrdersTabProps> = ({ returnOrders =
                                     </Typography.Text>
                                 </Descriptions.Item>
                             </Descriptions>
+                            {/* Show discount info if applicable */}
+                            {(Number(selectedOrder.discount) > 0 || Number(selectedOrder.temp_discount_percent) > 0 ||
+                              selectedOrder.items?.some((item: any) => (item.item_discount ?? 0) > 0)) && (
+                                <div className="mt-3 p-2 bg-orange-50 rounded border border-orange-200">
+                                    <Typography.Text type="warning" strong>
+                                        ملاحظة: يحتوي هذا الطلب على خصومات.
+                                        {selectedOrder.items?.some((item: any) => (item.item_discount ?? 0) > 0)
+                                            ? ' (خصومات على مستوى الأصناف)'
+                                            : Number(selectedOrder.temp_discount_percent) > 0
+                                            ? ` (خصم ${selectedOrder.temp_discount_percent}% على الطلب)`
+                                            : ` (خصم ${Number(selectedOrder.discount).toFixed(2)} ج.م على الطلب)`
+                                        }
+                                        {' '}سيتم احتساب مبلغ الإرجاع بناءً على السعر بعد الخصم.
+                                    </Typography.Text>
+                                </div>
+                            )}
                         </Card>
 
                         {/* Order Items Table */}

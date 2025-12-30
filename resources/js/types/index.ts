@@ -60,6 +60,7 @@ export interface OrderItem {
   item_discount?: number;
   item_discount_type?: string;
   item_discount_percent?: number;
+  effective_return_price?: number;
 }
 
 export interface Payment {

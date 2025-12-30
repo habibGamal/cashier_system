@@ -47,7 +47,6 @@ class ReturnOrderController extends Controller
             'items.*.order_item_id' => 'required|exists:order_items,id',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|numeric|min:0.001',
-            'items.*.return_price' => 'required|numeric|min:0',
             'items.*.reason' => 'nullable|string|max:255',
         ]);
 
@@ -56,7 +55,7 @@ class ReturnOrderController extends Controller
 
             $currentShift = $this->shiftService->getCurrentShift();
             // Validate that the order exists and is completed
-            $order = Order::with(['shift'])->findOrFail($request->order_id);
+            $order = Order::with(['shift', 'items'])->findOrFail($request->order_id);
 
             if ($order->status !== \App\Enums\OrderStatus::COMPLETED) {
                 return response()->json([
@@ -70,9 +69,15 @@ class ReturnOrderController extends Controller
             // Generate return number (unique per shift)
             $returnNumber = $this->generateReturnNumberForShift($order->shift_id);
 
-            // Calculate total refund amount
+            // Calculate order-level discount ratio for proper return price calculation
+            $orderDiscountRatio = $this->calculateOrderDiscountRatio($order);
+
+            // Index order items by ID for quick lookup
+            $orderItemsById = $order->items->keyBy('id');
+
+            // Calculate total refund amount with proper discount consideration
             $items = $request->items;
-            $refundAmount = collect($items)->sum(fn ($item) => $item['quantity'] * $item['return_price']);
+            $refundAmount = 0;
 
             // Create return order
             $returnOrder = ReturnOrder::create([
@@ -82,16 +87,20 @@ class ReturnOrderController extends Controller
                 'shift_id' => $currentShift->id,
                 'return_number' => $returnNumber,
                 'status' => 'completed',
-                'refund_amount' => $refundAmount,
+                'refund_amount' => 0, // Will be updated after calculating items
                 'reason' => $request->reason,
                 'notes' => $request->notes,
             ]);
 
-            // Create return items
+            // Create return items with correct effective return prices
             foreach ($items as $item) {
-                // Get original order item for cost information
-                $orderItem = \App\Models\OrderItem::findOrFail($item['order_item_id']);
-                $itemTotal = $item['quantity'] * $item['return_price'];
+                // Get original order item for cost and discount information
+                $orderItem = $orderItemsById[$item['order_item_id']];
+
+                // Calculate effective return price per unit considering discounts
+                $effectiveReturnPrice = $this->calculateEffectiveReturnPricePerUnit($orderItem, $orderDiscountRatio);
+                $itemTotal = $item['quantity'] * $effectiveReturnPrice;
+                $refundAmount += $itemTotal;
 
                 ReturnItem::create([
                     'return_order_id' => $returnOrder->id,
@@ -100,11 +109,14 @@ class ReturnOrderController extends Controller
                     'quantity' => $item['quantity'],
                     'original_price' => $orderItem->price,
                     'original_cost' => $orderItem->cost,
-                    'return_price' => $item['return_price'],
+                    'return_price' => $effectiveReturnPrice,
                     'total' => $itemTotal,
                     'reason' => $item['reason'] ?? null,
                 ]);
             }
+
+            // Update return order with calculated refund amount
+            $returnOrder->update(['refund_amount' => $refundAmount]);
 
             // Restore stock for returned items
             $this->restoreStockForReturnOrder($returnOrder);
@@ -165,11 +177,17 @@ class ReturnOrderController extends Controller
             // Get previously returned quantities for each order item
             $returnedQuantities = $this->getReturnedQuantitiesByOrderItem($orderId);
 
-            // Add available return quantities to each item
-            $order->items->transform(function ($item) use ($returnedQuantities) {
+            // Calculate order-level discount ratio if applicable
+            $orderDiscountRatio = $this->calculateOrderDiscountRatio($order);
+
+            // Add available return quantities and effective return price to each item
+            $order->items->transform(function ($item) use ($returnedQuantities, $orderDiscountRatio) {
                 $alreadyReturned = $returnedQuantities[$item->id] ?? 0;
                 $item->available_for_return = max(0, $item->quantity - $alreadyReturned);
                 $item->already_returned = $alreadyReturned;
+
+                // Calculate effective return price per unit considering discounts
+                $item->effective_return_price = $this->calculateEffectiveReturnPricePerUnit($item, $orderDiscountRatio);
 
                 return $item;
             });
@@ -181,6 +199,80 @@ class ReturnOrderController extends Controller
                 'message' => 'Order not found or cannot be returned.',
             ], 404);
         }
+    }
+
+    /**
+     * Calculate order-level discount ratio (discount per unit of subtotal)
+     */
+    private function calculateOrderDiscountRatio(Order $order): float
+    {
+        // Check if order has item-level discounts (mutual exclusivity)
+        $hasItemDiscounts = $order->items->some(fn ($item) => ($item->item_discount ?? 0) > 0);
+
+        if ($hasItemDiscounts) {
+            // Item-level discounts are applied, no order-level discount ratio
+            return 0;
+        }
+
+        // Calculate subtotal (sum of item totals before order-level discount)
+        $subtotal = $order->items->sum(fn ($item) => $item->price * $item->quantity);
+
+        if ($subtotal <= 0) {
+            return 0;
+        }
+
+        // Calculate order-level discount amount
+        $orderDiscount = 0;
+        if ($order->temp_discount_percent > 0) {
+            $orderDiscount = ($order->temp_discount_percent / 100) * $subtotal;
+        } elseif ($order->discount > 0) {
+            $orderDiscount = $order->discount;
+        }
+
+        // Return ratio: discount per unit of subtotal
+        return $orderDiscount / $subtotal;
+    }
+
+    /**
+     * Calculate effective return price per unit considering discounts
+     */
+    private function calculateEffectiveReturnPricePerUnit($item, float $orderDiscountRatio): float
+    {
+        $unitPrice = (float) $item->price;
+        $itemSubtotal = $unitPrice * $item->quantity;
+
+        // Check for item-level discount
+        if (($item->item_discount ?? 0) > 0 || ($item->item_discount_percent ?? 0) > 0) {
+            $itemDiscount = 0;
+
+            if ($item->item_discount_type === 'percent' && $item->item_discount_percent > 0) {
+                // Percentage discount on item
+                $itemDiscount = $itemSubtotal * ($item->item_discount_percent / 100);
+            } else {
+                // Fixed value discount on item
+                $itemDiscount = (float) ($item->item_discount ?? 0);
+            }
+
+            // Ensure discount doesn't exceed item subtotal
+            $itemDiscount = min($itemDiscount, $itemSubtotal);
+
+            // Effective price per unit = (subtotal - discount) / quantity
+            $effectivePricePerUnit = ($itemSubtotal - $itemDiscount) / $item->quantity;
+
+            return round($effectivePricePerUnit, 2);
+        }
+
+        // Apply order-level discount ratio if applicable
+        if ($orderDiscountRatio > 0) {
+            // Proportional discount per unit
+            $discountPerUnit = $unitPrice * $orderDiscountRatio;
+            $effectivePricePerUnit = $unitPrice - $discountPerUnit;
+
+            return round($effectivePricePerUnit, 2);
+        }
+
+        // No discount, return original price
+        return $unitPrice;
     }
 
     /**
