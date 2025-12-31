@@ -86,6 +86,32 @@ class CustomersPerformanceTableWidget extends BaseWidget
                     ->money('EGP')
                     ->sortable(),
 
+                TextColumn::make('return_orders_count')
+                    ->label('عدد المرتجعات')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('return_value')
+                    ->label('قيمة المرتجعات')
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('net_sales')
+                    ->label('صافي المبيعات')
+                    ->money('EGP')
+                    ->sortable()
+                    ->state(fn($record) => $record->total_sales - $record->return_value)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('net_profit')
+                    ->label('صافي الربح')
+                    ->money('EGP')
+                    ->sortable()
+                    ->state(fn($record) => $record->total_profit - $record->return_profit)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('avg_order_value')
                     ->label('متوسط قيمة الطلب')
                     ->money('EGP')

@@ -29,6 +29,9 @@ class CustomersPerformanceReportService
 
     public function getCustomersPerformanceQuery(?string $startDate = null, ?string $endDate = null)
     {
+        $parsedStartDate = $startDate ? Carbon::parse($startDate)->startOfDay() : now()->subDays(30)->startOfDay();
+        $parsedEndDate = $endDate ? Carbon::parse($endDate)->endOfDay() : now()->endOfDay();
+
         // Get customers with sales data aggregated by order type
         return Customer::query()
             ->select([
@@ -45,6 +48,26 @@ class CustomersPerformanceReportService
                 DB::raw('COALESCE(CASE WHEN COUNT(DISTINCT orders.id) > 0 THEN SUM(order_items.total) / COUNT(DISTINCT orders.id) ELSE 0 END) as avg_order_value'),
                 DB::raw('MAX(orders.created_at) as last_order_date'),
                 DB::raw('MIN(orders.created_at) as first_order_date'),
+
+                // Return data as subqueries
+                DB::raw('(SELECT COALESCE(COUNT(DISTINCT ro.id), 0) FROM return_orders ro
+                    WHERE ro.customer_id = customers.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_orders_count'),
+                DB::raw('(SELECT COALESCE(SUM(ro.refund_amount), 0) FROM return_orders ro
+                    WHERE ro.customer_id = customers.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_value'),
+                DB::raw('(SELECT COALESCE(SUM(ri.quantity), 0) FROM return_items ri
+                    INNER JOIN return_orders ro ON ri.return_order_id = ro.id
+                    WHERE ro.customer_id = customers.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_quantity'),
+                DB::raw('(SELECT COALESCE(SUM((ri.return_price - ri.original_cost) * ri.quantity), 0) FROM return_items ri
+                    INNER JOIN return_orders ro ON ri.return_order_id = ro.id
+                    WHERE ro.customer_id = customers.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_profit'),
 
                 // Takeaway
                 DB::raw('COALESCE(COUNT(DISTINCT CASE WHEN orders.type = "takeaway" THEN orders.id END), 0) as takeaway_orders'),
@@ -145,6 +168,9 @@ class CustomersPerformanceReportService
             ->limit(1)
             ->first();
 
+        // Get return orders data for net calculations
+        $returnsSummary = $this->getCustomersReturnOrdersSummary($startDate, $endDate);
+
         if (!$summary) {
             return [
                 'total_customers' => 0,
@@ -158,22 +184,70 @@ class CustomersPerformanceReportService
                 'top_customer_by_profit' => null,
                 'most_frequent_customer' => null,
                 'highest_avg_order_customer' => null,
+                // Net values after returns
+                'net_sales' => 0,
+                'net_profit' => 0,
+                'net_quantity' => 0,
+                'total_refund_amount' => 0,
+                'total_returned_quantity' => 0,
+                'customers_with_returns' => 0,
             ];
         }
+
+        // Calculate net values (gross - returns)
+        $grossSales = $summary->total_sales ?? 0;
+        $grossProfit = $summary->total_profit ?? 0;
+        $grossQuantity = $summary->total_quantity ?? 0;
+
+        $refundAmount = $returnsSummary['total_refund_amount'] ?? 0;
+        $returnedQuantity = $returnsSummary['total_returned_quantity'] ?? 0;
+
+        // Calculate returned items profit
+        $returnedProfit = $this->getReturnedItemsProfit($startDate, $endDate);
 
         return [
             'total_customers' => $summary->total_customers ?? 0,
             'total_orders' => $summary->total_orders ?? 0,
-            'total_sales' => $summary->total_sales ?? 0,
-            'total_profit' => $summary->total_profit ?? 0,
-            'total_quantity' => $summary->total_quantity ?? 0,
+            'total_sales' => $grossSales,
+            'total_profit' => $grossProfit,
+            'total_quantity' => $grossQuantity,
             'avg_order_value' => $summary->avg_order_value ?? 0,
             'avg_orders_per_customer' => $summary->avg_orders_per_customer ?? 0,
             'top_customer_by_sales' => $topCustomerBySales,
             'top_customer_by_profit' => $topCustomerByProfit,
             'most_frequent_customer' => $mostFrequentCustomer,
             'highest_avg_order_customer' => $highestAvgOrderCustomer,
+            // Net values after returns
+            'net_sales' => $grossSales - $refundAmount,
+            'net_profit' => $grossProfit - $returnedProfit,
+            'net_quantity' => $grossQuantity - $returnedQuantity,
+            'total_refund_amount' => $refundAmount,
+            'total_returned_quantity' => $returnedQuantity,
+            'customers_with_returns' => $returnsSummary['customers_with_returns'] ?? 0,
         ];
+    }
+
+    /**
+     * Get the profit from returned items for customers (return_price - original_cost) * quantity
+     */
+    private function getReturnedItemsProfit(?string $startDate = null, ?string $endDate = null): float
+    {
+        $result = DB::table('return_items as ri')
+            ->select([
+                DB::raw('COALESCE(SUM((ri.return_price - ri.original_cost) * ri.quantity), 0) as returned_profit'),
+            ])
+            ->leftJoin('return_orders as ro', 'ri.return_order_id', '=', 'ro.id')
+            ->where('ro.status', 'completed')
+            ->whereNotNull('ro.customer_id')
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+            })
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+            })
+            ->first();
+
+        return (float) ($result->returned_profit ?? 0);
     }
 
     /**

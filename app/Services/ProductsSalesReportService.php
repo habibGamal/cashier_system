@@ -30,6 +30,9 @@ class ProductsSalesReportService
 
     public function getProductsSalesPerformanceQuery(?string $startDate = null, ?string $endDate = null)
     {
+        $parsedStartDate = $startDate ? Carbon::parse($startDate)->startOfDay() : now()->subDays(30)->startOfDay();
+        $parsedEndDate = $endDate ? Carbon::parse($endDate)->endOfDay() : now()->endOfDay();
+
         // Get products with sales data aggregated by order type
         return Product::query()
             ->whereNot('products.type', ProductType::RawMaterial)
@@ -44,6 +47,23 @@ class ProductsSalesReportService
                 DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_quantity'),
                 DB::raw('COALESCE(SUM(order_items.total), 0) as total_sales'),
                 DB::raw('COALESCE(SUM(order_items.total - (order_items.cost * order_items.quantity)), 0) as total_profit'),
+
+                // Return data as subqueries
+                DB::raw('(SELECT COALESCE(SUM(ri.quantity), 0) FROM return_items ri
+                    INNER JOIN return_orders ro ON ri.return_order_id = ro.id
+                    WHERE ri.product_id = products.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_quantity'),
+                DB::raw('(SELECT COALESCE(SUM(ri.total), 0) FROM return_items ri
+                    INNER JOIN return_orders ro ON ri.return_order_id = ro.id
+                    WHERE ri.product_id = products.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_value'),
+                DB::raw('(SELECT COALESCE(SUM((ri.return_price - ri.original_cost) * ri.quantity), 0) FROM return_items ri
+                    INNER JOIN return_orders ro ON ri.return_order_id = ro.id
+                    WHERE ri.product_id = products.id
+                    AND ro.status = "completed"
+                    AND ro.created_at BETWEEN "' . $parsedStartDate . '" AND "' . $parsedEndDate . '") as return_profit'),
 
                 // Takeaway
                 DB::raw('COALESCE(SUM(CASE WHEN orders.type = "takeaway" THEN order_items.quantity ELSE 0 END), 0) as takeaway_quantity'),
@@ -214,6 +234,9 @@ class ProductsSalesReportService
             ->limit(1)
             ->first();
 
+        // Get return orders data for net calculations
+        $returnsSummary = $this->getReturnOrdersSummary($startDate, $endDate);
+
         if (!$summary) {
             return [
                 'total_products' => 0,
@@ -223,18 +246,63 @@ class ProductsSalesReportService
                 'avg_profit_margin' => 0,
                 'best_selling_product' => null,
                 'most_profitable_product' => null,
+                // Net values after returns
+                'net_sales' => 0,
+                'net_profit' => 0,
+                'net_quantity' => 0,
+                'total_refund_amount' => 0,
+                'total_returned_quantity' => 0,
             ];
         }
 
+        // Calculate net values (gross - returns)
+        $grossSales = $summary->total_sales ?? 0;
+        $grossProfit = $summary->total_profit ?? 0;
+        $grossQuantity = $summary->total_quantity ?? 0;
+
+        $refundAmount = $returnsSummary['total_refund_amount'] ?? 0;
+        $returnedQuantity = $returnsSummary['total_returned_quantity'] ?? 0;
+
+        // Calculate returned items profit (cost was already deducted when sold)
+        $returnedProfit = $this->getReturnedItemsProfit($startDate, $endDate);
+
         return [
             'total_products' => $summary->total_products,
-            'total_sales' => $summary->total_sales,
-            'total_profit' => $summary->total_profit,
-            'total_quantity' => $summary->total_quantity,
+            'total_sales' => $grossSales,
+            'total_profit' => $grossProfit,
+            'total_quantity' => $grossQuantity,
             'avg_profit_margin' => $summary->avg_profit_margin,
             'best_selling_product' => $bestSellingProduct,
             'most_profitable_product' => $mostProfitableProduct,
+            // Net values after returns
+            'net_sales' => $grossSales - $refundAmount,
+            'net_profit' => $grossProfit - $returnedProfit,
+            'net_quantity' => $grossQuantity - $returnedQuantity,
+            'total_refund_amount' => $refundAmount,
+            'total_returned_quantity' => $returnedQuantity,
         ];
+    }
+
+    /**
+     * Get the profit from returned items (return_price - original_cost) * quantity
+     */
+    private function getReturnedItemsProfit(?string $startDate = null, ?string $endDate = null): float
+    {
+        $result = DB::table('return_items as ri')
+            ->select([
+                DB::raw('COALESCE(SUM((ri.return_price - ri.original_cost) * ri.quantity), 0) as returned_profit'),
+            ])
+            ->leftJoin('return_orders as ro', 'ri.return_order_id', '=', 'ro.id')
+            ->where('ro.status', 'completed')
+            ->when($startDate, function ($query) use ($startDate) {
+                $query->where('ro.created_at', '>=', Carbon::parse($startDate)->startOfDay());
+            })
+            ->when($endDate, function ($query) use ($endDate) {
+                $query->where('ro.created_at', '<=', Carbon::parse($endDate)->endOfDay());
+            })
+            ->first();
+
+        return (float) ($result->returned_profit ?? 0);
     }
 
     /**

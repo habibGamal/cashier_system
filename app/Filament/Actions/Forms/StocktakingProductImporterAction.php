@@ -83,7 +83,8 @@ class StocktakingProductImporterAction extends Action
                     ->reactive()
                     ->afterStateUpdated(function (Set $set, Get $get, $state) {
                         // When selected_products is updated, also update selected_collection to match
-                        $set('selected_collection', collect([...$get('selected_collection'), ...$state])->unique()->values());
+                        $currentCollection = $get('selected_collection') ?? [];
+                        $set('selected_collection', collect([...$currentCollection, ...$state])->unique()->values()->all());
                     })
                     ->descriptions(function (Get $get) {
                         return $this->products->mapWithKeys(function ($product) {

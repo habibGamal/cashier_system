@@ -190,6 +190,7 @@ class InventoryDailyAggregationService
                 // Get the last opened day date
                 $openDay = InventoryItemMovementDaily::whereNull('closed_at')
                     ->orderBy('date', 'desc')
+                    ->orderBy('created_at', 'asc')
                     ->first();
 
                 if (!$openDay) {

@@ -81,6 +81,32 @@ class ProductsSalesTableWidget extends BaseWidget
                     ->money('EGP')
                     ->sortable(),
 
+                TextColumn::make('return_quantity')
+                    ->label('الكمية المرتجعة')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('return_value')
+                    ->label('قيمة المرتجعات')
+                    ->money('EGP')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('net_sales')
+                    ->label('صافي المبيعات')
+                    ->money('EGP')
+                    ->sortable()
+                    ->state(fn($record) => $record->total_sales - $record->return_value)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('net_profit')
+                    ->label('صافي الربح')
+                    ->money('EGP')
+                    ->sortable()
+                    ->state(fn($record) => $record->total_profit - $record->return_profit)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('profit_margin')
                     ->label('هامش الربح %')
                     ->state(
